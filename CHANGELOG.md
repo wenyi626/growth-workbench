@@ -3,6 +3,17 @@
 > 格式参考 [Keep a Changelog](https://keepachangelog.com/)。版本号规范：`v1.0` / `v1.1` / `v2.0` …；开发态 `version.json` 为 `dev`。
 > 每次发版必须在此追加条目，并更新 PROJECT.md 第 2 节「当前版本」。
 
+## [v1.2.0] - Decision Engine 决策引擎（当前部署）
+
+### Added
+- **Decision Engine 决策引擎**：新增 `RuleEngine` 作为**唯一决策中心**，`TodayAgent` 不再自行生成建议，改为调用 `RuleEngine.getSuggestions()` 取排序后建议。
+- **规则体系**：新增 `StudyRule` / ` WealthRule` / `FitnessRule` / `MediaRule` / `FutureRule`，每个 `evaluate(d)` 返回统一结构的 `Suggestion[]`；`RuleEngine` 聚合并按 `priority` 降序、`estimatedTime` 升序排序，输出 Top3。
+- **真实数据缺口驱动**：学习/运动/发布/复盘间隔、资产快照新鲜度、现金占比、体重趋势等均由真实 `S.data` 计算（非随机 Mock）；建议文案与阈值仍为硬编码（Mock 风格），`FutureRule` 为占位空桩。
+- **LLM 定位明确**：当前未接入任何大模型；未来 OpenAI 仅负责**解释 / 细化** `RuleEngine` 产出的 `Suggestion[]`，**绝不参与决策**。
+- 运行时版本 `version.json` → `1.2.0`（已打开页面将收到「发现新版本」提示）。
+- 架构文档：`docs/Architecture/DecisionEngine.md`。
+- 提交：`feat: build decision engine architecture`
+
 ## [v1.1.0] - Today OS 首页 AI 决策中心（当前部署）
 
 ### Added

@@ -3201,6 +3201,127 @@ document.addEventListener('DOMContentLoaded', App.load);
     return { summary: summary };
   })();
 
+  /* === RuleEngine：唯一决策中心（v1.2，规则系统，未接 LLM） === */
+  function _todayStr() { return U.todayStr(); }
+  function _daysBetween(a, b) { return Math.round((U.parseDate(b) - U.parseDate(a)) / 86400000); }
+
+  window.StudyRule = (function () {
+    function evaluate(d) {
+      var sugs = [];
+      var ls = (d.learning || []).slice().sort(function (a, b) { return b.date.localeCompare(a.date); });
+      var last = ls[0] ? ls[0].date : null;
+      var gap = last ? _daysBetween(last, _todayStr()) : 99;
+      if (gap >= 2) {
+        sugs.push({ id: 'study-gap', title: '今天优先学习英语', description: '已经连续 ' + gap + ' 天未学习，优先补上语言输入。',
+          category: 'action', priority: 5, reason: '已经连续 ' + gap + ' 天未学习英语', estimatedTime: 30, source: 'StudyRule', status: 'open' });
+      }
+      return sugs;
+    }
+    return { evaluate: evaluate };
+  })();
+
+  window.WealthRule = (function () {
+    function evaluate(d) {
+      var sugs = [], fx = (d.settings && d.settings.fx) || { USD: 7.2, HKD: 0.92, JPY: 0.048 }, assets = d.assets || [];
+      var total = 0, sgovVal = 0, sgovTarget = 0;
+      assets.forEach(function (a) {
+        var rate = a.currency === 'USD' ? fx.USD : a.currency === 'HKD' ? fx.HKD : a.currency === 'JPY' ? fx.JPY : 1;
+        var val = a.quantity * a.currentPrice * rate; total += val;
+        if (/sgov/i.test(a.symbol) || /货基|现金/.test(a.category)) { sgovVal += val; sgovTarget += a.targetAllocation; }
+      });
+      if (total > 0 && sgovTarget > 0 && (sgovVal / total * 100) > sgovTarget + 5) {
+        sugs.push({ id: 'wealth-sgov', title: '逐步把现金转成长资产', description: '现金/货基占比偏高，可定投到长期资产。',
+          category: 'risk', priority: 4, reason: 'SGOV 占比超过目标配置', estimatedTime: 20, source: 'WealthRule', status: 'open' });
+      }
+      var snaps = (d.wealthSnapshots || []).slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
+      var lastSnap = snaps[snaps.length - 1] ? snaps[snaps.length - 1].date : null;
+      var gap = lastSnap ? _daysBetween(lastSnap, _todayStr()) : 999;
+      if (gap > 30) {
+        sugs.push({ id: 'wealth-stale', title: '更新一次资产快照', description: '已超过 ' + gap + ' 天未记录资产，建议更新。',
+          category: 'action', priority: 3, reason: '超过一个月未记录资产', estimatedTime: 15, source: 'WealthRule', status: 'open' });
+      }
+      sugs.push({ id: 'wealth-opp', title: '市场回调时是低位补仓窗口', description: '可按计划小额定投，不追高。',
+        category: 'opportunity', priority: 3, reason: '定投纪律', estimatedTime: 0, source: 'WealthRule', status: 'open' });
+      return sugs;
+    }
+    return { evaluate: evaluate };
+  })();
+
+  window.FitnessRule = (function () {
+    function evaluate(d) {
+      var sugs = [];
+      var ex = (d.exercises || []).slice().sort(function (a, b) { return b.date.localeCompare(a.date); });
+      var lastEx = ex[0] ? ex[0].date : null;
+      var gap = lastEx ? _daysBetween(lastEx, _todayStr()) : 99;
+      if (gap >= 3) {
+        sugs.push({ id: 'fit-move', title: '今天安排 30 分钟运动', description: '已 ' + gap + ' 天未运动，先做低强度有氧恢复。',
+          category: 'action', priority: 5, reason: '连续 ' + gap + ' 天未运动', estimatedTime: 30, source: 'FitnessRule', status: 'open' });
+      }
+      var w = (d.weights || []).slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
+      if (w.length >= 3) {
+        var t = w.slice(-3);
+        if (t[0].weight < t[1].weight && t[1].weight < t[2].weight) {
+          sugs.push({ id: 'fit-weight', title: '控制饮食、增加蛋白', description: '体重连续 3 次上涨，注意热量与睡眠。',
+            category: 'action', priority: 4, reason: '体重连续上涨', estimatedTime: 0, source: 'FitnessRule', status: 'open' });
+        }
+      }
+      sugs.push({ id: 'fit-opp', title: '今天状态适合一次高质量有氧', description: '恢复优先，不堆量。',
+        category: 'opportunity', priority: 3, reason: '恢复优先', estimatedTime: 30, source: 'FitnessRule', status: 'open' });
+      return sugs;
+    }
+    return { evaluate: evaluate };
+  })();
+
+  window.MediaRule = (function () {
+    function evaluate(d) {
+      var sugs = [];
+      var cs = (d.contents || []).slice().sort(function (a, b) { return b.date.localeCompare(b.date); });
+      var lastCs = cs[0] ? cs[0].date : null;
+      var gap = lastCs ? _daysBetween(lastCs, _todayStr()) : 99;
+      if (gap >= 3) {
+        sugs.push({ id: 'media-post', title: '今天优先发布一篇小红书', description: '已 ' + gap + ' 天未发布，保持输出节奏。',
+          category: 'action', priority: 4, reason: '连续 ' + gap + ' 天未发小红书', estimatedTime: 45, source: 'MediaRule', status: 'open' });
+      }
+      var rv = (d.reviews || []).slice().sort(function (a, b) { return b.date.localeCompare(b.date); });
+      var lastRv = rv[0] ? rv[0].date : null;
+      var gapR = lastRv ? _daysBetween(lastRv, _todayStr()) : 99;
+      if (gapR >= 7) {
+        sugs.push({ id: 'media-review', title: '补一次周复盘', description: '已 ' + gapR + ' 天未复盘，容易丢失方向感。',
+          category: 'risk', priority: 4, reason: '连续 ' + gapR + ' 天未复盘', estimatedTime: 10, source: 'MediaRule', status: 'open' });
+      }
+      sugs.push({ id: 'media-opp', title: '「AI 做产品」选题互动高，可乘势发一篇', description: '延续高互动选题。',
+        category: 'opportunity', priority: 3, reason: '延续高互动', estimatedTime: 45, source: 'MediaRule', status: 'open' });
+      return sugs;
+    }
+    return { evaluate: evaluate };
+  })();
+
+  window.FutureRule = (function () {
+    function evaluate(d) { return []; } // 预留：未来接真实投资/职业等高级规则
+    return { evaluate: evaluate };
+  })();
+
+  window.RuleEngine = (function () {
+    function aggregate() {
+      var d = S.data;
+      return []
+        .concat(window.StudyRule.evaluate(d))
+        .concat(window.WealthRule.evaluate(d))
+        .concat(window.FitnessRule.evaluate(d))
+        .concat(window.MediaRule.evaluate(d))
+        .concat(window.FutureRule.evaluate(d));
+    }
+    function getSuggestions() {
+      var list = aggregate();
+      list.sort(function (a, b) {
+        if (b.priority !== a.priority) return b.priority - a.priority;
+        return (a.estimatedTime || 0) - (b.estimatedTime || 0);
+      });
+      return list;
+    }
+    return { getSuggestions: getSuggestions };
+  })();
+
   window.TodayAgent = (function () {
     function greeting() {
       var h = new Date().getHours();
@@ -3216,37 +3337,37 @@ document.addEventListener('DOMContentLoaded', App.load);
       '把不确定性交给系统，把判断力留给自己。',
       '先用 10 分钟复盘昨天，再决定今天往哪走。'
     ];
-    var RISKS = [
-      '科技仓位偏高，若继续定投会短期浮亏，注意现金缓冲。',
-      '今天若只刷不做，学习会停在「知道」层面，务必有产出。',
-      '睡眠不足会拉低明天的判断力，今晚别熬。'
-    ];
-    var OPS = [
-      '市场回调时是低位补仓窗口，可按计划小额定投。',
-      '「AI 做产品」选题互动高，今天可乘势发一篇。',
-      '把活动复盘流程自动化，每天能省下 50 分钟。'
-    ];
     var seed = 0;
     function regen() { seed = (seed + 1) % ONE_LINERS.length; }
     function getDashboard() {
-      var s = window.StudyAgent.summary();
+      var sugs = window.RuleEngine.getSuggestions();
+      var actions = sugs.filter(function (s) { return s.category === 'action'; });
+      var risks = sugs.filter(function (s) { return s.category === 'risk'; });
+      var ops = sugs.filter(function (s) { return s.category === 'opportunity'; });
+      var top3 = actions.slice(0, 3).map(function (s) { return s.title; });
+      if (top3.length < 3) {
+        top3 = top3.concat(ops.concat(risks).slice(0, 3 - top3.length).map(function (s) { return s.title; }));
+      }
+      function advOf(src) { var x = sugs.filter(function (s) { return s.source === src; })[0]; return x ? x.title : '保持节奏，今天没有特别要处理的。'; }
       var w = window.WealthAgent.summary();
+      var s = window.StudyAgent.summary();
       var f = window.FitnessAgent.summary();
       var m = window.MediaAgent.summary();
       return {
         greeting: greeting(),
         oneLiner: ONE_LINERS[seed],
-        top3: ['推进今日主线产出', '完成一次 30 分钟运动', '写一条内容或做复盘'],
-        wealth: { total: w.total, growth: w.growth, growthPct: w.growthPct, advice: w.advice },
-        study: s,
-        body: f,
-        media: m,
-        risk: RISKS[seed],
-        opportunity: OPS[seed]
+        top3: top3,
+        wealth: { total: w.total, growth: w.growth, growthPct: w.growthPct, advice: advOf('WealthRule') },
+        study: { recent: s.recent, advice: advOf('StudyRule') },
+        body: { exercise: f.exercise, sleep: f.sleep, weight: f.weight, advice: advOf('FitnessRule') },
+        media: { yesterday: m.yesterday, advice: advOf('MediaRule') },
+        risk: risks.length ? risks[0].title : '暂无重大风险',
+        opportunity: ops.length ? ops[0].title : '暂无特别机会'
       };
     }
     return { getDashboard: getDashboard, regen: regen };
   })();
+
 </script>
 <script>
   /* === Service Worker 注册 + 版本更新检测（新增功能，不改动业务逻辑） === */

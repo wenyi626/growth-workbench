@@ -20,7 +20,7 @@
 
 | 项 | 值 |
 | --- | --- |
-| 当前版本号 | `1.1.0`（运行时版本源 `version.json`；v1.1.0 引入 Today OS 首页 AI 决策中心） |
+| 当前版本号 | `1.2.0`（运行时版本源 `version.json`；v1.2.0 引入 Decision Engine 决策引擎：RuleEngine 唯一决策中心） |
 | 最近一次提交 | `feat: version update detection and pwa update flow`（v1.0.0） |
 | 发布状态 | 已部署 GitHub Pages，PWA 已可用 |
 | 版本标签规范 | 正式发版使用 `v1.0`、`v1.1`、`v2.0` …（见第 13 节） |
@@ -124,7 +124,13 @@
 | `AI`（本地规则） | `generateTodayPlan` `selfAnalysis` `wealthReview` `bodyReport` `parseExercise` `checkSentence` `genContentIdeas` `generateEnglish` |
 | `EnglishMod` | `open` `openQuiz` `openBankQuiz` |
 | `Pages` | `today` `learn` `wealth` `body` `content` `profile`（各页渲染器） |
-| `TodayAgent` | `getDashboard` / `regen`（首页 AI 决策中心；聚合 Study/Wealth/Fitness/Media Agent，当前 Mock/真实摘要混合） |
+| `TodayAgent` | `getDashboard` / `regen`（首页聚合入口；**不再自行生成建议**，改为调用 `RuleEngine.getSuggestions()` 取 Top3；各维度汇总文案仍由 Study/Wealth/Fitness/Media Agent 提供） |
+| `RuleEngine` | `getSuggestions()`（**唯一决策中心**：聚合 5 个 Rule 的 `Suggestion[]`，按 priority 降序、estimatedTime 升序排序后输出） |
+| `StudyRule` | `evaluate(d)` → `Suggestion[]`（学习间隔 ≥2 天未学习 → action p5） |
+| `WealthRule` | `evaluate(d)` → `Suggestion[]`（现金/货基占比超配 → risk p4；资产快照 >30 天未更新 → action p3；常驻机会 p3） |
+| `FitnessRule` | `evaluate(d)` → `Suggestion[]`（运动间隔 ≥3 天 → action p5；体重连升 3 次 → action p4；常驻机会 p3） |
+| `MediaRule` | `evaluate(d)` → `Suggestion[]`（发布间隔 ≥3 天 → action p4；复盘间隔 ≥7 天 → risk p4；常驻机会 p3） |
+| `FutureRule` | `evaluate(d)` → `Suggestion[]`（占位空桩，预留未来真实投资/职业等高级规则） |
 | `App` | 路由器（hash 路由 + `refresh()` 刷新当前页） |
 
 ---
@@ -163,6 +169,7 @@
 - [x] 版本自动检测与「发现新版本」弹窗 + PWA `skipWaiting` 更新流（v1.0.0）
 - [x] AI Prompt 管理体系（`docs/Prompt/`，9 个文件 + `PromptGuide.md` 规范）
 - [x] Today OS 首页架构（v1.1.0）：`TodayAgent` 汇总 + `StudyAgent`/`WealthAgent`/`FitnessAgent`/`MediaAgent` 桩，9 段式 AI CEO Dashboard（Mock/真实摘要混合）
+- [x] Decision Engine 决策引擎（v1.2.0）：`RuleEngine` 成为**唯一决策中心**，`TodayAgent` 改为只调用 `RuleEngine.getSuggestions()`；`StudyRule`/`WealthRule`/`FitnessRule`/`MediaRule` 基于真实数据缺口产出 `Suggestion[]`，`FutureRule` 为占位空桩；详见 `docs/Architecture/DecisionEngine.md`
 
 ---
 

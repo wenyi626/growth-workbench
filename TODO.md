@@ -12,7 +12,8 @@
 - [ ] **文档体系补全**：本项目 PROJECT/VISION/TODO/CHANGELOG/AI_RULES/README 已初始化（本次任务）。
 
 ## P1 — 重要 / 下一迭代
-- [ ] **TodayAgent 接入真实模型**：未来用 `docs/Prompt/` 中的 Prompt 替换 Mock，由 `TodayAgent` 聚合各 Agent 真实输出（参考 `Home.md`/`Study.md` 等）。
+- [ ] **RuleEngine 接入 OpenAI（仅解释/细化，不决策）**：用 `docs/Prompt/` 中的 Prompt 让 LLM 对 `RuleEngine.getSuggestions()` 返回的 `Suggestion[]` 做自然语言解释与个性化细化；**决策权仍归 RuleEngine**，LLM 不得自行生成或增删建议（参考 `Home.md`/`Study.md` 等）。
+- [ ] **规则增强**：Study/Wealth/Fitness/Media Rule 接入更多真实信号（如目标配置偏离、汇率影响、睡眠趋势），并补充 `FutureRule` 真实投资/职业类高级规则。
 
 - [ ] **财富增强**：资产再平衡提示、目标配置偏离告警、分红/汇率影响可视化。
 - [ ] **英语词库同步**：`vocabBank` 与 `EnglishMod` 测验打通，支持手动添加/复习曲线。
@@ -42,3 +43,4 @@
 - [x] 文档体系初始化（PROJECT / VISION / TODO / CHANGELOG / AI_RULES / README）
 - [x] 版本自动检测与 PWA 更新流（v1.0.0）：`version.json` 版本源 + 「发现新版本」弹窗 + `sw.js` skipWaiting 更新流
 - [x] Today OS 首页架构（v1.1.0）：`TodayAgent` + 四 Agent 桩，9 段式 AI CEO Dashboard（Mock 数据）
+- [x] Decision Engine 决策引擎（v1.2.0）：`RuleEngine` 唯一决策中心 + 5 个 Rule（`StudyRule`/`WealthRule`/`FitnessRule`/`MediaRule`/`FutureRule`）；`TodayAgent` 改为只消费 `RuleEngine.getSuggestions()`，未接入 LLM
