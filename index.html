@@ -1734,6 +1734,71 @@ window.EnglishMod = (function () {
 })();
 
 
+/* === assets/js/learning/aitool.js === */
+/* AI 工具课程查看器：渲染真实工具的一节完整课程（是什么/问题/能力/场景/教程/案例/练习）+ 小测验。
+   V1.3.1 AI 学习中心：每个学习对象是一节可学、可测、可记录的工具课。 */
+window.AIToolMod = (function () {
+  function open(tool, opts) {
+    opts = opts || {};
+    const sec = (title, body) => `<div class="sec-title" style="margin:14px 0 6px"><h2>${title}</h2></div><div class="card" style="box-shadow:none">${body}</div>`;
+    const list = (arr) => '<ul>' + (arr || []).map(x => `<li>${U.escapeHtml(x)}</li>`).join('') + '</ul>';
+    const quizHtml = (tool.quiz || []).map((q, qi) => `
+      <div class="quiz-block" style="margin-top:10px">
+        <div class="item-title">${qi + 1}. ${U.escapeHtml(q.q)}</div>
+        ${(q.options || []).map((o, oi) => `<label style="display:block;padding:5px 0;cursor:pointer"><input type="radio" name="aq${qi}" value="${oi}"> ${U.escapeHtml(o)}</label>`).join('')}
+        <div class="quiz-fb" id="aqfb${qi}" style="display:none"></div>
+      </div>`).join('');
+    App.openModal('🤖 ' + U.escapeHtml(tool.title), `
+      <div class="field"><label>定位</label><div class="muted">${U.escapeHtml(tool.subtitle || tool.source || '')}</div></div>
+      ${sec('是什么', U.escapeHtml(tool.what || ''))}
+      ${sec('适合解决什么问题', U.escapeHtml(tool.problem || ''))}
+      ${sec('核心能力', list(tool.capabilities))}
+      ${sec('常见使用场景', list(tool.scenarios))}
+      ${sec('基础教程', U.escapeHtml(tool.tutorial || ''))}
+      ${sec('一个实际案例', U.escapeHtml(tool.caseStudy || ''))}
+      <div class="sec-title" style="margin:14px 0 6px"><h2>今日练习</h2></div>
+      <textarea id="mEx" placeholder="写下你今天打算用 ${U.escapeHtml(tool.title)} 做的一件事…">${U.escapeHtml(opts.prefill || '')}</textarea>
+      <div class="sec-title" style="margin:14px 0 6px"><h2>小测验</h2><span class="act" data-start-quiz>测一测 ✓</span></div>
+      <div id="quizArea">${quizHtml}</div>
+      <div id="quizResult"></div>
+    `, () => {
+      const ex = (document.getElementById('mEx').value || '').trim();
+      const orig = opts.updateId ? S.data.learning.find(x => x.id === opts.updateId) : null;
+      const rec = { date: (orig && orig.date) || U.todayStr(), topic: tool.title, category: 'ai', source: tool.source,
+        summary: (tool.what || '').slice(0, 120), notes: ex ? ('练习：' + ex) : '完成工具学习', understanding: 3, output: ex ? '今日练习' : '工具学习' };
+      if (opts.updateId) S.update('learning', opts.updateId, rec); else S.add('learning', rec);
+      App.closeModal(); U.toast(opts.updateId ? '已更新学习记录' : '已记录 AI 工具学习'); App.refresh();
+    }, '标记已学');
+
+    setTimeout(() => {
+      const startBtn = document.querySelector('[data-start-quiz]');
+      if (startBtn) startBtn.onclick = () => scoreQuiz(tool);
+    }, 40);
+  }
+
+  function scoreQuiz(tool) {
+    const qs = tool.quiz || [];
+    let correct = 0;
+    qs.forEach((q, qi) => {
+      const sel = document.querySelector('input[name="aq' + qi + '"]:checked');
+      const fb = document.getElementById('aqfb' + qi);
+      if (!fb) return;
+      if (!sel) { fb.style.display = 'block'; fb.innerHTML = '<span class="muted tiny">未作答</span>'; return; }
+      const ok = parseInt(sel.value, 10) === q.answer;
+      if (ok) correct++;
+      fb.style.display = 'block';
+      fb.innerHTML = ok
+        ? '<span style="color:var(--accent-ink)">✓ ' + U.escapeHtml(q.explain || '正确') + '</span>'
+        : '<span style="color:var(--warn)">✗ 正确答案：' + U.escapeHtml((q.options || [])[q.answer] || '') + '。' + U.escapeHtml(q.explain || '') + '</span>';
+    });
+    const res = document.getElementById('quizResult');
+    if (res) res.innerHTML = '<div class="ai-box" style="margin-top:10px"><div class="ai-head">测验结果</div><p>答对 ' + correct + '/' + qs.length + '　' + (correct === qs.length ? '🎉 全部答对，可以去用一用了' : (correct >= Math.ceil(qs.length / 2) ? '还不错，再用一用更熟' : '再回去看一遍教程')) + '</p></div>';
+  }
+
+  return { open, scoreQuiz };
+})();
+
+
 /* === assets/js/learning/library.js === */
 /* 学习对象注册中心：统一管理英语 / AI工具 / 产品 等学习对象。
    V1.3.1 新增，为 V1.3.2（AI Learning 联网）预留统一接口。 */
@@ -1820,24 +1885,140 @@ window.LearningSource = (function () {
   ];
 
   const BUILTIN_AI = [
-    { id:'ai-agent', category:'ai', title:'AI Agent 与自动化', source:'行业博客 / 官方文档',
-      core:'Agent = 能自主规划、调用工具、循环执行的 AI 系统，不只是问答。',
-      question:'我现在的工作里，哪些流程能被拆成「观察→判断→动作」？',
-      relation:'活动配置检查、周报汇总、竞品监控都能先做规则化。',
-      practice:'拆一个你每周都做的运营动作，写出 3 条可自动化的规则。',
-      output:'一张「流程→规则」对照表' },
-    { id:'ai-data', category:'ai', title:'用 AI 做数据分析', source:'自己的运营后台',
-      core:'让 AI 帮你写 SQL / 透视思路，你负责定义问题和判断结论。',
-      question:'这周哪个指标异常，我想让 AI 帮我找原因？',
-      relation:'活动 ROI、转化漏斗、渠道对比都可用 AI 提速。',
-      practice:'挑一个真实数据问题，用 AI 生成分析框架并验证。',
-      output:'一份含结论的数据分析草稿' },
-    { id:'ai-code', category:'ai', title:'AI 编程工具实操', source:'文档 + 实操',
-      core:'AI 编程（如 Cursor/通义）把想法变成可运行代码，关键是把需求讲清楚。',
-      question:'我手头哪个小工具，值得用 AI 自己做出来？',
-      relation:'这个工作台本身就是例子：先框架，再逐页加功能。',
-      practice:'用 AI 写一个 30 行内的小工具解决一个真实痛点。',
-      output:'一个能用的小工具 / 脚本' }
+    { id:'ai-claude-code', category:'ai', title:'Claude Code', subtitle:'Anthropic 终端 AI 编程智能体', source:'claude.com/claude-code',
+      what:'Claude Code 是 Anthropic 的终端（CLI）AI 编程智能体：读懂整个代码库、执行命令、跑测试、改多文件并提交代码，把「想法」直接变成可运行的改动。',
+      problem:'适合解决：在已有项目里做跨文件修改、快速理解陌生仓库、自动化重复开发任务（重构、补测试、修 bug），而不离开终端。',
+      capabilities:['读取并理解整个代码库（上下文感知）','执行终端命令、跑测试、调接口','多文件编辑与 git 提交','用子代理并行处理复杂任务'],
+      scenarios:['接手陌生项目，先让它讲关键流程与架构','在大仓库里批量重命名 / 改接口','让它补单元测试并跑通','让它调查偶现 bug 并给出修复'],
+      tutorial:'1）安装并登录（在终端运行 claude）；2）进入仓库根目录运行 claude；3）用自然语言下达任务，如「给 utils 补全单元测试」；4）审查它给出的 diff，用 /review 让其自检；5）确认后让它提交。',
+      caseStudy:'你接手一个 2 万行的后端，先让 Claude Code「读 src/ 并总结请求生命周期」，再让它「给 auth 模块补测试」，约 10 分钟得到可运行测试与说明。',
+      exercise:'今天用 Claude Code 对你手头的一个仓库做一件小事：让它解释一个你不太懂的函数，并补一条测试。',
+      quiz:[
+        {q:'Claude Code 主要运行在哪里？', options:['浏览器网页','终端 CLI','Excel 插件','微信小程序'], answer:1, explain:'它是命令行 AI 编程代理，跑在终端里。'},
+        {q:'以下哪个最适合交给 Claude Code？', options:['定公司年度战略','跨多文件重构并跑测试','写一首诗','点外卖'], answer:1, explain:'它擅长在代码库内做跨文件、可验证的开发任务。'},
+        {q:'Claude Code 提交代码前应该？', options:['直接自动 push 到主分支','先审查 diff 再决定','完全不碰 git','只改不提交'], answer:1, explain:'应审查其改动（可用 /review）确认后再提交。'}
+      ] },
+    { id:'ai-cursor', category:'ai', title:'Cursor', subtitle:'AI 原生代码编辑器', source:'cursor.com',
+      what:'Cursor 是基于 VS Code 的 AI 原生编辑器，把大模型嵌入编辑体验：Chat 对话、⌘K 内联改写、⌘L 多文件对话、Agent 模式自主改代码。',
+      problem:'适合解决：边写边问、内联生成 / 改写代码片段、在编辑器内完成「理解→修改→跑通」的闭环，而不切换工具。',
+      capabilities:['⌘K 内联生成 / 改写选中代码','⌘L 把文件 / 代码块加入对话上下文','Agent 模式自主多文件修改','支持 .cursorrules 自定义规则'],
+      scenarios:['选中一段代码让它改写成函数并加类型','用 Agent 模式实现「加一个导出按钮」','把报错贴进 Chat 让它定位原因','用规则约束它的代码风格'],
+      tutorial:'1）安装并导入 VS Code 配置；2）打开项目，选中代码按 ⌘K 改写；3）按 ⌘L 打开对话，把相关文件加进来；4）让 Agent 完成一个明确任务；5）看 diff、跑测试。',
+      caseStudy:'你想给列表加「按时间排序」功能，选中列表组件按 ⌘K 说「加一个按创建时间降序的排序」——它直接改组件、补排序函数、给你预览。',
+      exercise:'今天用 Cursor 对一个你正在写的函数做内联改写：让它加输入校验与注释。',
+      quiz:[
+        {q:'Cursor 内联改写代码的快捷键是？', options:['Ctrl+C','⌘K','⌘Z','F5'], answer:1, explain:'⌘K 用于内联生成 / 改写选中代码。'},
+        {q:'哪个模式让 Cursor 自主跨多文件修改？', options:['Read 模式','Agent 模式','Zen 模式','飞行模式'], answer:1, explain:'Agent 模式可自主多文件编辑。'},
+        {q:'.cursorrules 的作用是？', options:['换主题','给 AI 设定代码风格 / 约束','清缓存','装插件'], answer:1, explain:'用规则约束 AI 的生成风格与边界。'}
+      ] },
+    { id:'ai-workbuddy', category:'ai', title:'WorkBuddy', subtitle:'通用 AI 智能体（IDE / 云端）', source:'通用智能体类产品',
+      what:'WorkBuddy 一类通用智能体把「对话 + 工具调用 + 文件 / 代码操作」打包成能替你干活的助手：查资料、写文档、跑脚本、管任务，适合非程序员把重复工作自动化。',
+      problem:'适合解决：运营 / 产品日常里大量「信息整理 + 文档生成 + 轻量自动化」任务，不想写代码也能驱动 AI 完成。',
+      capabilities:['用自然语言下达多步任务','调用工具（搜索 / 文件 / 代码 / 浏览器）','生成并管理文档与表格','把复用流程沉淀为可重复的任务'],
+      scenarios:['让它把一周运营数据整理成周报','让它写一份活动复盘并配图','让它批量生成社媒草稿','把「每周竞品监控」存成定时任务'],
+      tutorial:'1）用大白话描述目标与产出；2）给它必要资料 / 权限；3）让它先列步骤再执行；4）中途用追问纠偏；5）把跑通的流程保存为模板复用。',
+      caseStudy:'你让 WorkBuddy「汇总这 5 个竞品的最新动态，输出一页对比表」，它自动检索、提炼、排版，约 10 分钟给你可直接发的文档。',
+      exercise:'今天用 WorkBuddy 类工具做一件你每周都做的事：把零散信息整理成一份可发的文档。',
+      quiz:[
+        {q:'WorkBuddy 这类通用智能体最擅长？', options:['只写前端页面','把多步办公任务自动化','只做图片','只陪聊'], answer:1, explain:'它擅长用工具串联完成多步办公 / 自动化任务。'},
+        {q:'让智能体干活最好先？', options:['直接让它瞎猜','说清目标与产出，再让其列步骤','什么都不说','只发一张图'], answer:1, explain:'目标 + 产出清晰，再让它拆解步骤，结果更可控。'}
+      ] },
+    { id:'ai-chatgpt', category:'ai', title:'ChatGPT', subtitle:'OpenAI 对话式 AI（大众入口）', source:'openai.com/chatgpt',
+      what:'ChatGPT 是面向大众的对话式 AI，擅长写作、解释、头脑风暴、代码辅助与日常问答；进阶用法是「自定义 GPT / 项目 / 工具调用」把常用流程固化下来。',
+      problem:'适合解决：从零构思内容、把模糊想法变成提纲、解释陌生概念、做轻量代码 / 文案辅助——几乎所有「动笔前」的思考与外协。',
+      capabilities:['写作 / 改写 / 润色各类文案','解释概念与调试思路','用 GPTs / 项目管理常用提示词','联网 / 代码执行等工具调用'],
+      scenarios:['把周报口述整理成正式文稿','给一篇文章生成 3 个标题与提纲','解释一段报错并给修改方向','用自定义 GPT 固定你的复盘模板'],
+      tutorial:'1）用「角色 + 任务 + 约束 + 产出格式」写清楚需求；2）先要提纲再要正文；3）让它举例子与反面例子；4）用「换个角度」迭代；5）把满意的提示词存成 GPT / 项目。',
+      caseStudy:'你要把一次活动复盘写成文章，先让 ChatGPT「列 5 个角度与提纲」，选定后逐段扩写，再让它按小红书风格润色，半小时成稿。',
+      exercise:'今天用 ChatGPT 帮你把一个你近期要写的内容，先生成提纲，再扩写一段。',
+      quiz:[
+        {q:'写需求时最有效的是？', options:['越短越好','说清角色 / 任务 / 约束 / 产出','只发表情','只说「帮我写」'], answer:1, explain:'结构化需求（角色+任务+约束+产出）结果更可控。'},
+        {q:'ChatGPT 的「GPTs / 项目」适合？', options:['换电脑','固化常用提示词与流程','清聊天记录','装游戏'], answer:1, explain:'把常用提示词与流程固化为可复用资产。'}
+      ] },
+    { id:'ai-gemini-cli', category:'ai', title:'Gemini CLI', subtitle:'Google 终端 Gemini 代理', source:'github.com/google-gemini/gemini-cli',
+      what:'Gemini CLI 是 Google 的终端 AI 代理，基于 Gemini 模型，能读代码、跑命令、连 Google 搜索与谷歌生态，适合在终端里做轻量自动化与检索。',
+      problem:'适合解决：在终端里快速查资料（含联网搜索）、改小段代码、生成脚本、把 Gemini 的长上下文用于大文件分析。',
+      capabilities:['终端内对话与代码编辑','联网搜索（Google Search 集成）','长上下文处理大文件 / 日志','可脚本化与自动化'],
+      scenarios:['让它读日志并总结异常','连搜索查一个技术方案对比','生成一段处理数据的脚本','在仓库里做小范围重构'],
+      tutorial:'1）安装 Node 环境后运行 gemini；2）进入项目目录，用自然语言提问；3）开启搜索权限查最新资料；4）让它生成脚本并本地执行；5）把常用指令写成 shell 别名。',
+      caseStudy:'你排查一个线上问题，把服务日志喂给 Gemini CLI，让它「总结近 1 小时的错误模式」，它快速定位到某个超时配置。',
+      exercise:'今天用 Gemini CLI 对你的一份日志或文档做一次总结 / 提问。',
+      quiz:[
+        {q:'Gemini CLI 区别于纯网页版的关键在于？', options:['只能在手机用','能跑在终端并连搜索 / 执行命令','只能画图','只能聊天'], answer:1, explain:'它是终端代理，可连搜索、读文件、执行命令。'},
+        {q:'它适合处理？', options:['短笑话','大文件 / 日志的长上下文分析','仅图片','仅语音'], answer:1, explain:'Gemini 长上下文适合大文件与日志分析。'}
+      ] },
+    { id:'ai-codex', category:'ai', title:'Codex', subtitle:'OpenAI 编程智能体（CLI / 云端）', source:'openai.com/codex',
+      what:'Codex 是 OpenAI 的编程智能体，能在沙箱里自主规划、改代码、跑测试并给出可审查的改动；既有 CLI 也能在云端异步执行任务。',
+      problem:'适合解决：把「明确、可验证」的编码任务交给它独立完成（如补测试、修已知 bug、加小功能），你只做审查与合并。',
+      capabilities:['在沙箱中自主多步编码','跑测试并自我验证','生成可审查的 Pull Request','支持云端异步执行'],
+      scenarios:['把一个明确 bug 交给它修并验证','让它给模块补测试','让它实现一个小功能点','审查它产出的 diff 后合并'],
+      tutorial:'1）把任务写成清晰、可验证的描述（含验收标准）；2）在仓库里启动 Codex 并粘贴任务；3）让它规划、编码、自测；4）review 其改动；5）合并或让其继续迭代。',
+      caseStudy:'你有个「导出 CSV 时中文乱码」的 bug，交给 Codex 并写明复现步骤，它定位到编码参数、改完自测通过，给你一个可合并的 PR。',
+      exercise:'今天选一个你仓库里明确的小 bug / 小功能，用 Codex 类思路写成「任务卡」交给 AI 试一次。',
+      quiz:[
+        {q:'交给 Codex 的任务最好？', options:['越模糊越好','明确且可验证（含验收标准）','只说「随便改」','纯哲学问题'], answer:1, explain:'明确、可验证的任务它才能完成并自测。'},
+        {q:'Codex 产出的改动应该？', options:['直接上生产','先审查 diff 再合并','不看直接删','忽略'], answer:1, explain:'应 review 其改动（含测试）后再合并。'}
+      ] },
+    { id:'ai-windsurf', category:'ai', title:'Windsurf', subtitle:'AI 原生编辑器（Cascade 代理）', source:'windsurf.com',
+      what:'Windsurf 是 AI 原生编辑器，核心是 Cascade 代理：能跨文件理解项目、按自然语言做大型改动，并提供「莫妮卡」式对话与命令模式。',
+      problem:'适合解决：在编辑器内完成「理解整个项目 → 大范围修改 → 跑通」的代理式开发，尤其适合从 0 搭原型或重构。',
+      capabilities:['Cascade 代理跨文件自主修改','项目级上下文理解','命令 / 对话双模式','内联补全与多文件改写'],
+      scenarios:['让它按描述从 0 搭一个页面','跨多个文件做一次重构','把一段需求变成可运行代码','让它解释并优化一段慢查询'],
+      tutorial:'1）用账号登录并打开项目；2）在 Cascade 里用自然语言描述目标；3）让它先列改动计划；4）逐块应用并看预览；5）跑测试 / 构建验证。',
+      caseStudy:'你想加一个「深色模式」开关，在 Cascade 说「给项目加深色模式，含 CSS 变量与切换按钮」，它改了样式、组件与持久化逻辑并给你预览。',
+      exercise:'今天用 Windsurf 类编辑器对一个你正在做的页面，试着用代理完成一个明确的小改动。',
+      quiz:[
+        {q:'Windsurf 的核心代理叫？', options:['Copilot','Cascade','Clippy','Jarvis'], answer:1, explain:'Windsurf 的核心是 Cascade 代理。'},
+        {q:'Cascade 擅长？', options:['只补单个词','跨文件理解项目并做大范围修改','只做 PPT','只聊天'], answer:1, explain:'它能在项目级上下文里做大型改动。'}
+      ] },
+    { id:'ai-mcp', category:'ai', title:'MCP', subtitle:'Model Context Protocol（模型上下文协议）', source:'modelcontextprotocol.io',
+      what:'MCP 是连接 AI 与外部工具 / 数据 / 系统的开放协议：用统一的「客户端—服务器」方式，让大模型安全地调用数据库、文件、API 等能力，而不必为每个工具单独写集成。',
+      problem:'适合解决：让 AI 能安全、标准化地访问你的真实数据与工具（如查订单、读文档、发消息），而不是只在对话框里空谈。',
+      capabilities:['统一协议连接工具 / 数据 / 系统','客户端—服务器标准架构','可复用官方 / 社区服务器','把能力与模型解耦'],
+      scenarios:['给 AI 接一个查数据库的后端','接一个读本地文件的服务器','用社区 MCP 连 Slack / GitHub','把内部 API 暴露给多个 AI 应用'],
+      tutorial:'1）理解角色：Host（AI 应用）+ Client + Server（能力方）；2）选或写一个 MCP Server 暴露你的能力；3）在 Host 里配置并连接；4）用自然语言让 AI 调用；5）加权限与日志做安全管控。',
+      caseStudy:'你给工作台接一个「读运营数据库」的 MCP Server，之后直接问 AI「昨天转化率是多少」，它经 MCP 查库并回答，无需手写 SQL 接口。',
+      exercise:'今天了解 MCP 的客户端—服务器模型，想一个你最想让 AI 访问的真实数据源，并描述它应暴露哪些能力。',
+      quiz:[
+        {q:'MCP 主要解决？', options:['换模型','让 AI 标准化连接外部工具 / 数据','做图片','写诗'], answer:1, explain:'MCP 用统一协议把 AI 连到真实能力与数据。'},
+        {q:'MCP 的典型架构是？', options:['只有模型','Host+Client+Server','只有数据库','只有前端'], answer:1, explain:'Host（AI 应用）通过 Client 连接提供能力的 Server。'}
+      ] },
+    { id:'ai-a2a', category:'ai', title:'A2A', subtitle:'Agent2Agent（智能体间协作协议）', source:'google.github.io/A2A',
+      what:'A2A 是 Google 提出的智能体间协作协议，让不同厂商、不同框架的 Agent 能互相发现能力、委派任务、交换结果与状态，像「员工之间的协作协议」。',
+      problem:'适合解决：当一件事需要多个专职 Agent 配合（如一个做调研、一个写代码、一个发通知），用统一协议让它们协作而非各自为战。',
+      capabilities:['Agent 卡片描述并发现彼此能力','任务委派与状态追踪','多轮消息与产物交换','跨厂商 / 框架互通'],
+      scenarios:['调研 Agent 把结论交给写作 Agent','编排多个 Agent 完成一条流水线','让一个 Agent 调用另一个 Agent 的专长','在可控边界内做多 Agent 协作'],
+      tutorial:'1）理解 Agent Card（能力名片）；2）定义任务与输入输出；3）让「编排者」按能力把子任务派给对应 Agent；4）跟踪任务状态与产物；5）设定权限与人工兜底。',
+      caseStudy:'你搭一条内容流水线：调研 Agent 产出提纲 → 写作 Agent 成稿 → 发布 Agent 排版，三者用 A2A 串联，你只审最终稿。',
+      exercise:'今天想一个需要「多个专职 Agent 配合」的真实任务，试着用 Agent Card 的思路把它拆成角色与交接。',
+      quiz:[
+        {q:'A2A 解决的是？', options:['单模型聊天','多个 Agent 之间的协作与委派','换电脑','做表格'], answer:1, explain:'A2A 让不同 Agent 互相发现、委派与交换结果。'},
+        {q:'Agent Card 的作用是？', options:['换头像','描述并暴露一个 Agent 的能力','清缓存','装插件'], answer:1, explain:'Agent Card 是能力名片，供其他 Agent 发现与调用。'}
+      ] },
+    { id:'ai-n8n', category:'ai', title:'n8n', subtitle:'开源工作流自动化平台', source:'n8n.io',
+      what:'n8n 是开源的可视化工作流自动化工具，用节点把 API、数据库、AI 串成自动化流水线，支持自托管，既能无代码拖拽也能写代码节点。',
+      problem:'适合解决：把「周期性、跨系统」的重复操作自动化（如每天拉数据→清洗→生成报告→推送），而不必为每个流程写程序。',
+      capabilities:['可视化节点编排工作流','丰富的内置集成（HTTP / 数据库 / SaaS）','AI 节点（接大模型做判断 / 生成）','可自托管与写自定义代码节点'],
+      scenarios:['每天定时拉数据生成运营周报','把表单提交自动写库并通知','用 AI 节点给内容打分 / 分类','把多个 SaaS 串成一条流水线'],
+      tutorial:'1）用 Docker 自托管或注册云端；2）新建工作流，拖入触发器（如 Schedule）；3）加 HTTP / 数据库节点取数；4）加 AI 节点做处理；5）接输出（表格 / 邮件 / 消息）并启用。',
+      caseStudy:'你设一条工作流：每天 9 点拉各渠道数据 → AI 节点写一句话总结 → 推送到群里，全程无需人工。',
+      exercise:'今天用 n8n 把一件你每周手动做的数据整理 / 通知，画成一条自动化工作流的节点草图。',
+      quiz:[
+        {q:'n8n 主要是？', options:['聊天机器人','可视化工作流自动化平台','图片编辑器','搜索引擎'], answer:1, explain:'n8n 用节点编排自动化流水线。'},
+        {q:'它适合自动化？', options:['一次性绘画','周期性、跨系统的重复操作','纯写作','纯聊天'], answer:1, explain:'它擅长把周期、跨系统的重复操作自动化。'}
+      ] },
+    { id:'ai-dify', category:'ai', title:'Dify', subtitle:'开源 LLM 应用开发平台', source:'dify.ai',
+      what:'Dify 是开源的 LLM 应用开发平台，用可视化编排把提示词、知识库（RAG）、工具、工作流组合成可上线的 AI 应用，既能做聊天助手也能做复杂 Agent。',
+      problem:'适合解决：把「基于自己资料 / 业务」的 AI 应用快速做出来（如客服助手、知识库问答、内部 Copilot），而不从零搭后端。',
+      capabilities:['可视化编排提示词 / 工作流','知识库 RAG（接入自有文档）','工具与插件扩展','可发布为 API / WebApp'],
+      scenarios:['用自有文档搭一个知识库问答','做一个按模板写周报的内部助手','把多个步骤编排成 Agent 工作流','发布成 API 给其它系统调用'],
+      tutorial:'1）自托管或注册 Dify；2）建知识库并上传文档（向量化）；3）用编排画提示词 / 工作流；4）接工具与模型；5）调试后发布为 WebApp 或 API。',
+      caseStudy:'你把团队 SOP 文档导入 Dify 知识库，做一个「新人入职问答」助手，新人直接问流程，不再翻文档。',
+      exercise:'今天想一个你手头「基于自己资料」的 AI 助手场景，列出它该吃哪些文档、回答哪类问题。',
+      quiz:[
+        {q:'Dify 主要用于？', options:['做 PPT','可视化开发 LLM 应用（含 RAG / 工作流）','写小说','剪视频'], answer:1, explain:'Dify 把提示词、知识库、工具编排成可上线的 AI 应用。'},
+        {q:'知识库（RAG）的作用是？', options:['换模型','让 AI 基于你的自有文档回答','清缓存','做图片'], answer:1, explain:'RAG 让 AI 检索并基于你上传的文档作答。'}
+      ] }
   ];
 
   const BUILTIN_PRODUCT = [
@@ -2173,15 +2354,8 @@ window.Pages = window.Pages || {};
 window.Pages.learn = (function () {
   let sub = 'ai';
 
-  /* AI 学习内容现已统一存放在 LearningLibrary（category:'ai'），不再写死 AI_TOPICS。
-     这里仅保留「Library AI 对象 → 学习任务表单」的转换函数。 */
-  function aiPrefillFromLib(o) {
-    if (!o) return { topic:'', source:'', core:'', q:'', rel:'', prac:'', out:'' };
-    return {
-      topic: o.title || '', source: o.source || '', core: o.core || '',
-      q: o.question || '', rel: o.relation || '', prac: o.practice || '', out: o.output || ''
-    };
-  }
+  /* AI 学习内容现已统一迁移到「AI 工具学习中心」：工具对象来自 Library（category:'ai'），
+     点击工具卡片直接由 AIToolMod 打开完整课程（教程/案例/练习/测验），不再使用旧表单。 */
 
   function render() {
     const seg = `<div class="seg" style="margin-bottom:6px">
@@ -2199,56 +2373,42 @@ window.Pages.learn = (function () {
   }
 
   /* ---- AI 与职业能力 ---- */
+  /* ---- AI 工具学习中心：工具对象来自 Library（category:'ai'） ---- */
   function aiView() {
+    const tools = window.Library.byCategory('ai');
+    const learned = {};
+    S.data.learning.filter(l => l.category === 'ai').forEach(l => { learned[l.topic] = (learned[l.topic] || 0) + 1; });
+    const learnedCount = Object.keys(learned).length;
+    const d = U.parseDate(U.todayStr());
+    const pick = tools.length ? tools[d.getDate() % tools.length] : null;
+
+    const cards = tools.map(t => {
+      const done = learned[t.title];
+      return `<div class="item" data-ai-tool="${t.id}" style="cursor:pointer">
+        <div class="item-ico">🤖</div>
+        <div class="item-main"><div class="item-title">${U.escapeHtml(t.title)}</div>
+        <div class="item-sub">${U.escapeHtml(t.subtitle || t.source || '')}</div></div>
+        ${done ? '<span class="tag ai">已学</span>' : '<span class="muted tiny">未学</span>'}
+      </div>`;
+    }).join('');
+
     const recs = S.data.learning.filter(l => l.category === 'ai').slice(-6).reverse();
-    const recHtml = recs.length ? recs.map(r => `<div class="item">
+    const recHtml = recs.length ? recs.map(r => `<div class="item" data-learn="${r.id}" style="cursor:pointer">
       <div class="item-ico">🤖</div>
       <div class="item-main"><div class="item-title">${U.escapeHtml(r.topic)}</div>
-      <div class="item-sub">${U.fmtDateCN(r.date)} · 产出：${U.escapeHtml(r.output||'—')}</div></div>
-      <span class="tag ai">AI</span></div>`).join('') : '<div class="empty"><div class="e-ico">🤖</div><div class="e-sub">还没有 AI 学习记录</div></div>';
+      <div class="item-sub">${U.fmtDateCN(r.date)} · 产出：${U.escapeHtml(r.output || '—')}</div></div>
+      <span class="tag ai">AI</span></div>`).join('') : '<div class="empty"><div class="e-ico">🤖</div><div class="e-sub">还没有 AI 工具学习记录</div></div>';
 
     return `
     <div class="card">
-      <div class="card-head"><h3>🤖 AI × 职业能力</h3></div>
-      <p class="muted tiny" style="margin-top:-4px">目标：成为能用 AI、数据、自动化解决实际问题的运营。流程：信息 → 核心知识 → 理解 → 关联工作 → 实践 → 产出。</p>
-      <button class="btn btn-primary" data-gen-ai style="margin-top:12px">生成今日 AI 学习任务</button>
+      <div class="card-head"><h3>🤖 AI 工具学习中心</h3><span class="sub">已学 ${learnedCount} / ${tools.length}</span></div>
+      <p class="muted tiny" style="margin-top:-4px">这里收录真实可上手的 AI 工具，每个工具都有完整教程、案例、练习和测验。点开任意一个，跟着「学 → 做 → 测」。</p>
+      ${pick ? `<button class="btn btn-primary" data-ai-pick style="margin-top:12px">🎯 今日推荐：${U.escapeHtml(pick.title)}</button>` : ''}
     </div>
-    <div class="sec-title"><h2>最近 AI 学习</h2></div>
+    <div class="sec-title"><h2>工具库（${tools.length}）</h2></div>
+    <div class="card" style="padding-top:6px"><div class="list">${cards}</div></div>
+    <div class="sec-title"><h2>最近 AI 工具学习</h2></div>
     <div class="card" style="padding-top:6px"><div class="list">${recHtml}</div></div>`;
-  }
-
-  function genAiTask(opts) {
-    opts = opts || {};
-    let p;
-    if (opts.prefill) {
-      p = opts.prefill;
-    } else {
-      // 默认：从 LearningLibrary 的 AI 类别按日期确定性取一篇
-      const aiLib = window.Library.byCategory('ai');
-      const pick = aiLib.length ? aiLib[U.parseDate(U.todayStr()).getDate() % aiLib.length] : null;
-      p = aiPrefillFromLib(pick);
-    }
-    App.openModal('🤖 今日 AI 学习任务', `
-      <div class="field"><label>学习主题</label><input id="aTopic" value="${U.escapeHtml(p.topic)}"></div>
-      <div class="field"><label>信息来源</label><input id="aSrc" value="${U.escapeHtml(p.source)}"></div>
-      <div class="field"><label>核心知识</label><textarea id="aCore">${U.escapeHtml(p.core)}</textarea></div>
-      <div class="field"><label>我的真实问题</label><textarea id="aQ">${U.escapeHtml(p.q)}</textarea></div>
-      <div class="field"><label>和我的工作有什么关系</label><textarea id="aRel">${U.escapeHtml(p.rel)}</textarea></div>
-      <div class="field"><label>实践任务</label><textarea id="aPrac">${U.escapeHtml(p.prac)}</textarea></div>
-      <div class="field"><label>最终产出</label><input id="aOut" value="${U.escapeHtml(p.out)}"></div>
-      <div class="field"><label>理解程度（1-5）</label><input id="aUnd" type="number" min="1" max="5" value="3"></div>
-    `, () => {
-      // 继续学习（updateId 存在）时更新原记录并保留原始日期；否则新增一条今日记录
-      const orig = opts.updateId ? S.data.learning.find(x => x.id === opts.updateId) : null;
-      const rec = {
-        date: (orig && orig.date) || U.todayStr(), category: 'ai', topic: val('aTopic'), source: val('aSrc'),
-        summary: val('aCore'), notes: '问题：' + val('aQ') + ' | 关联：' + val('aRel') + ' | 实践：' + val('aPrac'),
-        understanding: parseInt(val('aUnd')) || 3, output: val('aOut')
-      };
-      if (opts.updateId) S.update('learning', opts.updateId, rec); else S.add('learning', rec);
-      App.closeModal(); U.toast(opts.updateId ? '已更新学习记录' : '已记录 AI 学习'); App.refresh();
-    }, '保存学习');
-    function val(id){ return document.getElementById(id).value.trim(); }
   }
 
   /* ---- 英语 ---- */
@@ -2405,18 +2565,29 @@ window.Pages.learn = (function () {
   /* 继续学习：以历史记录的内容回填交互式学习，完成后更新原记录（保留原始日期） */
   function continueLearning(r, libObj) {
     if (r.category === 'en' && libObj) EnglishMod.open(libObj, { prefill: (r.notes || '').replace(/^复述：/, ''), updateId: r.id });
-    else if (r.category === 'ai' && libObj) genAiTask({ prefill: aiPrefillFromLib(libObj), updateId: r.id });
+    else if (r.category === 'ai' && libObj) AIToolMod.open(libObj, { prefill: (r.notes || '').replace(/^练习：/, ''), updateId: r.id });
   }
   /* 重新学习：以全新状态重新走一遍交互式学习，完成后新增一条今日学习记录 */
   function relearn(r, libObj) {
     if (r.category === 'en' && libObj) EnglishMod.open(libObj, {});
-    else if (r.category === 'ai' && libObj) genAiTask({});
+    else if (r.category === 'ai' && libObj) AIToolMod.open(libObj, {});
   }
 
   function bind() {
     const view = document.getElementById('view');
     view.querySelectorAll('[data-sub]').forEach(b => b.onclick = () => { sub = b.dataset.sub; App.refresh(); });
-    const genBtn = view.querySelector('[data-gen-ai]'); if (genBtn) genBtn.onclick = genAiTask;
+    // AI 工具学习中心：工具卡片直接打开完整课程；「今日推荐」按日期确定性选一个
+    view.querySelectorAll('[data-ai-tool]').forEach(c => c.onclick = () => {
+      const o = window.Library.get(c.dataset.aiTool);
+      if (o) AIToolMod.open(o);
+    });
+    const pickBtn = view.querySelector('[data-ai-pick]');
+    if (pickBtn) pickBtn.onclick = () => {
+      const tools = window.Library.byCategory('ai');
+      const d = U.parseDate(U.todayStr());
+      const pick = tools.length ? tools[d.getDate() % tools.length] : null;
+      if (pick) AIToolMod.open(pick);
+    };
     const openEn = view.querySelector('[data-open-en]'); if (openEn) openEn.onclick = () => EnglishMod.open(AI.generateEnglish(false));
     const regenEn = view.querySelector('[data-regen-en]'); if (regenEn) regenEn.onclick = () => { EnglishMod.open(AI.generateEnglish(true)); U.toast('已换一篇'); };
     const testEn = view.querySelector('[data-test-en]'); if (testEn) testEn.onclick = () => EnglishMod.openQuiz(AI.generateEnglish(false).words, AI.generateEnglish(false).title);

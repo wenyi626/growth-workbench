@@ -16,8 +16,8 @@
 - [ ] **RuleEngine 接入 OpenAI（仅解释/细化，不决策）**：用 `docs/Prompt/` 中的 Prompt 让 LLM 对 `RuleEngine.getSuggestions()` 返回的 `Suggestion[]` 做自然语言解释与个性化细化；**决策权仍归 RuleEngine**，LLM 不得自行生成或增删建议（参考 `Home.md`/`Study.md` 等）。
 - [ ] **规则增强**：Study/Wealth/Fitness/Media Rule 接入更多真实信号（如目标配置偏离、汇率影响、睡眠趋势），并补充 `FutureRule` 真实投资/职业类高级规则。
 - [x] **学习历史升级（IMP-002 / v1.3.1 基础已落地）**：学习历史支持「查看历史笔记 / 继续学习 / 重新学习」，记录可完整恢复（英语/AI 交互式续学，其它类别恢复已存摘要/笔记/产出）。**复习曲线与产出追踪**留作 P2。
-- [x] **AI 学习模块重构（IMP-003 / v1.3.1 基础已落地）**：建立 `Library` + `LearningSource` 统一学习引擎，英语模块改为读取 `Library`，AI 学习主题亦从 `Library` 取；联网 AI 学习留待 V1.3.2。
-- [x] **英语课文源扩展（V1.3.1 基础已落地）**：`EN_LIB` 静态 4 篇已迁至 `LearningSource` 内置库（英语 8 篇 / AI 3 篇 / 产品 2 篇，且可继续扩充），「换一篇」在库内确定性/随机切换；**真实联网课文源属 V1.3.2（`RemoteSource` 占位）**，不在此版本实现联网
+- [x] **AI 学习模块重构（IMP-003 / v1.3.1 已落地 AI 工具学习中心）**：建立 `Library` + `LearningSource` 统一学习引擎，英语模块改读 `Library`；AI 模块从抽象主题重构为真实「AI 工具学习中心」——内置 11 个真实工具（Claude Code / Cursor / WorkBuddy / ChatGPT / Gemini CLI / Codex / Windsurf / MCP / A2A / n8n / Dify）完整课程（教程/案例/练习/测验），点击即学→做→测并标记已学；联网 AI 学习留待 V1.3.2。
+- [x] **英语课文源扩展（V1.3.1 基础已落地）**：`EN_LIB` 静态 4 篇已迁至 `LearningSource` 内置库（英语 8 篇 / AI 11 篇 / 产品 2 篇，且可继续扩充），「换一篇」在库内确定性/随机切换；**真实联网课文源属 V1.3.2（`RemoteSource` 占位）**，不在此版本实现联网
 
 - [ ] **财富增强**：资产再平衡提示、目标配置偏离告警、分红/汇率影响可视化。
 - [ ] **英语词库同步**：`vocabBank` 与 `EnglishMod` 测验打通，支持手动添加/复习曲线。
@@ -53,4 +53,5 @@
 - [x] 英语「换一篇」真正切换（v1.2.1 / BUG-002）
 - [x] 交易记录编辑与删除（v1.2.1 / IMP-001）
 - [x] 学习历史点击回看（v1.2.2）：历史记录点击恢复完整内容（英语匹配 EN_LIB 复原文章/单词/语法/测验）
-- [x] 学习引擎基础 Learning Foundation（v1.3.1）：LearningLibrary + LearningSource 数据源抽象（英语8/AI3/产品2，不再写死4篇；RemoteSource 为 V1.3.2 联网预留）；英语模块改读 Library；学习历史升级「查看历史笔记 / 继续学习 / 重新学习」
+- [x] 学习引擎基础 Learning Foundation（v1.3.1）：LearningLibrary + LearningSource 数据源抽象（英语8/AI11/产品2，不再写死4篇；RemoteSource 为 V1.3.2 联网预留）；英语模块改读 Library；学习历史升级「查看历史笔记 / 继续学习 / 重新学习」
+- [x] AI 工具学习中心（v1.3.1）：AI 页从抽象表单重构为 11 个真实 AI 工具的课程中心（教程/案例/练习/测验/标记已学），由 `AIToolMod` 驱动
