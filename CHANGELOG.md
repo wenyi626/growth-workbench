@@ -3,6 +3,19 @@
 > 格式参考 [Keep a Changelog](https://keepachangelog.com/)。版本号规范：`v1.0` / `v1.1` / `v2.0` …；开发态 `version.json` 为 `dev`。
 > 每次发版必须在此追加条目，并更新 PROJECT.md 第 2 节「当前版本」。
 
+## [v1.2.1] - 财富单一数据源 / 英语换一篇 / 交易编辑删除（当前版本）
+
+### Fixed
+- **BUG-001 财富模块单一数据源（SSOT）**：新增 `S.wealthTotal()` 作为「当前总资产」唯一来源；首页 `wealthSummary()`、`WealthAgent`、`WealthRule`、财富页 `totals()` 全部改为读取同一实时值。编辑资产后首页立即同步，不再依赖手动更新 `wealthSnapshots`。
+- **BUG-002 英语「换一篇」无效**：`generateEnglish(force)` 现在真正响应 `force` 参数，在未学过的课文中随机切换且保证与当前展示不同；「换一篇」按钮改为直接打开新文章，不再被 `App.refresh()` 的缓存覆盖。
+
+### Added
+- **IMP-001 交易记录编辑 / 删除**：交易列表每条新增 ✎ 编辑与 🗑 删除入口；`txEditModal` 支持修改操作类型、日期、金额（人民币）、备注；`txDelete` 提供删除确认。沿用现有 UI 风格与数据契约，未改动 `pgwb_data_v1`。
+
+### 其他
+- 运行时版本 `version.json` → `1.2.1`（已打开页面将收到「发现新版本」提示）。
+- 提交：`fix: v1.2.1 wealth SSOT, english regen, tx edit/delete`
+
 ## [v1.2.0] - Decision Engine 决策引擎（当前部署）
 
 ### Added

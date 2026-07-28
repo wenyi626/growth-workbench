@@ -826,7 +826,20 @@ window.S = (function () {
     save();
   }
 
-  return { load, save, reset, list, find, add, update, remove, get, set, setData, exportJSON, importJSON,
+  /* 财富当前总资产（单一数据源 / SSOT）：实时由资产持仓换算，
+     首页 / TodayAgent / 财富页 / RuleEngine / WealthAgent 全部共用此值，
+     编辑资产后无需手动同步快照即可立即反映。 */
+  function wealthTotal() {
+    const fx = (data.settings && data.settings.fx) || { USD: 7.2, HKD: 0.92, JPY: 0.048 };
+    let total = 0;
+    (data.assets || []).forEach(function (a) {
+      const rate = a.currency === 'USD' ? fx.USD : a.currency === 'HKD' ? fx.HKD : a.currency === 'JPY' ? fx.JPY : 1;
+      total += (a.quantity || 0) * (a.currentPrice || 0) * rate;
+    });
+    return total;
+  }
+
+  return { load, save, reset, list, find, add, update, remove, get, set, setData, exportJSON, importJSON, wealthTotal,
     backupToCloud, restoreFromBackup, forceBackup,
     get data() { return data; } };
 })();
@@ -1394,6 +1407,7 @@ window.AI = (function () {
       grammar:{point:'what \u5f15\u5bfc\u7684\u540d\u8bcd\u6027\u4ece\u53e5',ex:'What expats need is routine.'} }
   };
 
+  let currentEnKey = null;
   function generateEnglish(force) {
     const d = S.data;
     const t = U.todayStr();
@@ -1402,9 +1416,18 @@ window.AI = (function () {
     if (plan) key = ({ai:'ai', wealth:'invest', en:'career', build:'career', content:'career', body:'overseas'})[plan.cat] || 'ai';
     const used = d.learning.filter(l => l.category === 'en').map(l => l.topic);
     const keys = Object.keys(EN_LIB).filter(k => !used.includes(EN_LIB[k].title));
-    const pickKey = keys.length ? keys[U.parseDate(t).getDate() % keys.length] : key;
-    const lib = EN_LIB[pickKey] || EN_LIB[key];
-    return lib;
+    let pickKey;
+    if (force) {
+      // 真正「换一篇」：在未学过的课文中随机取一篇，且保证与当前展示的不同
+      const pool = (keys.length ? keys : Object.keys(EN_LIB)).filter(k => k !== currentEnKey);
+      const src = pool.length ? pool : (keys.length ? keys : Object.keys(EN_LIB));
+      pickKey = src[Math.floor(Math.random() * src.length)];
+    } else {
+      // 默认每日一文：同一天确定性（与日期挂钩），保持「今日固定课文」的节奏感
+      pickKey = keys.length ? keys[U.parseDate(t).getDate() % keys.length] : key;
+    }
+    currentEnKey = pickKey;
+    return EN_LIB[pickKey] || EN_LIB[key];
   }
 
   /* ---------- content ideas ---------- */
@@ -1746,10 +1769,11 @@ window.Pages.today = (function () {
   }
 
   function wealthSummary() {
+    const total = S.wealthTotal();
     const ws = S.data.wealthSnapshots.slice().sort((a,b)=>a.date.localeCompare(b.date));
-    if (ws.length < 1) return { total: 0, delta: 0 };
-    const last = ws[ws.length - 1], prev = ws[ws.length - 2] || last;
-    return { total: last.totalAssets, delta: last.totalAssets - prev.totalAssets };
+    const prev = ws.length >= 2 ? ws[ws.length - 2] : (ws[0] || { totalAssets: total });
+    const delta = total - (prev.totalAssets || 0);
+    return { total, delta };
   }
 
   function bodySummary() {
@@ -2214,7 +2238,7 @@ window.Pages.learn = (function () {
     view.querySelectorAll('[data-sub]').forEach(b => b.onclick = () => { sub = b.dataset.sub; App.refresh(); });
     const genBtn = view.querySelector('[data-gen-ai]'); if (genBtn) genBtn.onclick = genAiTask;
     const openEn = view.querySelector('[data-open-en]'); if (openEn) openEn.onclick = () => EnglishMod.open(AI.generateEnglish(false));
-    const regenEn = view.querySelector('[data-regen-en]'); if (regenEn) regenEn.onclick = () => { AI.generateEnglish(true); App.refresh(); U.toast('已换一篇'); };
+    const regenEn = view.querySelector('[data-regen-en]'); if (regenEn) regenEn.onclick = () => { EnglishMod.open(AI.generateEnglish(true)); U.toast('已换一篇'); };
     const testEn = view.querySelector('[data-test-en]'); if (testEn) testEn.onclick = () => EnglishMod.openQuiz(AI.generateEnglish(false).words, AI.generateEnglish(false).title);
     const testBank = view.querySelector('[data-test-bank]'); if (testBank) testBank.onclick = () => EnglishMod.openBankQuiz();
     view.querySelectorAll('[data-proj]').forEach(c => c.onclick = () => openProj(c.dataset.proj));
@@ -2236,13 +2260,13 @@ window.Pages.wealth = (function () {
   function fx() { return S.data.settings.fx; }
   function cny(a) { return (a.quantity || 0) * (a.currentPrice || 0) * (fx()[a.currency] || 1); }
   function totals() {
-    let total = 0, invest = 0, cash = 0;
+    let invest = 0, cash = 0;
     S.data.assets.forEach(a => {
-      const v = cny(a); total += v;
+      const v = cny(a);
       if (['美股ETF','美股个股','黄金'].includes(a.category)) invest += v;
       else cash += v;
     });
-    return { total, invest, cash };
+    return { total: S.wealthTotal(), invest, cash };
   }
 
   function snapStats() {
@@ -2349,6 +2373,8 @@ window.Pages.wealth = (function () {
           <div class="item-sub">${U.fmtDateCN(t.date)} · ${U.money(t.amount)} · ${U.escapeHtml((t.reason||'').slice(0,24))}${(t.reason||'').length>24?'…':''}</div>
         </div>
         <span class="tag ${t.decisionType==='情绪驱动'?'content':''}">${U.escapeHtml(t.decisionType||'')}</span>
+        <span class="item-arrow" data-tx-edit="${t.id}" title="编辑" style="margin-left:8px">✎</span>
+        <span class="item-arrow" data-tx-del="${t.id}" title="删除" style="margin-left:10px;color:var(--down)">🗑</span>
       </div>`).join('') || '<div class="card"><div class="empty"><div class="e-ico">💰</div><div class="e-sub">还没有交易记录</div></div></div>';
     return `
     <div class="tool-row" style="margin-bottom:6px"><button class="btn btn-primary" data-add-tx>＋ 记录一笔操作</button></div>
@@ -2501,6 +2527,38 @@ window.Pages.wealth = (function () {
     function val(id){ return document.getElementById(id).value.trim(); }
   }
 
+  /* ---- 编辑交易 ---- */
+  function txEditModal(id) {
+    const t = S.data.transactions.find(x=>x.id===id); if (!t) return;
+    const types = ['买入','卖出','分红','入金','出金','换汇'];
+    App.openModal('编辑交易', `
+      <div class="field"><label>资产</label><input id="eAsset" value="${U.escapeHtml(t.asset)}" readonly style="background:var(--surface-soft)"></div>
+      <div class="field"><label>操作类型</label><select id="eType">${types.map(tp=>`<option ${tp===t.type?'selected':''}>${tp}</option>`).join('')}</select></div>
+      <div class="field"><label>日期</label><input id="eDate" type="date" value="${U.escapeHtml(t.date)}"></div>
+      <div class="field"><label>金额（人民币）</label><input id="eAmt" type="number" step="0.01" value="${t.amount}"></div>
+      <div class="field"><label>备注 / 为什么做这个操作</label><textarea id="eWhy" placeholder="例如：市场下跌，我认为长期科技仍有增长潜力，因此补仓。">${U.escapeHtml(t.reason||'')}</textarea></div>
+    `, () => {
+      S.update('transactions', id, {
+        type: document.getElementById('eType').value,
+        date: document.getElementById('eDate').value.trim(),
+        amount: parseFloat(document.getElementById('eAmt').value) || 0,
+        reason: document.getElementById('eWhy').value.trim()
+      });
+      App.closeModal(); U.toast('已保存'); App.refresh();
+    }, '保存');
+  }
+
+  /* ---- 删除交易 ---- */
+  function txDelete(id) {
+    const t = S.data.transactions.find(x=>x.id===id); if (!t) return;
+    App.openModal('删除交易', `
+      <div class="muted">确定删除这笔「<b style="color:var(--text)">${U.escapeHtml(t.asset)} · ${U.escapeHtml(t.type)}</b>」记录吗？删除后不可恢复。</div>
+    `, () => {
+      S.remove('transactions', id);
+      App.closeModal(); U.toast('已删除'); App.refresh();
+    }, '删除');
+  }
+
   function colorOf(a) {
     const m = { '美股ETF':'#5b6cf0', '美股个股':'#7c5cff', '黄金':'#c9962b', '美元货基':'#2b8a9b', '其他':'#9a9aa0' };
     return m[a.category] || '#5b6cf0';
@@ -2515,6 +2573,8 @@ window.Pages.wealth = (function () {
     view.querySelectorAll('[data-edit-asset]').forEach(b => b.onclick = (e)=>{ e.stopPropagation(); assetModal(b.dataset.editAsset); });
     const addT = view.querySelector('[data-add-tx]'); if (addT) addT.onclick = txModal;
     view.querySelectorAll('[data-tx-outcome]').forEach(b => b.onclick = () => txOutcome(b.dataset.txOutcome));
+    view.querySelectorAll('[data-tx-edit]').forEach(b => b.onclick = (e) => { e.stopPropagation(); txEditModal(b.dataset.txEdit); });
+    view.querySelectorAll('[data-tx-del]').forEach(b => b.onclick = (e) => { e.stopPropagation(); txDelete(b.dataset.txDel); });
     App.setHeader('财富', '资产实验室 · 区分增长与收益');
   }
 
@@ -3163,10 +3223,10 @@ document.addEventListener('DOMContentLoaded', App.load);
 
   window.WealthAgent = (function () {
     function summary() {
+      var total = S.wealthTotal();
       var ws = (S.data.wealthSnapshots || []).slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
-      var last = ws[ws.length - 1] || { totalAssets: 0 };
+      var last = ws[ws.length - 1] || { totalAssets: total };
       var prev = ws[ws.length - 2] || last;
-      var total = last.totalAssets;
       var growth = total - prev.totalAssets;
       var growthPct = prev.totalAssets ? (growth / prev.totalAssets * 100) : 0;
       return { total: total, growth: growth, growthPct: growthPct,
@@ -3223,10 +3283,10 @@ document.addEventListener('DOMContentLoaded', App.load);
   window.WealthRule = (function () {
     function evaluate(d) {
       var sugs = [], fx = (d.settings && d.settings.fx) || { USD: 7.2, HKD: 0.92, JPY: 0.048 }, assets = d.assets || [];
-      var total = 0, sgovVal = 0, sgovTarget = 0;
+      var total = S.wealthTotal(), sgovVal = 0, sgovTarget = 0;
       assets.forEach(function (a) {
         var rate = a.currency === 'USD' ? fx.USD : a.currency === 'HKD' ? fx.HKD : a.currency === 'JPY' ? fx.JPY : 1;
-        var val = a.quantity * a.currentPrice * rate; total += val;
+        var val = a.quantity * a.currentPrice * rate;
         if (/sgov/i.test(a.symbol) || /货基|现金/.test(a.category)) { sgovVal += val; sgovTarget += a.targetAllocation; }
       });
       if (total > 0 && sgovTarget > 0 && (sgovVal / total * 100) > sgovTarget + 5) {

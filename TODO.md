@@ -10,10 +10,13 @@
 - [ ] **数据契约冻结确认**：确认 `pgwb_data_v1` 字段结构，作为 v1.0 稳定基线。
 - [ ] **首次启动引导**：帮助用户清空示例种子数据或一键导入自己的数据。
 - [ ] **文档体系补全**：本项目 PROJECT/VISION/TODO/CHANGELOG/AI_RULES/README 已初始化（本次任务）。
+- [ ] **Projects / Planner 重构（IMP-004，下一版本）**：引入 `PlannerEngine`，Projects 进度从手工百分比改为计划 / 排期驱动。
 
 ## P1 — 重要 / 下一迭代
 - [ ] **RuleEngine 接入 OpenAI（仅解释/细化，不决策）**：用 `docs/Prompt/` 中的 Prompt 让 LLM 对 `RuleEngine.getSuggestions()` 返回的 `Suggestion[]` 做自然语言解释与个性化细化；**决策权仍归 RuleEngine**，LLM 不得自行生成或增删建议（参考 `Home.md`/`Study.md` 等）。
 - [ ] **规则增强**：Study/Wealth/Fitness/Media Rule 接入更多真实信号（如目标配置偏离、汇率影响、睡眠趋势），并补充 `FutureRule` 真实投资/职业类高级规则。
+- [ ] **学习历史升级（IMP-002，下一版本）**：沉淀学习历史库，支持复习曲线与产出追踪。
+- [ ] **AI 学习模块重构（IMP-003，下一版本）**：将英语学习等纳入统一学习引擎。
 
 - [ ] **财富增强**：资产再平衡提示、目标配置偏离告警、分红/汇率影响可视化。
 - [ ] **英语词库同步**：`vocabBank` 与 `EnglishMod` 测验打通，支持手动添加/复习曲线。
@@ -44,3 +47,6 @@
 - [x] 版本自动检测与 PWA 更新流（v1.0.0）：`version.json` 版本源 + 「发现新版本」弹窗 + `sw.js` skipWaiting 更新流
 - [x] Today OS 首页架构（v1.1.0）：`TodayAgent` + 四 Agent 桩，9 段式 AI CEO Dashboard（Mock 数据）
 - [x] Decision Engine 决策引擎（v1.2.0）：`RuleEngine` 唯一决策中心 + 5 个 Rule（`StudyRule`/`WealthRule`/`FitnessRule`/`MediaRule`/`FutureRule`）；`TodayAgent` 改为只消费 `RuleEngine.getSuggestions()`，未接入 LLM
+- [x] 财富数据单一数据源 SSOT（v1.2.1 / BUG-001）
+- [x] 英语「换一篇」真正切换（v1.2.1 / BUG-002）
+- [x] 交易记录编辑与删除（v1.2.1 / IMP-001）

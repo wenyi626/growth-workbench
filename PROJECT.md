@@ -20,7 +20,7 @@
 
 | 项 | 值 |
 | --- | --- |
-| 当前版本号 | `1.2.0`（运行时版本源 `version.json`；v1.2.0 引入 Decision Engine 决策引擎：RuleEngine 唯一决策中心） |
+| 当前版本号 | `1.2.1`（运行时版本源 `version.json`；v1.2.0 引入 Decision Engine 决策引擎：RuleEngine 唯一决策中心；v1.2.1 修复财富单一数据源、英语「换一篇」、交易编辑/删除） |
 | 最近一次提交 | `feat: version update detection and pwa update flow`（v1.0.0） |
 | 发布状态 | 已部署 GitHub Pages，PWA 已可用 |
 | 版本标签规范 | 正式发版使用 `v1.0`、`v1.1`、`v2.0` …（见第 13 节） |
@@ -66,7 +66,7 @@
 ├── index.html              # 整个应用（约 3100+ 行，内联全部 CSS/JS）
 ├── manifest.json           # PWA 清单（名称/图标/主题色/启动方式）
 ├── sw.js                   # Service Worker（离线缓存 + 导航网络优先回退）
-├── version.json            # 版本号（当前为 "dev"，用于版本检测，本地）
+├── version.json            # 版本号（当前 1.2.1，运行时版本检测源）
 ├── icon-192.png            # PWA 图标 192
 ├── icon-512.png            # PWA 图标 512
 ├── icon-maskable-512.png   # 可遮罩图标（Android 安全区）
@@ -170,6 +170,9 @@
 - [x] AI Prompt 管理体系（`docs/Prompt/`，9 个文件 + `PromptGuide.md` 规范）
 - [x] Today OS 首页架构（v1.1.0）：`TodayAgent` 汇总 + `StudyAgent`/`WealthAgent`/`FitnessAgent`/`MediaAgent` 桩，9 段式 AI CEO Dashboard（Mock/真实摘要混合）
 - [x] Decision Engine 决策引擎（v1.2.0）：`RuleEngine` 成为**唯一决策中心**，`TodayAgent` 改为只调用 `RuleEngine.getSuggestions()`；`StudyRule`/`WealthRule`/`FitnessRule`/`MediaRule` 基于真实数据缺口产出 `Suggestion[]`，`FutureRule` 为占位空桩；详见 `docs/Architecture/DecisionEngine.md`
+- [x] 财富数据单一数据源 SSOT（v1.2.1 / BUG-001）：`S.wealthTotal()` 统一首页 / TodayAgent / 财富页 / RuleEngine / WealthAgent 的当前总资产读数
+- [x] 英语「换一篇」真正切换（v1.2.1 / BUG-002）
+- [x] 交易记录编辑与删除（v1.2.1 / IMP-001，复用现有 UI 与数据契约）
 
 ---
 
