@@ -1,0 +1,13 @@
+# OS / 编辑器
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+
+# 日志
+*.log
+
+# 依赖（后续若引入）
+node_modules/
