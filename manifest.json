@@ -1,0 +1,17 @@
+{
+  "name": "我的个人成长工作台",
+  "short_name": "成长台",
+  "description": "移动端个人成长 OS：学习、财富、身体、自媒体一体化追踪与 AI 复盘。",
+  "lang": "zh-CN",
+  "start_url": "./?utm_source=homescreen",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f3ef",
+  "theme_color": "#5b6cf0",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

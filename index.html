@@ -8,6 +8,15 @@
   <meta name="apple-mobile-web-app-title" content="成长台" />
   <meta name="theme-color" content="#f6f5f2" />
   <title>我的个人成长工作台</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="apple-touch-startup-image" media="(device-width: 1125px) and (device-height: 2436px) and (-webkit-device-pixel-ratio: 3)" href="splash-1125x2436.png" />
+  <link rel="apple-touch-startup-image" media="(device-width: 1242px) and (device-height: 2688px) and (-webkit-device-pixel-ratio: 3)" href="splash-1242x2688.png" />
+  <link rel="apple-touch-startup-image" media="(device-width: 1170px) and (device-height: 2532px) and (-webkit-device-pixel-ratio: 3)" href="splash-1170x2532.png" />
+  <link rel="apple-touch-startup-image" media="(device-width: 1290px) and (device-height: 2796px) and (-webkit-device-pixel-ratio: 3)" href="splash-1290x2796.png" />
+  <link rel="apple-touch-startup-image" media="(device-width: 750px) and (device-height: 1334px) and (-webkit-device-pixel-ratio: 2)" href="splash-750x1334.png" />
+  <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" href="splash-834x1194.png" />
+  <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" href="splash-1024x1366.png" />
   <style>
 /* =========================================================
    我的个人成长工作台 · 设计系统
@@ -3107,6 +3116,13 @@ window.App = (function () {
 document.addEventListener('DOMContentLoaded', App.load);
 
 
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function (e) { console.warn('SW 注册失败', e); });
+    });
+  }
 </script>
 </body>
 </html>
