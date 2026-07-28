@@ -3,6 +3,23 @@
 > 格式参考 [Keep a Changelog](https://keepachangelog.com/)。版本号规范：`v1.0` / `v1.1` / `v2.0` …；开发态 `version.json` 为 `dev`。
 > 每次发版必须在此追加条目，并更新 PROJECT.md 第 2 节「当前版本」。
 
+## [v1.3.2] - AI 工具课程模板标准化（行动化重构）
+
+> 本版本目标重新定义为：不是增加更多 AI 工具，而是把「一个 AI 工具应该怎么学」这件事做好。所有 AI 工具统一采用同一套 6 段课程模板，后续扩展几十个工具都不会乱。
+
+### Added
+- **统一 AI 工具课程模板（6 段固定结构）**：所有 AI 工具（Claude Code / Cursor / WorkBuddy / ChatGPT / Gemini CLI / Codex / Windsurf / MCP / A2A / n8n / Dify）一律用同一套结构渲染——① 是什么（约 5%）② 核心能力（约 15%）③ 实战案例（约 30%）④ 实际操作（约 30%）⑤ 今日任务（约 10%）⑥ 小测验（约 10%）。模板由 `AIToolMod.open` 固定渲染，新增任何工具只需填同一组字段，结构不可能漂移。
+- **`AIToolMod` 重写为固定模板渲染器**：课程 HTML 严格按 6 段生成（标注占比），`scoreQuiz` 批改单选测验、提交写入 `category:'ai'` 学习记录的逻辑保持不变；`open` 支持 `opts.prefill` / `opts.updateId` 回填与续学。
+- **11 个工具课程全部行动化重写（去百科化）**：从「知道是什么」转向「会用」——实战案例改为真实可做的案例（如「用 Cursor 写网页 / 改 Bug / 重构 / 调试 / 接 MCP」），实际操作改为可照做的分步指引，今日任务改为一个当天就能完成的小任务（如「用 Cursor 创建一个 Hello World 页面」）。
+
+### Changed
+- **数据模型**：`BUILTIN_AI` 课程对象字段从百科式（what/capabilities/scenarios/tutorial/caseStudy/exercise）改为模板式（intro/problem/forWhom/caps[]/cases[]/steps[]/task/quiz[]）；与 `Library` 注册中心、`pgwb_data_v1` 数据契约无关，不影响用户已有学习记录。
+
+### 约束遵守
+- 未改动数据契约 `pgwb_data_v1`；未触碰 Planner / Project / Memory Engine、TodayAgent、RuleEngine、财富/身体/自媒体模块与 UI 风格；保持 localStorage 兼容、PWA 正常。
+- 运行时版本 `version.json` → `1.3.2`。
+- 提交：`feat: v1.3.2 AI tool course template standardized (action-oriented, fixed 6-part)`
+
 ## [v1.3.1] - 学习引擎基础 Learning Foundation
 
 ### Added（学习基础设施）

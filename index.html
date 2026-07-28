@@ -1740,8 +1740,10 @@ window.EnglishMod = (function () {
 window.AIToolMod = (function () {
   function open(tool, opts) {
     opts = opts || {};
-    const sec = (title, body) => `<div class="sec-title" style="margin:14px 0 6px"><h2>${title}</h2></div><div class="card" style="box-shadow:none">${body}</div>`;
-    const list = (arr) => '<ul>' + (arr || []).map(x => `<li>${U.escapeHtml(x)}</li>`).join('') + '</ul>';
+    const part = (no, name, pct, body) => `<div class="sec-title" style="margin:16px 0 6px"><h2>${no} ${name} <span class="muted tiny">· 约 ${pct}</span></h2></div><div class="card" style="box-shadow:none">${body}</div>`;
+    const capHtml = (tool.caps || []).map(c => `<li><b>${U.escapeHtml(c.name || '')}</b>：${U.escapeHtml(c.desc || '')}</li>`).join('');
+    const caseHtml = (tool.cases || []).map(c => `<li><b>${U.escapeHtml(c.t || '')}</b>：${U.escapeHtml(c.d || '')}</li>`).join('');
+    const stepHtml = '<ol>' + (tool.steps || []).map(s => `<li>${U.escapeHtml(s)}</li>`).join('') + '</ol>';
     const quizHtml = (tool.quiz || []).map((q, qi) => `
       <div class="quiz-block" style="margin-top:10px">
         <div class="item-title">${qi + 1}. ${U.escapeHtml(q.q)}</div>
@@ -1750,22 +1752,19 @@ window.AIToolMod = (function () {
       </div>`).join('');
     App.openModal('🤖 ' + U.escapeHtml(tool.title), `
       <div class="field"><label>定位</label><div class="muted">${U.escapeHtml(tool.subtitle || tool.source || '')}</div></div>
-      ${sec('是什么', U.escapeHtml(tool.what || ''))}
-      ${sec('适合解决什么问题', U.escapeHtml(tool.problem || ''))}
-      ${sec('核心能力', list(tool.capabilities))}
-      ${sec('常见使用场景', list(tool.scenarios))}
-      ${sec('基础教程', U.escapeHtml(tool.tutorial || ''))}
-      ${sec('一个实际案例', U.escapeHtml(tool.caseStudy || ''))}
-      <div class="sec-title" style="margin:14px 0 6px"><h2>今日练习</h2></div>
-      <textarea id="mEx" placeholder="写下你今天打算用 ${U.escapeHtml(tool.title)} 做的一件事…">${U.escapeHtml(opts.prefill || '')}</textarea>
-      <div class="sec-title" style="margin:14px 0 6px"><h2>小测验</h2><span class="act" data-start-quiz>测一测 ✓</span></div>
+      ${part('①', '是什么', '5%', `<p>${U.escapeHtml(tool.intro || '')}</p><p><b>解决什么问题：</b>${U.escapeHtml(tool.problem || '')}</p><p><b>适合谁：</b>${U.escapeHtml(tool.forWhom || '')}</p>`)}
+      ${part('②', '核心能力', '15%', '<ul>' + capHtml + '</ul>')}
+      ${part('③', '实战案例', '30%', '<ul>' + caseHtml + '</ul>')}
+      ${part('④', '实际操作', '30%', stepHtml)}
+      ${part('⑤', '今日任务', '10%', `<p>${U.escapeHtml(tool.task || '')}</p><textarea id="mEx" placeholder="完成后写一句你的产出/心得…">${U.escapeHtml(opts.prefill || '')}</textarea>`)}
+      <div class="sec-title" style="margin:16px 0 6px"><h2>⑥ 小测验 <span class="muted tiny">· 约 10%</span></h2><span class="act" data-start-quiz>测一测 ✓</span></div>
       <div id="quizArea">${quizHtml}</div>
       <div id="quizResult"></div>
     `, () => {
       const ex = (document.getElementById('mEx').value || '').trim();
       const orig = opts.updateId ? S.data.learning.find(x => x.id === opts.updateId) : null;
       const rec = { date: (orig && orig.date) || U.todayStr(), topic: tool.title, category: 'ai', source: tool.source,
-        summary: (tool.what || '').slice(0, 120), notes: ex ? ('练习：' + ex) : '完成工具学习', understanding: 3, output: ex ? '今日练习' : '工具学习' };
+        summary: (tool.intro || '').slice(0, 120), notes: ex ? ('任务：' + ex) : '完成工具学习', understanding: 3, output: ex ? '今日任务' : '工具学习' };
       if (opts.updateId) S.update('learning', opts.updateId, rec); else S.add('learning', rec);
       App.closeModal(); U.toast(opts.updateId ? '已更新学习记录' : '已记录 AI 工具学习'); App.refresh();
     }, '标记已学');
@@ -1885,141 +1884,338 @@ window.LearningSource = (function () {
   ];
 
   const BUILTIN_AI = [
-    { id:'ai-claude-code', category:'ai', title:'Claude Code', subtitle:'Anthropic 终端 AI 编程智能体', source:'claude.com/claude-code',
-      what:'Claude Code 是 Anthropic 的终端（CLI）AI 编程智能体：读懂整个代码库、执行命令、跑测试、改多文件并提交代码，把「想法」直接变成可运行的改动。',
-      problem:'适合解决：在已有项目里做跨文件修改、快速理解陌生仓库、自动化重复开发任务（重构、补测试、修 bug），而不离开终端。',
-      capabilities:['读取并理解整个代码库（上下文感知）','执行终端命令、跑测试、调接口','多文件编辑与 git 提交','用子代理并行处理复杂任务'],
-      scenarios:['接手陌生项目，先让它讲关键流程与架构','在大仓库里批量重命名 / 改接口','让它补单元测试并跑通','让它调查偶现 bug 并给出修复'],
-      tutorial:'1）安装并登录（在终端运行 claude）；2）进入仓库根目录运行 claude；3）用自然语言下达任务，如「给 utils 补全单元测试」；4）审查它给出的 diff，用 /review 让其自检；5）确认后让它提交。',
-      caseStudy:'你接手一个 2 万行的后端，先让 Claude Code「读 src/ 并总结请求生命周期」，再让它「给 auth 模块补测试」，约 10 分钟得到可运行测试与说明。',
-      exercise:'今天用 Claude Code 对你手头的一个仓库做一件小事：让它解释一个你不太懂的函数，并补一条测试。',
-      quiz:[
-        {q:'Claude Code 主要运行在哪里？', options:['浏览器网页','终端 CLI','Excel 插件','微信小程序'], answer:1, explain:'它是命令行 AI 编程代理，跑在终端里。'},
-        {q:'以下哪个最适合交给 Claude Code？', options:['定公司年度战略','跨多文件重构并跑测试','写一首诗','点外卖'], answer:1, explain:'它擅长在代码库内做跨文件、可验证的开发任务。'},
-        {q:'Claude Code 提交代码前应该？', options:['直接自动 push 到主分支','先审查 diff 再决定','完全不碰 git','只改不提交'], answer:1, explain:'应审查其改动（可用 /review）确认后再提交。'}
-      ] },
-    { id:'ai-cursor', category:'ai', title:'Cursor', subtitle:'AI 原生代码编辑器', source:'cursor.com',
-      what:'Cursor 是基于 VS Code 的 AI 原生编辑器，把大模型嵌入编辑体验：Chat 对话、⌘K 内联改写、⌘L 多文件对话、Agent 模式自主改代码。',
-      problem:'适合解决：边写边问、内联生成 / 改写代码片段、在编辑器内完成「理解→修改→跑通」的闭环，而不切换工具。',
-      capabilities:['⌘K 内联生成 / 改写选中代码','⌘L 把文件 / 代码块加入对话上下文','Agent 模式自主多文件修改','支持 .cursorrules 自定义规则'],
-      scenarios:['选中一段代码让它改写成函数并加类型','用 Agent 模式实现「加一个导出按钮」','把报错贴进 Chat 让它定位原因','用规则约束它的代码风格'],
-      tutorial:'1）安装并导入 VS Code 配置；2）打开项目，选中代码按 ⌘K 改写；3）按 ⌘L 打开对话，把相关文件加进来；4）让 Agent 完成一个明确任务；5）看 diff、跑测试。',
-      caseStudy:'你想给列表加「按时间排序」功能，选中列表组件按 ⌘K 说「加一个按创建时间降序的排序」——它直接改组件、补排序函数、给你预览。',
-      exercise:'今天用 Cursor 对一个你正在写的函数做内联改写：让它加输入校验与注释。',
-      quiz:[
-        {q:'Cursor 内联改写代码的快捷键是？', options:['Ctrl+C','⌘K','⌘Z','F5'], answer:1, explain:'⌘K 用于内联生成 / 改写选中代码。'},
-        {q:'哪个模式让 Cursor 自主跨多文件修改？', options:['Read 模式','Agent 模式','Zen 模式','飞行模式'], answer:1, explain:'Agent 模式可自主多文件编辑。'},
-        {q:'.cursorrules 的作用是？', options:['换主题','给 AI 设定代码风格 / 约束','清缓存','装插件'], answer:1, explain:'用规则约束 AI 的生成风格与边界。'}
-      ] },
-    { id:'ai-workbuddy', category:'ai', title:'WorkBuddy', subtitle:'通用 AI 智能体（IDE / 云端）', source:'通用智能体类产品',
-      what:'WorkBuddy 一类通用智能体把「对话 + 工具调用 + 文件 / 代码操作」打包成能替你干活的助手：查资料、写文档、跑脚本、管任务，适合非程序员把重复工作自动化。',
-      problem:'适合解决：运营 / 产品日常里大量「信息整理 + 文档生成 + 轻量自动化」任务，不想写代码也能驱动 AI 完成。',
-      capabilities:['用自然语言下达多步任务','调用工具（搜索 / 文件 / 代码 / 浏览器）','生成并管理文档与表格','把复用流程沉淀为可重复的任务'],
-      scenarios:['让它把一周运营数据整理成周报','让它写一份活动复盘并配图','让它批量生成社媒草稿','把「每周竞品监控」存成定时任务'],
-      tutorial:'1）用大白话描述目标与产出；2）给它必要资料 / 权限；3）让它先列步骤再执行；4）中途用追问纠偏；5）把跑通的流程保存为模板复用。',
-      caseStudy:'你让 WorkBuddy「汇总这 5 个竞品的最新动态，输出一页对比表」，它自动检索、提炼、排版，约 10 分钟给你可直接发的文档。',
-      exercise:'今天用 WorkBuddy 类工具做一件你每周都做的事：把零散信息整理成一份可发的文档。',
-      quiz:[
-        {q:'WorkBuddy 这类通用智能体最擅长？', options:['只写前端页面','把多步办公任务自动化','只做图片','只陪聊'], answer:1, explain:'它擅长用工具串联完成多步办公 / 自动化任务。'},
-        {q:'让智能体干活最好先？', options:['直接让它瞎猜','说清目标与产出，再让其列步骤','什么都不说','只发一张图'], answer:1, explain:'目标 + 产出清晰，再让它拆解步骤，结果更可控。'}
-      ] },
-    { id:'ai-chatgpt', category:'ai', title:'ChatGPT', subtitle:'OpenAI 对话式 AI（大众入口）', source:'openai.com/chatgpt',
-      what:'ChatGPT 是面向大众的对话式 AI，擅长写作、解释、头脑风暴、代码辅助与日常问答；进阶用法是「自定义 GPT / 项目 / 工具调用」把常用流程固化下来。',
-      problem:'适合解决：从零构思内容、把模糊想法变成提纲、解释陌生概念、做轻量代码 / 文案辅助——几乎所有「动笔前」的思考与外协。',
-      capabilities:['写作 / 改写 / 润色各类文案','解释概念与调试思路','用 GPTs / 项目管理常用提示词','联网 / 代码执行等工具调用'],
-      scenarios:['把周报口述整理成正式文稿','给一篇文章生成 3 个标题与提纲','解释一段报错并给修改方向','用自定义 GPT 固定你的复盘模板'],
-      tutorial:'1）用「角色 + 任务 + 约束 + 产出格式」写清楚需求；2）先要提纲再要正文；3）让它举例子与反面例子；4）用「换个角度」迭代；5）把满意的提示词存成 GPT / 项目。',
-      caseStudy:'你要把一次活动复盘写成文章，先让 ChatGPT「列 5 个角度与提纲」，选定后逐段扩写，再让它按小红书风格润色，半小时成稿。',
-      exercise:'今天用 ChatGPT 帮你把一个你近期要写的内容，先生成提纲，再扩写一段。',
-      quiz:[
-        {q:'写需求时最有效的是？', options:['越短越好','说清角色 / 任务 / 约束 / 产出','只发表情','只说「帮我写」'], answer:1, explain:'结构化需求（角色+任务+约束+产出）结果更可控。'},
-        {q:'ChatGPT 的「GPTs / 项目」适合？', options:['换电脑','固化常用提示词与流程','清聊天记录','装游戏'], answer:1, explain:'把常用提示词与流程固化为可复用资产。'}
-      ] },
-    { id:'ai-gemini-cli', category:'ai', title:'Gemini CLI', subtitle:'Google 终端 Gemini 代理', source:'github.com/google-gemini/gemini-cli',
-      what:'Gemini CLI 是 Google 的终端 AI 代理，基于 Gemini 模型，能读代码、跑命令、连 Google 搜索与谷歌生态，适合在终端里做轻量自动化与检索。',
-      problem:'适合解决：在终端里快速查资料（含联网搜索）、改小段代码、生成脚本、把 Gemini 的长上下文用于大文件分析。',
-      capabilities:['终端内对话与代码编辑','联网搜索（Google Search 集成）','长上下文处理大文件 / 日志','可脚本化与自动化'],
-      scenarios:['让它读日志并总结异常','连搜索查一个技术方案对比','生成一段处理数据的脚本','在仓库里做小范围重构'],
-      tutorial:'1）安装 Node 环境后运行 gemini；2）进入项目目录，用自然语言提问；3）开启搜索权限查最新资料；4）让它生成脚本并本地执行；5）把常用指令写成 shell 别名。',
-      caseStudy:'你排查一个线上问题，把服务日志喂给 Gemini CLI，让它「总结近 1 小时的错误模式」，它快速定位到某个超时配置。',
-      exercise:'今天用 Gemini CLI 对你的一份日志或文档做一次总结 / 提问。',
-      quiz:[
-        {q:'Gemini CLI 区别于纯网页版的关键在于？', options:['只能在手机用','能跑在终端并连搜索 / 执行命令','只能画图','只能聊天'], answer:1, explain:'它是终端代理，可连搜索、读文件、执行命令。'},
-        {q:'它适合处理？', options:['短笑话','大文件 / 日志的长上下文分析','仅图片','仅语音'], answer:1, explain:'Gemini 长上下文适合大文件与日志分析。'}
-      ] },
-    { id:'ai-codex', category:'ai', title:'Codex', subtitle:'OpenAI 编程智能体（CLI / 云端）', source:'openai.com/codex',
-      what:'Codex 是 OpenAI 的编程智能体，能在沙箱里自主规划、改代码、跑测试并给出可审查的改动；既有 CLI 也能在云端异步执行任务。',
-      problem:'适合解决：把「明确、可验证」的编码任务交给它独立完成（如补测试、修已知 bug、加小功能），你只做审查与合并。',
-      capabilities:['在沙箱中自主多步编码','跑测试并自我验证','生成可审查的 Pull Request','支持云端异步执行'],
-      scenarios:['把一个明确 bug 交给它修并验证','让它给模块补测试','让它实现一个小功能点','审查它产出的 diff 后合并'],
-      tutorial:'1）把任务写成清晰、可验证的描述（含验收标准）；2）在仓库里启动 Codex 并粘贴任务；3）让它规划、编码、自测；4）review 其改动；5）合并或让其继续迭代。',
-      caseStudy:'你有个「导出 CSV 时中文乱码」的 bug，交给 Codex 并写明复现步骤，它定位到编码参数、改完自测通过，给你一个可合并的 PR。',
-      exercise:'今天选一个你仓库里明确的小 bug / 小功能，用 Codex 类思路写成「任务卡」交给 AI 试一次。',
-      quiz:[
-        {q:'交给 Codex 的任务最好？', options:['越模糊越好','明确且可验证（含验收标准）','只说「随便改」','纯哲学问题'], answer:1, explain:'明确、可验证的任务它才能完成并自测。'},
-        {q:'Codex 产出的改动应该？', options:['直接上生产','先审查 diff 再合并','不看直接删','忽略'], answer:1, explain:'应 review 其改动（含测试）后再合并。'}
-      ] },
-    { id:'ai-windsurf', category:'ai', title:'Windsurf', subtitle:'AI 原生编辑器（Cascade 代理）', source:'windsurf.com',
-      what:'Windsurf 是 AI 原生编辑器，核心是 Cascade 代理：能跨文件理解项目、按自然语言做大型改动，并提供「莫妮卡」式对话与命令模式。',
-      problem:'适合解决：在编辑器内完成「理解整个项目 → 大范围修改 → 跑通」的代理式开发，尤其适合从 0 搭原型或重构。',
-      capabilities:['Cascade 代理跨文件自主修改','项目级上下文理解','命令 / 对话双模式','内联补全与多文件改写'],
-      scenarios:['让它按描述从 0 搭一个页面','跨多个文件做一次重构','把一段需求变成可运行代码','让它解释并优化一段慢查询'],
-      tutorial:'1）用账号登录并打开项目；2）在 Cascade 里用自然语言描述目标；3）让它先列改动计划；4）逐块应用并看预览；5）跑测试 / 构建验证。',
-      caseStudy:'你想加一个「深色模式」开关，在 Cascade 说「给项目加深色模式，含 CSS 变量与切换按钮」，它改了样式、组件与持久化逻辑并给你预览。',
-      exercise:'今天用 Windsurf 类编辑器对一个你正在做的页面，试着用代理完成一个明确的小改动。',
-      quiz:[
-        {q:'Windsurf 的核心代理叫？', options:['Copilot','Cascade','Clippy','Jarvis'], answer:1, explain:'Windsurf 的核心是 Cascade 代理。'},
-        {q:'Cascade 擅长？', options:['只补单个词','跨文件理解项目并做大范围修改','只做 PPT','只聊天'], answer:1, explain:'它能在项目级上下文里做大型改动。'}
-      ] },
-    { id:'ai-mcp', category:'ai', title:'MCP', subtitle:'Model Context Protocol（模型上下文协议）', source:'modelcontextprotocol.io',
-      what:'MCP 是连接 AI 与外部工具 / 数据 / 系统的开放协议：用统一的「客户端—服务器」方式，让大模型安全地调用数据库、文件、API 等能力，而不必为每个工具单独写集成。',
-      problem:'适合解决：让 AI 能安全、标准化地访问你的真实数据与工具（如查订单、读文档、发消息），而不是只在对话框里空谈。',
-      capabilities:['统一协议连接工具 / 数据 / 系统','客户端—服务器标准架构','可复用官方 / 社区服务器','把能力与模型解耦'],
-      scenarios:['给 AI 接一个查数据库的后端','接一个读本地文件的服务器','用社区 MCP 连 Slack / GitHub','把内部 API 暴露给多个 AI 应用'],
-      tutorial:'1）理解角色：Host（AI 应用）+ Client + Server（能力方）；2）选或写一个 MCP Server 暴露你的能力；3）在 Host 里配置并连接；4）用自然语言让 AI 调用；5）加权限与日志做安全管控。',
-      caseStudy:'你给工作台接一个「读运营数据库」的 MCP Server，之后直接问 AI「昨天转化率是多少」，它经 MCP 查库并回答，无需手写 SQL 接口。',
-      exercise:'今天了解 MCP 的客户端—服务器模型，想一个你最想让 AI 访问的真实数据源，并描述它应暴露哪些能力。',
-      quiz:[
-        {q:'MCP 主要解决？', options:['换模型','让 AI 标准化连接外部工具 / 数据','做图片','写诗'], answer:1, explain:'MCP 用统一协议把 AI 连到真实能力与数据。'},
-        {q:'MCP 的典型架构是？', options:['只有模型','Host+Client+Server','只有数据库','只有前端'], answer:1, explain:'Host（AI 应用）通过 Client 连接提供能力的 Server。'}
-      ] },
-    { id:'ai-a2a', category:'ai', title:'A2A', subtitle:'Agent2Agent（智能体间协作协议）', source:'google.github.io/A2A',
-      what:'A2A 是 Google 提出的智能体间协作协议，让不同厂商、不同框架的 Agent 能互相发现能力、委派任务、交换结果与状态，像「员工之间的协作协议」。',
-      problem:'适合解决：当一件事需要多个专职 Agent 配合（如一个做调研、一个写代码、一个发通知），用统一协议让它们协作而非各自为战。',
-      capabilities:['Agent 卡片描述并发现彼此能力','任务委派与状态追踪','多轮消息与产物交换','跨厂商 / 框架互通'],
-      scenarios:['调研 Agent 把结论交给写作 Agent','编排多个 Agent 完成一条流水线','让一个 Agent 调用另一个 Agent 的专长','在可控边界内做多 Agent 协作'],
-      tutorial:'1）理解 Agent Card（能力名片）；2）定义任务与输入输出；3）让「编排者」按能力把子任务派给对应 Agent；4）跟踪任务状态与产物；5）设定权限与人工兜底。',
-      caseStudy:'你搭一条内容流水线：调研 Agent 产出提纲 → 写作 Agent 成稿 → 发布 Agent 排版，三者用 A2A 串联，你只审最终稿。',
-      exercise:'今天想一个需要「多个专职 Agent 配合」的真实任务，试着用 Agent Card 的思路把它拆成角色与交接。',
-      quiz:[
-        {q:'A2A 解决的是？', options:['单模型聊天','多个 Agent 之间的协作与委派','换电脑','做表格'], answer:1, explain:'A2A 让不同 Agent 互相发现、委派与交换结果。'},
-        {q:'Agent Card 的作用是？', options:['换头像','描述并暴露一个 Agent 的能力','清缓存','装插件'], answer:1, explain:'Agent Card 是能力名片，供其他 Agent 发现与调用。'}
-      ] },
-    { id:'ai-n8n', category:'ai', title:'n8n', subtitle:'开源工作流自动化平台', source:'n8n.io',
-      what:'n8n 是开源的可视化工作流自动化工具，用节点把 API、数据库、AI 串成自动化流水线，支持自托管，既能无代码拖拽也能写代码节点。',
-      problem:'适合解决：把「周期性、跨系统」的重复操作自动化（如每天拉数据→清洗→生成报告→推送），而不必为每个流程写程序。',
-      capabilities:['可视化节点编排工作流','丰富的内置集成（HTTP / 数据库 / SaaS）','AI 节点（接大模型做判断 / 生成）','可自托管与写自定义代码节点'],
-      scenarios:['每天定时拉数据生成运营周报','把表单提交自动写库并通知','用 AI 节点给内容打分 / 分类','把多个 SaaS 串成一条流水线'],
-      tutorial:'1）用 Docker 自托管或注册云端；2）新建工作流，拖入触发器（如 Schedule）；3）加 HTTP / 数据库节点取数；4）加 AI 节点做处理；5）接输出（表格 / 邮件 / 消息）并启用。',
-      caseStudy:'你设一条工作流：每天 9 点拉各渠道数据 → AI 节点写一句话总结 → 推送到群里，全程无需人工。',
-      exercise:'今天用 n8n 把一件你每周手动做的数据整理 / 通知，画成一条自动化工作流的节点草图。',
-      quiz:[
-        {q:'n8n 主要是？', options:['聊天机器人','可视化工作流自动化平台','图片编辑器','搜索引擎'], answer:1, explain:'n8n 用节点编排自动化流水线。'},
-        {q:'它适合自动化？', options:['一次性绘画','周期性、跨系统的重复操作','纯写作','纯聊天'], answer:1, explain:'它擅长把周期、跨系统的重复操作自动化。'}
-      ] },
-    { id:'ai-dify', category:'ai', title:'Dify', subtitle:'开源 LLM 应用开发平台', source:'dify.ai',
-      what:'Dify 是开源的 LLM 应用开发平台，用可视化编排把提示词、知识库（RAG）、工具、工作流组合成可上线的 AI 应用，既能做聊天助手也能做复杂 Agent。',
-      problem:'适合解决：把「基于自己资料 / 业务」的 AI 应用快速做出来（如客服助手、知识库问答、内部 Copilot），而不从零搭后端。',
-      capabilities:['可视化编排提示词 / 工作流','知识库 RAG（接入自有文档）','工具与插件扩展','可发布为 API / WebApp'],
-      scenarios:['用自有文档搭一个知识库问答','做一个按模板写周报的内部助手','把多个步骤编排成 Agent 工作流','发布成 API 给其它系统调用'],
-      tutorial:'1）自托管或注册 Dify；2）建知识库并上传文档（向量化）；3）用编排画提示词 / 工作流；4）接工具与模型；5）调试后发布为 WebApp 或 API。',
-      caseStudy:'你把团队 SOP 文档导入 Dify 知识库，做一个「新人入职问答」助手，新人直接问流程，不再翻文档。',
-      exercise:'今天想一个你手头「基于自己资料」的 AI 助手场景，列出它该吃哪些文档、回答哪类问题。',
-      quiz:[
-        {q:'Dify 主要用于？', options:['做 PPT','可视化开发 LLM 应用（含 RAG / 工作流）','写小说','剪视频'], answer:1, explain:'Dify 把提示词、知识库、工具编排成可上线的 AI 应用。'},
-        {q:'知识库（RAG）的作用是？', options:['换模型','让 AI 基于你的自有文档回答','清缓存','做图片'], answer:1, explain:'RAG 让 AI 检索并基于你上传的文档作答。'}
-      ] }
-  ];
+  { id:'ai-claude-code', category:'ai', title:'Claude Code', subtitle:'Anthropic 终端 AI 编程智能体', source:'claude.com/claude-code',
+    intro:'Claude Code 是 Anthropic 的终端 AI 编程助手：能读懂整个代码库、改多个文件、跑测试并提交代码，把你的想法直接变成可运行的改动。',
+    problem:'在已有项目里做跨文件修改、理解陌生仓库、自动化重复开发任务时，不用离开终端。',
+    forWhom:'愿意学一点命令行的开发者、想用 AI 加速改代码的人、刚接手陌生项目的人。',
+    caps:[
+      { name:'读懂整个仓库', desc:'理解项目结构与上下文，不用你手动把代码贴进去' },
+      { name:'改多文件', desc:'一次性跨多个文件完成改动，并给出可审查的 diff' },
+      { name:'跑命令与测试', desc:'在终端里执行命令、运行测试来验证改动对不对' },
+      { name:'提交代码', desc:'改完可以直接 git 提交，但需你确认后再 push' },
+      { name:'子代理并行', desc:'把复杂任务拆给多个子代理并行处理' }
+    ],
+    cases:[
+      { t:'接手陌生仓库先搞懂流程', d:'让它读 src/ 并讲清「一个请求从进来到返回的完整路径」' },
+      { t:'给老模块补测试', d:'让它给 auth 模块写单元测试并跑通' },
+      { t:'修一个跨文件 Bug', d:'描述现象，让它定位并修复相关的几个文件' },
+      { t:'批量重命名接口', d:'让它把旧函数名全局替换并修好所有引用' },
+      { t:'写提交说明', d:'让它根据 diff 生成清晰、规范的 commit message' }
+    ],
+    steps:[
+      '第一步：装好 Node 18+，在终端运行 npm install -g @anthropic-ai/claude-code 并登录账号',
+      '第二步：进入你的项目目录，运行 claude 启动它',
+      '第三步：用自然语言下任务，例如「给 utils/ 下的函数补全单元测试」',
+      '第四步：看它给出的改动（diff），用 /review 让它自检一遍',
+      '第五步：确认无误后，让它「提交这次改动」，你检查 commit 内容后再 push'
+    ],
+    task:'用 Claude Code 对你手头的一个仓库，让它解释一个你不太懂的函数，并补一条测试。',
+    quiz:[
+      { q:'Claude Code 主要运行在哪里？', options:['浏览器网页','终端 CLI','Excel 插件','微信小程序'], answer:1, explain:'它是命令行 AI 编程代理，跑在终端里。' },
+      { q:'以下哪个最适合交给 Claude Code？', options:['定公司年度战略','跨多文件重构并跑测试','写一首诗','点外卖'], answer:1, explain:'它擅长在代码库内做跨文件、可验证的开发任务。' },
+      { q:'Claude Code 提交代码前应该？', options:['直接自动 push 主分支','先审查 diff 再决定','完全不碰 git','只改不提交'], answer:1, explain:'应审查其改动（可用 /review）确认后再提交。' }
+    ] },
+  { id:'ai-cursor', category:'ai', title:'Cursor', subtitle:'AI 原生代码编辑器', source:'cursor.com',
+    intro:'Cursor 是基于 VS Code 的 AI 编辑器，把大模型嵌进你写代码的过程里：对话、内联改写、自主改代码都能做。',
+    problem:'想边写边问、内联生成或改写代码片段、在编辑器内完成「理解→修改→跑通」的闭环，而不切换工具。',
+    forWhom:'写代码的人、想用 AI 提速的开发者、做原型的运营/产品。',
+    caps:[
+      { name:'⌘K 内联改写', desc:'选中一段代码，让它直接改写或生成' },
+      { name:'⌘L 多文件对话', desc:'把相关文件加入上下文，连续追问' },
+      { name:'Agent 模式', desc:'自主跨多个文件修改并给出结果' },
+      { name:'.cursorrules', desc:'用规则文件约束 AI 的代码风格与边界' }
+    ],
+    cases:[
+      { t:'用 Cursor 写网页', d:'描述想要的页面，让它生成 HTML/CSS 并预览' },
+      { t:'用 Cursor 修改 Bug', d:'把报错贴进去，让它定位原因并修复' },
+      { t:'用 Cursor 重构代码', d:'让它把一团乱的函数拆清楚、补上类型' },
+      { t:'用 Cursor 调试', d:'让它逐步分析「为什么页面没效果」' },
+      { t:'用 Cursor 接 MCP', d:'接一个 MCP Server，让它能查你的业务数据' }
+    ],
+    steps:[
+      '第一步：从 cursor.com 下载安装，首次打开可一键导入你的 VS Code 配置',
+      '第二步：打开一个项目文件夹',
+      '第三步：选中一段代码，按 ⌘K，输入「加输入校验和注释」让它改写',
+      '第四步：按 ⌘L 打开对话，把相关文件加进去继续问',
+      '第五步：试 Agent 模式，输入「加一个导出按钮」，看它改完并本地跑一下'
+    ],
+    task:'用 Cursor 创建一个 Hello World 页面（一个只显示「Hello World」的网页）。',
+    quiz:[
+      { q:'Cursor 内联改写代码的快捷键是？', options:['Ctrl+C','⌘K','⌘Z','F5'], answer:1, explain:'⌘K 用于内联生成/改写选中代码。' },
+      { q:'哪个模式让 Cursor 自主跨多文件修改？', options:['Read 模式','Agent 模式','Zen 模式','飞行模式'], answer:1, explain:'Agent 模式可自主多文件编辑。' },
+      { q:'.cursorrules 的作用是？', options:['换主题','给 AI 设定代码风格与约束','清缓存','装插件'], answer:1, explain:'用规则约束 AI 的生成风格与边界。' }
+    ] },
+  { id:'ai-workbuddy', category:'ai', title:'WorkBuddy', subtitle:'通用 AI 智能体（IDE / 云端）', source:'通用智能体类产品',
+    intro:'WorkBuddy 一类通用智能体把「对话 + 工具调用 + 文件/代码操作」打包成能替你干活的助手，不想写代码也能驱动 AI 完成多步任务。',
+    problem:'运营/产品日常里大量「信息整理 + 文档生成 + 轻量自动化」任务，可以用自然语言交给 AI 跑完。',
+    forWhom:'运营、产品、任何想把重复办公活交给 AI 的非程序员。',
+    caps:[
+      { name:'多步任务', desc:'用大白话描述目标，它拆成步骤自己执行' },
+      { name:'调用工具', desc:'搜索、读文件、跑代码、开浏览器等都能用' },
+      { name:'生成文档', desc:'周报、复盘、对比表、社媒草稿都能写' },
+      { name:'沉淀模板', desc:'把跑通的流程存成可复用任务，下次一键用' }
+    ],
+    cases:[
+      { t:'汇总竞品动态', d:'让它检索 5 个竞品最新动作，输出一页对比表' },
+      { t:'写活动复盘', d:'给几个要点，让它成稿并排好结构' },
+      { t:'批量生成社媒草稿', d:'给主题，让它出一周的小红书文案' },
+      { t:'整理周报', d:'把零散数据整理成可直接发的周报' },
+      { t:'定时监控', d:'把「每周竞品监控」存成定时任务自动跑' }
+    ],
+    steps:[
+      '第一步：打开 WorkBuddy，新建一个对话或任务',
+      '第二步：用大白话写清「目标 + 产出」，例如「把这份销售数据整理成周报」',
+      '第三步：给它必要资料（贴文本，或授权读取文件）',
+      '第四步：让它先列步骤再执行，中途用追问纠偏',
+      '第五步：把跑通的流程「存为模板」，下次直接复用'
+    ],
+    task:'用 WorkBuddy 类工具，把你本周要做的一次信息整理（如竞品截图或数据）整理成一份可发文档。',
+    quiz:[
+      { q:'WorkBuddy 这类通用智能体最擅长？', options:['只写前端页面','把多步办公任务自动化','只做图片','只陪聊'], answer:1, explain:'它擅长用工具串联完成多步办公/自动化任务。' },
+      { q:'让智能体干活最好先？', options:['直接让它瞎猜','说清目标与产出，再让其列步骤','什么都不说','只发一张图'], answer:1, explain:'目标+产出清晰，再让它拆解步骤，结果更可控。' },
+      { q:'把跑通的流程存成模板的好处是？', options:['占内存','下次一键复用','没好处','必须删掉'], answer:1, explain:'沉淀为可复用任务，避免每次从头描述。' }
+    ] },
+  { id:'ai-chatgpt', category:'ai', title:'ChatGPT', subtitle:'OpenAI 对话式 AI（大众入口）', source:'openai.com/chatgpt',
+    intro:'ChatGPT 是面向大众的对话式 AI，擅长写作、解释、头脑风暴和轻量代码辅助；进阶用法是用自定义 GPT 把常用流程固化下来。',
+    problem:'从零构思内容、把模糊想法变成提纲、解释陌生概念、做轻量文案/代码辅助——几乎所有「动笔前」的思考与外协。',
+    forWhom:'所有人；尤其运营/产品做内容、写作、调研。',
+    caps:[
+      { name:'写作润色', desc:'各类文案的生成、改写与润色' },
+      { name:'解释概念', desc:'把难懂的东西讲明白，给例子' },
+      { name:'自定义 GPT', desc:'把常用提示词与流程固化为可复用资产' },
+      { name:'工具调用', desc:'联网、代码执行、画图等扩展能力' }
+    ],
+    cases:[
+      { t:'列文章提纲', d:'给主题，让它出 5 个角度和详细提纲' },
+      { t:'写小红书文案', d:'给卖点，让它出多篇不同风格的文案' },
+      { t:'解释报错', d:'贴报错，让它讲原因和修改方向' },
+      { t:'做活动复盘', d:'给要点，让它成结构化的复盘稿' },
+      { t:'固定复盘模板', d:'把满意的提示词存成 GPT/项目，下次复用' }
+    ],
+    steps:[
+      '第一步：打开 chatgpt.com，新建一个对话',
+      '第二步：用「角色 + 任务 + 约束 + 产出格式」写清需求',
+      '第三步：先要提纲，再要正文，分段扩写',
+      '第四步：让它举正例/反例，用「换个角度」迭代',
+      '第五步：把满意的提示词存成 GPT 或项目，下次直接调用'
+    ],
+    task:'用 ChatGPT 帮你把一个近期要写的内容，先生成提纲，再扩写其中一段。',
+    quiz:[
+      { q:'写需求时最有效的是？', options:['越短越好','说清角色/任务/约束/产出','只发表情','只说帮我写'], answer:1, explain:'结构化需求（角色+任务+约束+产出）结果更可控。' },
+      { q:'ChatGPT 的「GPTs / 项目」适合？', options:['换电脑','固化常用提示词与流程','清聊天记录','装游戏'], answer:1, explain:'把常用提示词与流程固化为可复用资产。' },
+      { q:'更好的写作方式是？', options:['一次要全文','先提纲再分段扩写','直接交差','不修改'], answer:1, explain:'先要提纲再扩写，质量更可控。' }
+    ] },
+  { id:'ai-gemini-cli', category:'ai', title:'Gemini CLI', subtitle:'Google 终端 Gemini 代理', source:'github.com/google-gemini/gemini-cli',
+    intro:'Gemini CLI 是 Google 的终端 AI 代理，基于 Gemini 模型，能读代码、跑命令、连 Google 搜索、分析大文件。',
+    problem:'在终端里快速查资料（含联网搜索）、改小段代码、分析大日志/长文档，而不离开命令行。',
+    forWhom:'喜欢命令行的开发者、需要分析长文档/日志的人。',
+    caps:[
+      { name:'终端对话', desc:'在命令行里直接问问题、改代码' },
+      { name:'联网搜索', desc:'开权限后可查最新资料（Google Search 集成）' },
+      { name:'长上下文', desc:'处理大文件、长日志很拿手' },
+      { name:'可脚本化', desc:'写成 shell 命令，串进自动化流程' }
+    ],
+    cases:[
+      { t:'总结日志异常', d:'把服务日志喂给它，总结近 1 小时的错误模式' },
+      { t:'查技术方案', d:'开搜索权限，对比两个方案的优劣' },
+      { t:'生成处理脚本', d:'让它写一段清洗数据的脚本并在本地跑' },
+      { t:'读长文档', d:'上传一份长 PDF，问它关键结论' },
+      { t:'小范围重构', d:'在仓库里做局部修改并验证' }
+    ],
+    steps:[
+      '第一步：装好 Node，运行 npx @google/gemini-cli 或 gemini 启动',
+      '第二步：进入项目目录，用自然语言提问',
+      '第三步：按需开启搜索权限，查最新资料',
+      '第四步：让它生成脚本并在本地执行验证',
+      '第五步：把常用指令写成 shell 别名，方便复用'
+    ],
+    task:'用 Gemini CLI 对你的一份日志或长文档做一次总结/提问。',
+    quiz:[
+      { q:'Gemini CLI 区别于纯网页版的关键在于？', options:['只能在手机用','能跑在终端并连搜索/执行命令','只能画图','只能聊天'], answer:1, explain:'它是终端代理，可连搜索、读文件、执行命令。' },
+      { q:'它适合处理？', options:['短笑话','大文件/日志的长上下文分析','仅图片','仅语音'], answer:1, explain:'Gemini 长上下文适合大文件与日志分析。' },
+      { q:'想查最新资料应该？', options:['不用管','开启搜索权限','关掉模型','删日志'], answer:1, explain:'开启搜索权限后它可检索最新信息。' }
+    ] },
+  { id:'ai-codex', category:'ai', title:'Codex', subtitle:'OpenAI 编程智能体（CLI / 云端）', source:'openai.com/codex',
+    intro:'Codex 是 OpenAI 的编程智能体，在沙箱里自主规划、改代码、跑测试，并给出可审查的改动；既有 CLI 也能在云端异步执行。',
+    problem:'把「明确、可验证」的编码任务交给它独立完成（如补测试、修已知 bug、加小功能），你只做审查与合并。',
+    forWhom:'开发者；想把明确的小任务自动化的人。',
+    caps:[
+      { name:'自主编码', desc:'在沙箱里多步修改代码' },
+      { name:'自测验证', desc:'跑测试确认改动确实可行' },
+      { name:'产出 PR', desc:'生成可审查的 Pull Request' },
+      { name:'云端异步', desc:'后台跑任务，不用一直盯着' }
+    ],
+    cases:[
+      { t:'修已知 Bug', d:'写清复现步骤，让它定位并修复' },
+      { t:'补测试', d:'让它给某个模块补单元测试' },
+      { t:'加小功能', d:'让它实现明确的小功能点' },
+      { t:'审改动', d:'review 它产出的 diff 后再合并' },
+      { t:'做迁移', d:'让它完成明确的格式/字段迁移' }
+    ],
+    steps:[
+      '第一步：在支持 Codex 的环境（CLI 或云端）打开你的仓库',
+      '第二步：把任务写成「明确 + 可验证」的描述，含验收标准',
+      '第三步：粘贴任务，让它规划、编码、自测',
+      '第四步：review 它生成的 diff 和测试',
+      '第五步：确认后合并，或让它继续迭代'
+    ],
+    task:'选你仓库里一个明确的小 bug 或小功能，写成「任务卡」（目标 + 验收标准）交给 Codex 类思路试一次。',
+    quiz:[
+      { q:'交给 Codex 的任务最好？', options:['越模糊越好','明确且可验证（含验收标准）','只说随便改','纯哲学问题'], answer:1, explain:'明确、可验证的任务它才能完成并自测。' },
+      { q:'Codex 产出的改动应该？', options:['直接上生产','先审查 diff 再合并','不看直接删','忽略'], answer:1, explain:'应 review 其改动（含测试）后再合并。' },
+      { q:'Codex 的特色能力是？', options:['只聊天','在沙箱自测并产出 PR','只画图','只写诗'], answer:1, explain:'它能在沙箱里自测并给出可审查的 PR。' }
+    ] },
+  { id:'ai-windsurf', category:'ai', title:'Windsurf', subtitle:'AI 原生编辑器（Cascade 代理）', source:'windsurf.com',
+    intro:'Windsurf 是 AI 原生编辑器，核心是 Cascade 代理：能跨文件理解项目、按自然语言做大型改动。',
+    problem:'想在编辑器内完成「理解整个项目 → 大范围修改 → 跑通」的代理式开发，尤其适合从 0 搭原型或重构。',
+    forWhom:'写代码的人、从 0 搭原型的人。',
+    caps:[
+      { name:'Cascade 代理', desc:'跨文件自主修改代码' },
+      { name:'项目级理解', desc:'理解整个项目的上下文' },
+      { name:'命令/对话双模式', desc:'既能下命令也能多轮对话' },
+      { name:'内联补全', desc:'多文件改写与补全' }
+    ],
+    cases:[
+      { t:'从 0 搭页面', d:'描述需求，让它生成完整页面' },
+      { t:'跨文件重构', d:'一次重构多个相关文件' },
+      { t:'需求变代码', d:'把一段需求描述变成可运行代码' },
+      { t:'优化慢查询', d:'让它解释并优化一条慢 SQL' },
+      { t:'加完整功能', d:'加一个含样式与逻辑的小功能' }
+    ],
+    steps:[
+      '第一步：登录 Windsurf，打开你的项目',
+      '第二步：在 Cascade 里用自然语言描述目标',
+      '第三步：让它先列出改动计划',
+      '第四步：逐块应用改动并看预览',
+      '第五步：跑测试/构建验证没问题'
+    ],
+    task:'用 Windsurf 类编辑器，对你正在做的页面，试试用代理完成一个明确的小改动。',
+    quiz:[
+      { q:'Windsurf 的核心代理叫？', options:['Copilot','Cascade','Clippy','Jarvis'], answer:1, explain:'Windsurf 的核心是 Cascade 代理。' },
+      { q:'Cascade 擅长？', options:['只补单个词','跨文件理解项目并做大范围修改','只做 PPT','只聊天'], answer:1, explain:'它能在项目级上下文里做大型改动。' },
+      { q:'让代理动手前最好先？', options:['直接改','让它列改动计划再应用','不理它','删项目'], answer:1, explain:'先看计划再应用，更可控、易回退。' }
+    ] },
+  { id:'ai-mcp', category:'ai', title:'MCP', subtitle:'Model Context Protocol（模型上下文协议）', source:'modelcontextprotocol.io',
+    intro:'MCP 是让 AI 安全连接外部工具/数据/系统的开放协议：用统一的「客户端—服务器」方式，让大模型调用数据库、文件、API 等能力。',
+    problem:'想让 AI 能标准化访问你的真实数据与工具（查订单、读文档、发消息），而不是只在对话框里空谈。',
+    forWhom:'想让 AI 接入自己业务系统的开发者、技术运营。',
+    caps:[
+      { name:'统一协议', desc:'一套方式连接各种外部能力' },
+      { name:'客户端—服务器', desc:'标准架构，能力方可插拔' },
+      { name:'可复用', desc:'官方/社区已有大量现成 Server' },
+      { name:'能力与模型解耦', desc:'换模型不影响已接的能力' }
+    ],
+    cases:[
+      { t:'接数据库问答', d:'配一个读库 Server，直接问「昨天转化率是多少」' },
+      { t:'读本地文件', d:'让 AI 读你电脑里的文档来回答' },
+      { t:'连 Slack/GitHub', d:'用社区 MCP 让 AI 发消息、建 issue' },
+      { t:'暴露内部 API', d:'把内部接口暴露给多个 AI 应用复用' },
+      { t:'查订单状态', d:'接电商后台，让 AI 直接查订单' }
+    ],
+    steps:[
+      '第一步：理解三角色——Host（AI 应用）+ Client + Server（能力方）',
+      '第二步：选一个现成 MCP Server（如文件系统、数据库），或列清你的能力清单',
+      '第三步：在支持 MCP 的 Host（如 Claude、Cursor）设置里添加 Server 地址',
+      '第四步：连接后，用自然语言让 AI 调用，例如「读一下桌面上的销售表」',
+      '第五步：加权限与日志，管好 AI 能访问什么'
+    ],
+    task:'想一个你最想让 AI 访问的真实数据源（如销售表/订单库），写清楚它应暴露哪些能力。',
+    quiz:[
+      { q:'MCP 主要解决？', options:['换模型','让 AI 标准化连接外部工具/数据','做图片','写诗'], answer:1, explain:'MCP 用统一协议把 AI 连到真实能力与数据。' },
+      { q:'MCP 的典型架构是？', options:['只有模型','Host+Client+Server','只有数据库','只有前端'], answer:1, explain:'Host（AI 应用）通过 Client 连接提供能力的 Server。' },
+      { q:'用社区 MCP Server 的好处是？', options:['更慢','不用自己从零写集成','更贵','没用'], answer:1, explain:'现成 Server 可直接复用，省去重复对接。' }
+    ] },
+  { id:'ai-a2a', category:'ai', title:'A2A', subtitle:'Agent2Agent（智能体间协作协议）', source:'google.github.io/A2A',
+    intro:'A2A 是 Google 提出的智能体间协作协议，让不同厂商、不同框架的 Agent 互相发现能力、委派任务、交换结果与状态。',
+    problem:'一件事需要多个专职 Agent 配合（如一个调研、一个写代码、一个发通知）时，用统一协议让它们协作而非各自为战。',
+    forWhom:'想搭多 Agent 流水线的开发者、技术运营。',
+    caps:[
+      { name:'能力发现', desc:'Agent Card 互相看到彼此能做什么' },
+      { name:'任务委派', desc:'把子任务派给最合适的 Agent' },
+      { name:'状态追踪', desc:'跟踪任务进度与产物' },
+      { name:'跨厂商互通', desc:'不同框架的 Agent 也能协作' }
+    ],
+    cases:[
+      { t:'调研→写作流水线', d:'调研 Agent 产出提纲，交给写作 Agent 成稿' },
+      { t:'多 Agent 编排', d:'编排多个 Agent 完成一条内容流水线' },
+      { t:'专长调用', d:'一个 Agent 调用另一个的专长' },
+      { t:'内容生产流', d:'调研→成稿→发布三段串联' },
+      { t:'可控协作', d:'在设定边界内做多 Agent 配合' }
+    ],
+    steps:[
+      '第一步：理解 Agent Card（能力名片）的概念',
+      '第二步：给每个 Agent 定义「能做什么、输入输出是什么」',
+      '第三步：让「编排者」按能力把子任务派给对应 Agent',
+      '第四步：跟踪各 Agent 的任务状态与产物',
+      '第五步：设定权限与人工兜底，防止跑偏'
+    ],
+    task:'想一个需要「多个专职 Agent 配合」的真实任务，用 Agent Card 思路拆成角色与交接。',
+    quiz:[
+      { q:'A2A 解决的是？', options:['单模型聊天','多个 Agent 之间的协作与委派','换电脑','做表格'], answer:1, explain:'A2A 让不同 Agent 互相发现、委派与交换结果。' },
+      { q:'Agent Card 的作用是？', options:['换头像','描述并暴露一个 Agent 的能力','清缓存','装插件'], answer:1, explain:'Agent Card 是能力名片，供其他 Agent 发现与调用。' },
+      { q:'多 Agent 协作最好？', options:['各干各的','由编排者按能力委派并跟踪','全丢给一个','不协作'], answer:1, explain:'用编排者统一派任务、跟状态，结果可控。' }
+    ] },
+  { id:'ai-n8n', category:'ai', title:'n8n', subtitle:'开源工作流自动化平台', source:'n8n.io',
+    intro:'n8n 是开源的可视化工作流自动化工具，用节点把 API、数据库、AI 串成自动化流水线，支持自托管，既能无代码拖拽也能写代码节点。',
+    problem:'把「周期性、跨系统」的重复操作自动化（如每天拉数据→清洗→生成报告→推送），而不必为每个流程写程序。',
+    forWhom:'运营、需要自动化重复流程的人、技术运营。',
+    caps:[
+      { name:'可视化编排', desc:'拖节点连成工作流，直观' },
+      { name:'丰富集成', desc:'内置 HTTP/数据库/各类 SaaS 节点' },
+      { name:'AI 节点', desc:'接大模型做判断、总结、分类' },
+      { name:'可自托管', desc:'也能写自定义代码节点' }
+    ],
+    cases:[
+      { t:'自动周报', d:'每天拉数据→AI 写总结→推送到群里' },
+      { t:'表单入库通知', d:'表单提交自动写库并通知负责人' },
+      { t:'内容打分', d:'用 AI 节点给内容分类/打分' },
+      { t:'多 SaaS 串联', d:'把多个系统串成一条流水线' },
+      { t:'定时备份', d:'定时导出数据到表格存档' }
+    ],
+    steps:[
+      '第一步：用 Docker 自托管，或注册 n8n 云端',
+      '第二步：新建工作流，拖入「定时器 Schedule」作为触发',
+      '第三步：加 HTTP/数据库节点把数据取出来',
+      '第四步：加 AI 节点做处理（总结/分类）',
+      '第五步：接输出（表格/邮件/消息）并启用工作流'
+    ],
+    task:'用 n8n 把一件你每周手动做的数据整理/通知，画成一条自动化工作流的节点草图。',
+    quiz:[
+      { q:'n8n 主要是？', options:['聊天机器人','可视化工作流自动化平台','图片编辑器','搜索引擎'], answer:1, explain:'n8n 用节点编排自动化流水线。' },
+      { q:'它适合自动化？', options:['一次性绘画','周期性、跨系统的重复操作','纯写作','纯聊天'], answer:1, explain:'它擅长把周期、跨系统的重复操作自动化。' },
+      { q:'n8n 里的 AI 节点通常用来？', options:['换主题','做判断/总结/分类','清缓存','装插件'], answer:1, explain:'AI 节点用来对数据做智能处理。' }
+    ] },
+  { id:'ai-dify', category:'ai', title:'Dify', subtitle:'开源 LLM 应用开发平台', source:'dify.ai',
+    intro:'Dify 是开源的 LLM 应用开发平台，用可视化编排把提示词、知识库（RAG）、工具、工作流组合成可上线的 AI 应用，既能做聊天助手也能做复杂 Agent。',
+    problem:'把「基于自己资料/业务」的 AI 应用快速做出来（如客服助手、知识库问答、内部 Copilot），而不从零搭后端。',
+    forWhom:'想做内部 AI 助手/知识库问答的运营、产品、开发者。',
+    caps:[
+      { name:'可视化编排', desc:'提示词/工作流拖拽即可' },
+      { name:'知识库 RAG', desc:'接入你自己的文档回答' },
+      { name:'工具扩展', desc:'插件/API 扩展能力' },
+      { name:'一键发布', desc:'出 API 或 WebApp' }
+    ],
+    cases:[
+      { t:'知识库问答', d:'导入团队文档，做新人入职问答助手' },
+      { t:'写周报助手', d:'按模板自动生成周报' },
+      { t:'Agent 工作流', d:'把多步骤编排成一个 Agent' },
+      { t:'内部 Copilot', d:'发布成 API 给其它系统调用' },
+      { t:'SOP 助手', d:'把 SOP 文档变成可问答的助手' }
+    ],
+    steps:[
+      '第一步：自托管或注册 Dify',
+      '第二步：建知识库，上传你的文档（自动向量化）',
+      '第三步：用编排画提示词/工作流',
+      '第四步：接工具与模型',
+      '第五步：调试后发布为 WebApp 或 API'
+    ],
+    task:'想一个你手头「基于自己资料」的 AI 助手场景，列出它该吃哪些文档、回答哪类问题。',
+    quiz:[
+      { q:'Dify 主要用于？', options:['做 PPT','可视化开发 LLM 应用（含 RAG/工作流）','写小说','剪视频'], answer:1, explain:'Dify 把提示词、知识库、工具编排成可上线的 AI 应用。' },
+      { q:'知识库（RAG）的作用是？', options:['换模型','让 AI 基于你的自有文档回答','清缓存','做图片'], answer:1, explain:'RAG 让 AI 检索并基于你上传的文档作答。' },
+      { q:'做好一个应用后通常？', options:['删掉','发布成 API 或 WebApp','只截图','不管'], answer:1, explain:'Dify 可一键发布为 API 或 WebApp 供使用。' }
+    ] }
+];
 
   const BUILTIN_PRODUCT = [
     { id:'prod-notion', category:'product', title:'用 Notion 搭个人知识库', source:'官方模板 + 实操',

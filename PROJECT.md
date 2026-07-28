@@ -20,7 +20,7 @@
 
 | 项 | 值 |
 | --- | --- |
-| 当前版本号 | `1.3.1`（运行时版本源 `version.json`；v1.2.0 Decision Engine 决策引擎；v1.2.1 财富 SSOT/英语换一篇/交易编辑删除；v1.2.2 学习历史点击回看；**v1.3.1 学习引擎基础 Learning Foundation：LearningLibrary + LearningSource + 学习历史升级 + 英语读 Library + AI 工具学习中心 AIToolMod（11 个真实工具）**） |
+| 当前版本号 | `1.3.2`（运行时版本源 `version.json`；v1.2.0 Decision Engine；v1.2.1 财富 SSOT/英语换一篇/交易编辑删除；v1.2.2 学习历史点击回看；v1.3.1 学习引擎基础 Learning Foundation（Library + LearningSource + 学习历史升级 + 英语读 Library + AI 工具学习中心 AIToolMod）；**v1.3.2 AI 工具课程模板标准化（统一 6 段行动化模板，11 个真实工具去百科化）**） |
 | 最近一次提交 | `feat: version update detection and pwa update flow`（v1.0.0） |
 | 发布状态 | 已部署 GitHub Pages，PWA 已可用 |
 | 版本标签规范 | 正式发版使用 `v1.0`、`v1.1`、`v2.0` …（见第 13 节） |
@@ -125,7 +125,7 @@
 | `EnglishMod` | `open(lesson, opts)` `openQuiz` `openBankQuiz`（v1.3.1：`open` 支持 `opts.prefill` 回填复述、`opts.updateId` 继续学习更新原记录） |
 | `Library` | `register` `registerAll` `get` `all` `byCategory` `findByTitle` `search` `categories`（v1.3.1 学习对象统一注册中心：英语 8 篇 / AI 工具 11 个 / 产品 2 篇） |
 | `LearningSource` | `addSource` `load` `LocalSource` `RemoteSource`（v1.3.1 数据源抽象：内置 LocalSource 聚合进 Library；`RemoteSource` 为 V1.3.2 联网预留，当前返回空） |
-| `AIToolMod` | `open(tool, opts)` `scoreQuiz(tool)`（v1.3.1 AI 工具学习中心：`open` 渲染完整工具课程并支持 `opts.prefill`/`opts.updateId` 回填与续学；`scoreQuiz` 批改单选测验） |
+| `AIToolMod` | `open(tool, opts)` `scoreQuiz(tool)`（v1.3.2 统一课程模板渲染器：`open` 用固定 6 段模板（是什么/核心能力/实战案例/实际操作/今日任务/小测验）渲染任意工具课，支持 `opts.prefill`/`opts.updateId` 回填与续学；`scoreQuiz` 批改单选测验） |
 | `Pages` | `today` `learn` `wealth` `body` `content` `profile`（各页渲染器） |
 | `TodayAgent` | `getDashboard` / `regen`（首页聚合入口；**不再自行生成建议**，改为调用 `RuleEngine.getSuggestions()` 取 Top3；各维度汇总文案仍由 Study/Wealth/Fitness/Media Agent 提供） |
 | `RuleEngine` | `getSuggestions()`（**唯一决策中心**：聚合 5 个 Rule 的 `Suggestion[]`，按 priority 降序、estimatedTime 升序排序后输出） |
@@ -180,6 +180,7 @@
 - [x] 学习历史点击回看（v1.2.2）：历史记录可点击恢复完整内容；英语匹配 EN_LIB 复原文章/单词/语法/测验，其它类别恢复已存摘要/笔记/产出
 - [x] 学习引擎基础 Learning Foundation（v1.3.1）：新增 `Library` 学习对象统一注册中心 + `LearningSource` 数据源抽象（内置 LocalSource 含 英语8篇 / AI工具11个真实工具 / 产品2篇，**不再写死 4 篇**；`RemoteSource` 为 V1.3.2 联网预留）；英语模块改为读取 `Library`（不再直接依赖 EN_LIB）；学习历史升级「查看历史笔记 / 继续学习 / 重新学习」，记录可完整恢复；保留数据契约 `pgwb_data_v1` 不变
 - [x] AI 工具学习中心（v1.3.1）：AI 页从抽象的「生成今日 AI 学习任务」表单重构为真实工具学习中心，内置 11 个真实 AI 工具（Claude Code / Cursor / WorkBuddy / ChatGPT / Gemini CLI / Codex / Windsurf / MCP / A2A / n8n / Dify）的完整课程（是什么/适合解决什么问题/核心能力/常见使用场景/基础教程/实际案例/今日练习/小测验），点击工具卡片或「今日推荐」即可学→做→测并标记已学；删除旧的 `genAiTask`/`aiPrefillFromLib` 抽象表单
+- [x] AI 工具课程模板标准化（v1.3.2）：所有 AI 工具统一 6 段固定模板（是什么/核心能力/实战案例/实际操作/今日任务/小测验），由 `AIToolMod.open` 固定渲染；11 个真实工具课程行动化重写（去百科化），实战案例与分步操作可照做，今日任务为当天可完成的小任务。
 
 ---
 
@@ -206,7 +207,7 @@
 
 1. **v1.0（已达成）**：文档体系 + 版本自动检测与 PWA 更新流（见 v1.0.0）。下一步：数据契约冻结。
 2. **v1.1（已达成）**：Today OS 首页架构（v1.1.0）+ Decision Engine 决策引擎（v1.2.0）、财富 SSOT / 英语换一篇 / 交易编辑（v1.2.1）、学习历史点击回看（v1.2.2）。
-3. **v1.3（进行中）**：学习引擎基础 Learning Foundation（v1.3.1 已落地：LearningLibrary + LearningSource + 学习历史升级 + 英语读 Library + AI 工具学习中心 AIToolMod（11 个真实工具））；**v1.3.2 规划：联网 AI 学习的真实课文源与个性化练习**（当前 `RemoteSource` 仅占位，未实现联网，不触碰数据契约）。
+3. **v1.3（收尾）**：学习引擎基础 Learning Foundation（v1.3.1 已落地：LearningLibrary + LearningSource + 学习历史升级 + 英语读 Library + AI 工具学习中心 AIToolMod）；**v1.3.2 已落地：AI 工具课程模板标准化**——所有 AI 工具统一 6 段固定模板、行动化重写（去百科化），新增工具只填同一组字段即可复用模板；**联网 AI 学习（`RemoteSource` 真实课文源）顺延至后续版本**，不在本版本实现联网、不改动数据契约。
 4. **v2.0（愿景）**：「AI Personal CEO」——端侧 AI 自动串联四大维度，给出每日优先级与行动建议。详见 VISION.md。
 
 ---
