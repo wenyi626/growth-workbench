@@ -845,6 +845,269 @@ window.S = (function () {
 })();
 
 
+/* === Project Library：本地项目知识库（V1.3.3，非联网 / 非 AI / 纯本地内置数据） === */
+window.ProjectLibrary = (function () {
+  /* 每个模板至少包含：项目介绍 / 目标 / 适合人群 / 预计周期 / 阶段列表 /
+     每阶段的步骤（标题 + 完成标准 + 预计耗时）/ 推荐学习资料 / 容易踩坑。
+     第一版内置 4 个完整项目 + 1 个通用兜底模板，后续版本继续扩充。 */
+  const TEMPLATES = [
+    {
+      id: 'tpl-ai-workbench', name: '个人 AI 工作台', keywords: ['ai', '工作台', 'workbench', '效率', '个人助手', '自动化', '智能体', 'agent'],
+      intro: '把日常重复的运营、写作、分析工作，用 AI 串成可复用的自动化工作台（网页或脚本），让自己从重复劳动里抽身。',
+      goal: '做出一个能真正替你跑日常任务的私人 AI 工作台，沉淀可复用流程。',
+      forWhom: '想用 AI 提效、但还没系统做过产品的运营 / 产品 / 非程序员。',
+      estDuration: '4–6 周',
+      stages: [
+        { name: '需求分析', steps: [
+          { title: '梳理高频重复任务', doneCriteria: '列出 10 个可交给 AI 的重复任务', estTime: '2h' },
+          { title: '选出 1 个最小切口', doneCriteria: '确定第一个要自动化的场景', estTime: '1h' }
+        ] },
+        { name: '产品设计', steps: [
+          { title: '画核心流程图', doneCriteria: '产出一张端到端流程图', estTime: '2h' },
+          { title: '定义输入输出', doneCriteria: '写清每个步骤的输入与产出', estTime: '1h' }
+        ] },
+        { name: 'UI 设计', steps: [
+          { title: '画低保真界面', doneCriteria: '用纸或工具画出主要页面', estTime: '2h' }
+        ] },
+        { name: 'MVP 开发', steps: [
+          { title: '搭最小可用版本', doneCriteria: '能跑通核心一步', estTime: '1 周' },
+          { title: '接 AI 能力', doneCriteria: '核心任务可由 AI 完成', estTime: '1 周' }
+        ] },
+        { name: '测试', steps: [
+          { title: '真实场景走查', doneCriteria: '用 3 个真实任务验证', estTime: '3h' }
+        ] },
+        { name: '上线', steps: [
+          { title: '部署可访问', doneCriteria: '他人能打开使用', estTime: '半天' }
+        ] },
+        { name: '持续优化', steps: [
+          { title: '收集使用反馈', doneCriteria: '记录 3 条改进点', estTime: '持续' },
+          { title: '沉淀为模板', doneCriteria: '把跑通的流程固化', estTime: '2h' }
+        ] }
+      ],
+      resources: ['Anthropic / OpenAI 官方文档', 'WorkBuddy / Cursor 使用教程', '《用 AI 把重复工作自动化》类文章'],
+      pitfalls: ['一上来就想做全家桶，先做一个能用的小工具', '忽视错误处理，AI 出错时无人兜底', '不做版本记录，改坏无从回退']
+    },
+    {
+      id: 'tpl-xhs', name: '小红书账号', keywords: ['小红书', 'xhs', 'rednote', '自媒体', '账号', '博主', '种草', '笔记'],
+      intro: '从 0 做一个能持续产出、慢慢涨粉的小红书账号，把真实经验变成内容。',
+      goal: '建立稳定更新节奏，跑通「选题→创作→发布→复盘」闭环。',
+      forWhom: '想把真实经历 / 专业变成内容的人，尤其女生成长、AI、投资、运营方向。',
+      estDuration: '2–3 个月起量',
+      stages: [
+        { name: '定位', steps: [
+          { title: '明确人设与受众', doneCriteria: '写出一句话定位', estTime: '2h' },
+          { title: '定内容方向', doneCriteria: '列出 3 个可长期写的方向', estTime: '1h' }
+        ] },
+        { name: '竞品调研', steps: [
+          { title: '找 10 个对标账号', doneCriteria: '整理其选题与爆款结构', estTime: '3h' }
+        ] },
+        { name: '内容生产', steps: [
+          { title: '建选题库', doneCriteria: '攒 30 个选题', estTime: '2h' },
+          { title: '写第一篇笔记', doneCriteria: '完成图文 / 视频草稿', estTime: '3h' },
+          { title: '固定排版风格', doneCriteria: '形成可复用的模板', estTime: '2h' }
+        ] },
+        { name: '发布与运营', steps: [
+          { title: '按节奏发布', doneCriteria: '连续发布 10 篇', estTime: '3 周' },
+          { title: '互动维护', doneCriteria: '回复评论、看数据', estTime: '持续' }
+        ] },
+        { name: '复盘优化', steps: [
+          { title: '看数据找爆款规律', doneCriteria: '总结 3 条可复用经验', estTime: '2h' },
+          { title: '迭代内容策略', doneCriteria: '调整下月方向', estTime: '1h' }
+        ] }
+      ],
+      resources: ['小红书创作学院', '爆款笔记拆解方法', '封面 / 排版工具（醒图、Canva）'],
+      pitfalls: ['一开始追求完美不敢发', '追热点丢了自己的人设', '不看数据凭感觉更', '断更导致权重掉']
+    },
+    {
+      id: 'tpl-taobao', name: '淘宝自动化', keywords: ['淘宝', 'taobao', '电商', '店铺', '运营', '自动化', '选品', '上货'],
+      intro: '用工具把淘宝 / 天猫店铺里重复的选品、上货、数据复盘工作自动化，减少手工操作。',
+      goal: '搭建一套能稳定跑的店铺运营自动化流程，提高效率、降低出错。',
+      forWhom: '电商运营、店主，熟悉后台但被重复劳动拖住的人。',
+      estDuration: '3–5 周',
+      stages: [
+        { name: '流程盘点', steps: [
+          { title: '列出重复操作', doneCriteria: '梳理出 10 个可自动化环节', estTime: '2h' },
+          { title: '评估可行性', doneCriteria: '标记哪些能用工具/脚本', estTime: '1h' }
+        ] },
+        { name: '选品辅助', steps: [
+          { title: '搭选品看板', doneCriteria: '汇总竞品与数据', estTime: '半天' }
+        ] },
+        { name: '上货自动化', steps: [
+          { title: '做标题/详情模板', doneCriteria: '形成可复用模板', estTime: '半天' },
+          { title: '批量生成草稿', doneCriteria: '一次产出多条', estTime: '1 天' }
+        ] },
+        { name: '数据复盘', steps: [
+          { title: '做每日数据表', doneCriteria: '自动汇总核心指标', estTime: '半天' },
+          { title: '写复盘规则', doneCriteria: '明确什么情况要调整', estTime: '2h' }
+        ] },
+        { name: '上线运行', steps: [
+          { title: '小范围试运行', doneCriteria: '跑一周无大错', estTime: '1 周' },
+          { title: '固化流程', doneCriteria: '写成 SOP', estTime: '2h' }
+        ] }
+      ],
+      resources: ['千牛 / 生意参谋文档', 'RPA / 表格自动化工具教程', '电商数据指标说明'],
+      pitfalls: ['直接动生产环境出错', '忽略平台规则被处罚', '自动化后不复查数据']
+    },
+    {
+      id: 'tpl-website', name: '个人网站', keywords: ['网站', '个人网站', '官网', '博客', 'blog', 'web', 'app', '小程序', '产品', 'saas', '官网', '作品集', 'portfolio', 'kitchen', 'magic'],
+      intro: '从 0 做一个属于你自己的网站 / 产品（官网、博客、作品集或小程序），把想法变成线上可访问的东西。',
+      goal: '上线一个能访问、能持续迭代的网站 / 产品，跑通开发到上线全流程。',
+      forWhom: '任何想把想法落地的个人；含非程序员（用 AI 辅助开发）。',
+      estDuration: '3–8 周',
+      stages: [
+        { name: '需求分析', steps: [
+          { title: '明确网站用途', doneCriteria: '一句话说清解决什么问题', estTime: '1h' },
+          { title: '列出核心页面', doneCriteria: '画出页面清单', estTime: '1h' }
+        ] },
+        { name: '产品设计', steps: [
+          { title: '画信息架构', doneCriteria: '产出站点地图', estTime: '2h' },
+          { title: '写核心文案', doneCriteria: '定下首页与关键页文案', estTime: '2h' }
+        ] },
+        { name: 'UI 设计', steps: [
+          { title: '做视觉稿', doneCriteria: '确定配色与版式', estTime: '半天' }
+        ] },
+        { name: 'MVP 开发', steps: [
+          { title: '搭页面骨架', doneCriteria: '主要页面可访问', estTime: '1 周' },
+          { title: '接必要功能', doneCriteria: '核心交互可用', estTime: '1 周' }
+        ] },
+        { name: '测试', steps: [
+          { title: '多端走查', doneCriteria: '手机/桌面都正常', estTime: '半天' }
+        ] },
+        { name: '上线', steps: [
+          { title: '部署并绑定域名', doneCriteria: '公网可访问', estTime: '半天' }
+        ] },
+        { name: '持续优化', steps: [
+          { title: '收集反馈', doneCriteria: '记 3 条改进', estTime: '持续' },
+          { title: '迭代版本', doneCriteria: '发一版更新', estTime: '1 周' }
+        ] }
+      ],
+      resources: ['MDN Web 文档', 'GitHub Pages / Vercel 部署教程', 'HTML/CSS 基础', '用 Cursor / WorkBuddy 辅助开发'],
+      pitfalls: ['在完美设计上耗太久不发', '功能一口气做太多', '不做移动端适配', '上线后不维护']
+    },
+    {
+      id: 'tpl-generic', name: '通用项目', keywords: ['项目', '计划', '目标', '学习', '习惯', '读书', '健身', '其他'],
+      intro: '一个通用的项目骨架，适用于没有专属模板的项目。创建后可按需要增删改。',
+      goal: '把目标拆成可推进的阶段与步骤，持续推进。',
+      forWhom: '任何想系统推进一个目标的人。',
+      estDuration: '视项目而定',
+      stages: [
+        { name: '目标拆解', steps: [
+          { title: '写清最终目标', doneCriteria: '一句话目标', estTime: '30 分' },
+          { title: '拆成阶段', doneCriteria: '列出 3–5 个阶段', estTime: '1h' }
+        ] },
+        { name: '计划', steps: [
+          { title: '排第一步', doneCriteria: '明确最小一步', estTime: '30 分' }
+        ] },
+        { name: '执行', steps: [
+          { title: '推进并记录', doneCriteria: '完成首个可见产出', estTime: '持续' }
+        ] },
+        { name: '复盘', steps: [
+          { title: '回顾与调整', doneCriteria: '总结 3 条', estTime: '1h' }
+        ] }
+      ],
+      resources: ['《搞定》类时间管理书', '任何任务管理工具'],
+      pitfalls: ['目标太大无从下手', '不做复盘越做越偏']
+    }
+  ];
+
+  function norm(s) { return (s || '').toLowerCase().trim(); }
+
+  /* 按名称模糊匹配最合适的模板；无匹配返回通用兜底模板 */
+  function match(name) {
+    const n = norm(name);
+    if (!n) return TEMPLATES[TEMPLATES.length - 1];
+    let best = null, bestScore = 0;
+    TEMPLATES.forEach(function (t) {
+      let score = 0;
+      const tn = norm(t.name);
+      if (n.indexOf(tn) >= 0 || tn.indexOf(n) >= 0) score += 5;
+      (t.keywords || []).forEach(function (k) {
+        const kk = norm(k);
+        if (kk && (n.indexOf(kk) >= 0 || kk.indexOf(n) >= 0)) score += kk.length >= 2 ? 3 : 1;
+      });
+      if (score > bestScore) { bestScore = score; best = t; }
+    });
+    return bestScore > 0 ? best : TEMPLATES[TEMPLATES.length - 1];
+  }
+
+  function get(id) { return TEMPLATES.find(function (t) { return t.id === id; }) || null; }
+  function all() { return TEMPLATES.slice(); }
+
+  return { match: match, get: get, all: all };
+})();
+
+
+/* === Project Engine：根据 ProjectLibrary 自动生成项目（V1.3.3） === */
+window.ProjectEngine = (function () {
+  /* 由模板生成「草稿」项目（仅内存，不落库）；为每个阶段/步骤分配 id，步骤 done=false */
+  function buildDraft(name, tpl) {
+    const stages = (tpl.stages || []).map(function (s) {
+      return {
+        id: U.uid('st'), name: s.name,
+        steps: (s.steps || []).map(function (st) {
+          return { id: U.uid('sp'), title: st.title || '', doneCriteria: st.doneCriteria || '', estTime: st.estTime || '', done: false };
+        })
+      };
+    });
+    return {
+      id: U.uid('pj'),
+      name: name || tpl.name,
+      goal: tpl.goal || '',
+      intro: tpl.intro || '',
+      forWhom: tpl.forWhom || '',
+      estDuration: tpl.estDuration || '',
+      stage: stages[0] ? stages[0].name : '想法',
+      progress: 0,
+      nextAction: (stages[0] && stages[0].steps[0]) ? stages[0].steps[0].title : '开始第一步',
+      notes: '',
+      versions: [{ v: '0.1', date: U.todayStr(), note: '由模板「' + tpl.name + '」创建' }],
+      aiChats: [],
+      sourceType: tpl.id === 'tpl-generic' ? 'generic' : 'library',
+      libraryId: tpl.id,
+      templateName: tpl.name,
+      stages: stages,
+      resources: (tpl.resources || []).slice(),
+      pitfalls: (tpl.pitfalls || []).slice()
+    };
+  }
+
+  /* 进度自动计算：done/total；下一步 = 第一个未完成步骤；当前阶段 = 该步骤所在阶段 */
+  function compute(p) {
+    const stages = p.stages || [];
+    let total = 0, done = 0, next = null, curStage = '';
+    for (let i = 0; i < stages.length; i++) {
+      const steps = stages[i].steps || [];
+      for (let j = 0; j < steps.length; j++) {
+        total++;
+        if (steps[j].done) done++;
+        if (!steps[j].done && next === null) { next = steps[j].title; curStage = stages[i].name; }
+      }
+    }
+    const progress = total ? Math.round(done / total * 100) : 0;
+    const nextAction = total ? (next !== null ? next : '🎉 全部完成') : '添加你的第一步';
+    return { total: total, done: done, progress: progress, nextAction: nextAction, currentStage: curStage };
+  }
+
+  /* 把派生值写回项目对象（progress / nextAction / stage），供其它模块读取 */
+  function recompute(p) {
+    const c = compute(p);
+    p.progress = c.progress;
+    p.nextAction = c.nextAction;
+    if (c.currentStage) p.stage = c.currentStage;
+    return c;
+  }
+
+  /* 正式创建：补好版本信息后写入数据层 */
+  function create(draft) {
+    const p = Object.assign({}, draft);
+    recompute(p);
+    return S.add('projects', p);
+  }
+
+  return { buildDraft: buildDraft, compute: compute, recompute: recompute, create: create };
+})();
+
+
 /* === assets/js/charts.js === */
 /* 轻量 SVG 图表（无依赖，离线可用） */
 window.Charts = (function () {
@@ -2640,70 +2903,249 @@ window.Pages.learn = (function () {
     <div class="card" style="padding-top:6px"><div class="list">${listHtml}</div></div>`;
   }
 
-  /* ---- 创造能力 ---- */
+  /* ---- 创造能力（V1.3.3：ProjectLibrary + ProjectEngine 驱动） ---- */
+  /* 进度 / 下一步 统一由 ProjectEngine 计算：有 stages 的项目自动算，旧项目回退原字段 */
+  function projProgress(p) {
+    return (p.stages && p.stages.length) ? window.ProjectEngine.compute(p).progress : (p.progress || 0);
+  }
+  function projNext(p) {
+    return (p.stages && p.stages.length) ? window.ProjectEngine.compute(p).nextAction : (p.nextAction || '—');
+  }
+  function projStage(p) {
+    if (p.stages && p.stages.length) { const c = window.ProjectEngine.compute(p); return c.currentStage || p.stage; }
+    return p.stage;
+  }
+
   function buildView() {
     const projects = S.data.projects;
     const html = projects.map(p => `
       <div class="card" data-proj="${p.id}" style="box-shadow:var(--shadow-soft)">
-        <div class="card-head"><h3>${U.escapeHtml(p.name)}</h3><span class="tag build">${U.escapeHtml(p.stage)}</span></div>
-        <div class="muted tiny" style="margin-top:-6px">${U.escapeHtml(p.goal)}</div>
-        <div style="margin:12px 0 4px" class="muted tiny">进度 ${p.progress||0}%</div>
-        <div class="barr"><span style="width:${p.progress||0}%"></span></div>
-        <div class="muted tiny" style="margin-top:10px">下一步：<b style="color:var(--text)">${U.escapeHtml(p.nextAction||'—')}</b></div>
+        <div class="card-head"><h3>${U.escapeHtml(p.name)}</h3><span class="tag build">${U.escapeHtml(projStage(p) || '')}</span></div>
+        <div class="muted tiny" style="margin-top:-6px">${U.escapeHtml(p.goal || '')}</div>
+        <div style="margin:12px 0 4px" class="muted tiny">进度 ${projProgress(p)}%</div>
+        <div class="barr"><span style="width:${projProgress(p)}%"></span></div>
+        <div class="muted tiny" style="margin-top:10px">下一步：<b style="color:var(--text)">${U.escapeHtml(projNext(p))}</b></div>
       </div>`).join('');
     return `
     <div class="sec-title"><h2>🚀 我的项目</h2><span class="act" data-add-proj>＋ 新项目</span></div>
     ${html || '<div class="card"><div class="empty"><div class="e-ico">🚀</div><div class="e-sub">还没有项目，创建一个吧</div></div></div>'}
-    <div class="notice">流程：发现问题 → 想法 → 验证 → 设计 → AI开发 → 测试 → 反馈 → 迭代</div>`;
+    <div class="notice">输入项目名称即可自动生成路线（来自本地项目知识库），创建前可自由增删改步骤。</div>`;
   }
 
   function openProj(id) {
     const p = S.data.projects.find(x => x.id === id); if (!p) return;
-    const verHtml = (p.versions||[]).slice().reverse().map(v => `<div class="item" style="border:none;padding:8px 0">
+    // 旧项目（无 stages）保持原手动编辑弹窗，确保历史数据不受影响
+    if (!p.stages || !p.stages.length) { openProjLegacy(id); return; }
+    const c = window.ProjectEngine.compute(p);
+    const verHtml = (p.versions || []).slice().reverse().map(v => `<div class="item" style="border:none;padding:8px 0">
       <div class="item-main"><div class="item-title">v${U.escapeHtml(v.v)} · ${U.fmtDateCN(v.date)}</div>
-      <div class="item-sub">${U.escapeHtml(v.note||'')}</div></div></div>`).join('') || '<div class="muted tiny">暂无版本</div>';
+      <div class="item-sub">${U.escapeHtml(v.note || '')}</div></div></div>`).join('') || '<div class="muted tiny">暂无版本</div>';
+    const stagesHtml = p.stages.map(function (s, si) {
+      const done = (s.steps || []).filter(function (st) { return st.done; }).length;
+      const stepsHtml = (s.steps || []).map(function (st, ki) {
+        return `<label class="item" style="border:none;padding:8px 0;cursor:pointer">
+          <input type="checkbox" data-step="${si}_${ki}" ${st.done ? 'checked' : ''} style="margin-right:8px;flex:none">
+          <div class="item-main">
+            <div class="item-title" style="${st.done ? 'text-decoration:line-through;opacity:.55' : ''}">${U.escapeHtml(st.title)}</div>
+            <div class="item-sub">完成标准：${U.escapeHtml(st.doneCriteria || '—')} · 预计 ${U.escapeHtml(st.estTime || '—')}</div>
+          </div></label>`;
+      }).join('');
+      return `<div class="card" style="box-shadow:none;margin:10px 0;padding:12px">
+        <div class="card-head"><h3>${U.escapeHtml(s.name)}</h3><span class="muted tiny">${done}/${s.steps.length}</span></div>
+        ${stepsHtml}</div>`;
+    }).join('');
+    const resHtml = (p.resources && p.resources.length) ? `<div class="field"><label>推荐学习资料</label><div class="muted tiny">${p.resources.map(function (r) { return '· ' + U.escapeHtml(r); }).join('<br>')}</div></div>` : '';
+    const pitHtml = (p.pitfalls && p.pitfalls.length) ? `<div class="field"><label>容易踩坑</label><div class="muted tiny">${p.pitfalls.map(function (r) { return '⚠ ' + U.escapeHtml(r); }).join('<br>')}</div></div>` : '';
     App.openModal('🚀 ' + p.name, `
-      <div class="field"><label>项目目标</label><textarea id="pGoal">${U.escapeHtml(p.goal||'')}</textarea></div>
-      <div class="field"><label>当前阶段</label><input id="pStage" value="${U.escapeHtml(p.stage||'')}"></div>
-      <div class="field"><label>进度（%）</label><input id="pProg" type="number" min="0" max="100" value="${p.progress||0}"></div>
-      <div class="field"><label>下一步行动</label><textarea id="pNext">${U.escapeHtml(p.nextAction||'')}</textarea></div>
-      <div class="field"><label>笔记</label><textarea id="pNote">${U.escapeHtml(p.notes||'')}</textarea></div>
+      <div class="field"><label>项目介绍</label><div class="muted tiny">${U.escapeHtml(p.intro || '—')}</div></div>
+      <div class="field"><label>项目目标</label><div class="muted tiny">${U.escapeHtml(p.goal || '—')}</div></div>
+      <div class="field"><label>适合人群</label><div class="muted tiny">${U.escapeHtml(p.forWhom || '—')}</div></div>
+      <div class="field"><label>预计周期</label><div class="muted tiny">${U.escapeHtml(p.estDuration || '—')}</div></div>
+      <div style="margin:12px 0 4px" class="muted tiny">进度 ${c.progress}% · 共 ${c.total} 步，已完成 ${c.done} 步</div>
+      <div class="barr"><span style="width:${c.progress}%"></span></div>
+      <div class="muted tiny" style="margin-top:10px">下一步：<b style="color:var(--text)">${U.escapeHtml(c.nextAction)}</b></div>
+      ${resHtml}${pitHtml}
+      <div class="sec-title" style="margin:14px 4px 4px"><h2>阶段与步骤</h2></div>
+      ${stagesHtml}
       <div class="card" style="box-shadow:none"><div class="muted tiny" style="font-weight:700;margin-bottom:4px">版本迭代</div>${verHtml}
         <div class="tool-row" style="margin-top:8px"><input id="pVer" placeholder="如 v0.2" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2)">
         <button class="btn btn-sm" data-add-ver>记录版本</button></div>
       </div>
-    `, () => {
-      S.update('projects', id, {
-        goal: val('pGoal'), stage: val('pStage'), progress: parseInt(val('pProg'))||0,
-        nextAction: val('pNext'), notes: val('pNote')
-      });
-      App.closeModal(); U.toast('已保存项目'); App.refresh();
+      <div class="field"><label>笔记</label><textarea id="pNote">${U.escapeHtml(p.notes || '')}</textarea></div>
+    `, function () {
+      S.update('projects', id, { notes: (document.getElementById('pNote').value || '').trim() });
+      App.closeModal(); U.toast('已保存'); App.refresh();
     }, '保存');
-    function val(id){ return document.getElementById(id).value.trim(); }
-    setTimeout(() => {
+    // 勾选步骤 → 更新 done → 自动重算进度 / 下一步
+    p.stages.forEach(function (s, si) {
+      (s.steps || []).forEach(function (st, ki) {
+        const cb = document.querySelector('[data-step="' + si + '_' + ki + '"]');
+        if (cb) cb.onchange = function () {
+          st.done = cb.checked; window.ProjectEngine.recompute(p); S.save(); openProj(id);
+        };
+      });
+    });
+    setTimeout(function () {
       const addBtn = document.querySelector('[data-add-ver]');
-      if (addBtn) addBtn.onclick = () => {
+      if (addBtn) addBtn.onclick = function () {
         const v = document.getElementById('pVer').value.trim(); if (!v) return;
-        const p2 = S.data.projects.find(x=>x.id===id);
+        const p2 = S.data.projects.find(function (x) { return x.id === id; });
         p2.versions = p2.versions || [];
-        p2.versions.push({ v, date: U.todayStr(), note: '手动记录' });
+        p2.versions.push({ v: v, date: U.todayStr(), note: '手动记录' });
         S.save(); U.toast('已记录版本'); openProj(id);
       };
     }, 30);
   }
 
+  /* 旧项目（无 stages）兼容：保留原手动编辑弹窗 */
+  function openProjLegacy(id) {
+    const p = S.data.projects.find(x => x.id === id); if (!p) return;
+    const verHtml = (p.versions || []).slice().reverse().map(v => `<div class="item" style="border:none;padding:8px 0">
+      <div class="item-main"><div class="item-title">v${U.escapeHtml(v.v)} · ${U.fmtDateCN(v.date)}</div>
+      <div class="item-sub">${U.escapeHtml(v.note || '')}</div></div></div>`).join('') || '<div class="muted tiny">暂无版本</div>';
+    App.openModal('🚀 ' + p.name, `
+      <div class="field"><label>项目目标</label><textarea id="pGoal">${U.escapeHtml(p.goal || '')}</textarea></div>
+      <div class="field"><label>当前阶段</label><input id="pStage" value="${U.escapeHtml(p.stage || '')}"></div>
+      <div class="field"><label>进度（%）</label><input id="pProg" type="number" min="0" max="100" value="${p.progress || 0}"></div>
+      <div class="field"><label>下一步行动</label><textarea id="pNext">${U.escapeHtml(p.nextAction || '')}</textarea></div>
+      <div class="field"><label>笔记</label><textarea id="pNote">${U.escapeHtml(p.notes || '')}</textarea></div>
+      <div class="card" style="box-shadow:none"><div class="muted tiny" style="font-weight:700;margin-bottom:4px">版本迭代</div>${verHtml}
+        <div class="tool-row" style="margin-top:8px"><input id="pVer" placeholder="如 v0.2" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2)">
+        <button class="btn btn-sm" data-add-ver>记录版本</button></div>
+      </div>
+    `, function () {
+      S.update('projects', id, {
+        goal: val('pGoal'), stage: val('pStage'), progress: parseInt(val('pProg')) || 0,
+        nextAction: val('pNext'), notes: val('pNote')
+      });
+      App.closeModal(); U.toast('已保存项目'); App.refresh();
+    }, '保存');
+    function val(id) { return document.getElementById(id).value.trim(); }
+    setTimeout(function () {
+      const addBtn = document.querySelector('[data-add-ver]');
+      if (addBtn) addBtn.onclick = function () {
+        const v = document.getElementById('pVer').value.trim(); if (!v) return;
+        const p2 = S.data.projects.find(function (x) { return x.id === id; });
+        p2.versions = p2.versions || [];
+        p2.versions.push({ v: v, date: U.todayStr(), note: '手动记录' });
+        S.save(); U.toast('已记录版本'); openProjLegacy(id);
+      };
+    }, 30);
+  }
+
+  /* 新建项目：先输入名称 → 由 ProjectEngine 生成路线 → 预览可编辑 → 确认才创建 */
   function addProj() {
     App.openModal('🚀 新建项目', `
-      <div class="field"><label>项目名称</label><input id="nName" placeholder="例如：个人成长工作台"></div>
-      <div class="field"><label>项目目标</label><textarea id="nGoal" placeholder="它要解决什么问题？"></textarea></div>
-      <div class="field"><label>当前阶段</label><input id="nStage" value="想法"></div>
-      <div class="field"><label>下一步行动</label><textarea id="nNext" placeholder="最小的一步"></textarea></div>
-    `, () => {
-      S.add('projects', { name: val('nName')||'未命名项目', goal: val('nGoal'), stage: val('nStage')||'想法',
-        progress: 0, nextAction: val('nNext'), notes: '', versions: [{v:'0.1', date:U.todayStr(), note:'创建项目'}], aiChats: [] });
+      <div class="field"><label>项目名称</label><input id="nName" placeholder="例如：个人 AI 工作台 / 小红书账号 / 淘宝自动化 / 个人网站"></div>
+      <div class="muted tiny" style="margin:6px 0 0">输入名称后，系统会根据本地项目知识库自动生成完整路线；创建前可自由增删改步骤。</div>
+    `, function () {
+      const name = (document.getElementById('nName').value || '').trim();
+      if (!name) { U.toast('请先输入项目名称'); return; }
+      const tpl = window.ProjectLibrary.match(name);
+      renderPreview(window.ProjectEngine.buildDraft(name, tpl), tpl);
+    }, '生成路线');
+  }
+
+  /* 路线预览（可编辑草稿，确认前不落库） */
+  function renderPreview(draft, tpl) {
+    const isGeneric = draft.sourceType === 'generic';
+    const stagesHtml = draft.stages.map(function (s, si) {
+      const stepsHtml = (s.steps || []).map(function (st, ki) {
+        return `<div class="item" style="border:none;padding:6px 0">
+          <div class="item-main">
+            <input id="spTitle_${si}_${ki}" value="${U.escapeHtml(st.title)}" style="width:100%;border:none;background:transparent;font-weight:600" placeholder="步骤标题">
+            <input id="spCrit_${si}_${ki}" value="${U.escapeHtml(st.doneCriteria)}" style="width:100%;border:none;background:transparent;font-size:12px;color:var(--text-3)" placeholder="完成标准">
+            <input id="spTime_${si}_${ki}" value="${U.escapeHtml(st.estTime)}" style="width:100%;border:none;background:transparent;font-size:12px;color:var(--text-3)" placeholder="预计耗时">
+          </div>
+          <div class="item-arrow" style="display:flex;gap:4px">
+            <button class="mini-btn" data-sp-up="${si}_${ki}">↑</button>
+            <button class="mini-btn" data-sp-dn="${si}_${ki}">↓</button>
+            <button class="mini-btn" data-sp-del="${si}_${ki}">✕</button>
+          </div></div>`;
+      }).join('');
+      return `<div class="card" style="box-shadow:none;margin:10px 0;padding:12px">
+        <div class="tool-row" style="margin-bottom:6px">
+          <input id="stgName_${si}" value="${U.escapeHtml(s.name)}" style="flex:1;font-weight:700;border:none;background:transparent;font-size:15px" placeholder="阶段名称">
+          <button class="mini-btn" data-stg-up="${si}">↑</button>
+          <button class="mini-btn" data-stg-dn="${si}">↓</button>
+          <button class="mini-btn" data-stg-del="${si}">删</button>
+        </div>
+        ${stepsHtml}
+        <button class="btn btn-sm btn-ghost" data-sp-add="${si}" style="margin-top:4px">＋ 添加步骤</button>
+      </div>`;
+    }).join('');
+
+    const html = `
+      <div class="field"><label>项目名称</label><input id="pName" value="${U.escapeHtml(draft.name)}"></div>
+      <div class="field"><label>项目介绍</label><textarea id="pIntro" placeholder="这个项目是什么">${U.escapeHtml(draft.intro || '')}</textarea></div>
+      <div class="field"><label>项目目标</label><textarea id="pGoal" placeholder="它要解决什么问题">${U.escapeHtml(draft.goal || '')}</textarea></div>
+      <div class="field"><label>适合人群</label><input id="pWho" value="${U.escapeHtml(draft.forWhom || '')}" placeholder="谁适合做这个项目"></div>
+      <div class="field"><label>预计周期</label><input id="pDur" value="${U.escapeHtml(draft.estDuration || '')}" placeholder="如 4–6 周"></div>
+      <div class="field"><label>推荐学习资料（每行一条）</label><textarea id="pRes">${(draft.resources || []).map(function (r) { return U.escapeHtml(r); }).join('\n')}</textarea></div>
+      <div class="field"><label>容易踩坑（每行一条）</label><textarea id="pPit">${(draft.pitfalls || []).map(function (r) { return U.escapeHtml(r); }).join('\n')}</textarea></div>
+      <div class="sec-title" style="margin:14px 4px 4px"><h2>项目路线（可调整）</h2></div>
+      <div class="muted tiny" style="margin:0 4px 6px">${isGeneric ? '未匹配到专属模板，已生成通用路线，可自由调整。' : '已根据模板「' + U.escapeHtml(tpl.name) + '」生成，可自由增删改。'}共 <b id="stepCount"></b> 步。</div>
+      ${stagesHtml}
+      <button class="btn btn-sm btn-ghost" data-stg-add style="margin-top:6px">＋ 添加阶段</button>`;
+
+    App.openModal('🚀 预览项目路线', html, function () {
+      draft.name = (document.getElementById('pName').value || '').trim() || draft.name;
+      draft.intro = document.getElementById('pIntro').value.trim();
+      draft.goal = document.getElementById('pGoal').value.trim();
+      draft.forWhom = document.getElementById('pWho').value.trim();
+      draft.estDuration = document.getElementById('pDur').value.trim();
+      draft.resources = document.getElementById('pRes').value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
+      draft.pitfalls = document.getElementById('pPit').value.split('\n').map(function (x) { return x.trim(); }).filter(Boolean);
+      window.ProjectEngine.create(draft);
       App.closeModal(); U.toast('项目已创建'); App.refresh();
-    }, '创建');
-    function val(id){ return document.getElementById(id).value.trim(); }
+    }, '确认创建');
+
+    // 文本字段双向绑定到 draft（oninput）
+    const bindText = function (id, fn) { const el = document.getElementById(id); if (el) el.oninput = function () { fn(el.value); }; };
+    bindText('pName', function (v) { draft.name = v.trim() || draft.name; });
+    bindText('pIntro', function (v) { draft.intro = v.trim(); });
+    bindText('pGoal', function (v) { draft.goal = v.trim(); });
+    bindText('pWho', function (v) { draft.forWhom = v.trim(); });
+    bindText('pDur', function (v) { draft.estDuration = v.trim(); });
+    bindText('pRes', function (v) { draft.resources = v.split('\n').map(function (x) { return x.trim(); }).filter(Boolean); });
+    bindText('pPit', function (v) { draft.pitfalls = v.split('\n').map(function (x) { return x.trim(); }).filter(Boolean); });
+    draft.stages.forEach(function (s, si) {
+      const sn = document.getElementById('stgName_' + si); if (sn) sn.oninput = function () { s.name = sn.value; };
+      (s.steps || []).forEach(function (st, ki) {
+        const t = document.getElementById('spTitle_' + si + '_' + ki); if (t) t.oninput = function () { st.title = t.value; };
+        const c = document.getElementById('spCrit_' + si + '_' + ki); if (c) c.oninput = function () { st.doneCriteria = c.value; };
+        const tm = document.getElementById('spTime_' + si + '_' + ki); if (tm) tm.oninput = function () { st.estTime = tm.value; };
+      });
+    });
+
+    // 结构性操作：直接改 draft 后重渲染预览
+    const root = document.getElementById('modalRoot');
+    root.querySelectorAll('[data-sp-up]').forEach(function (b) { b.onclick = function () { moveStep(b.dataset.spUp, -1); renderPreview(draft, tpl); }; });
+    root.querySelectorAll('[data-sp-dn]').forEach(function (b) { b.onclick = function () { moveStep(b.dataset.spDn, 1); renderPreview(draft, tpl); }; });
+    root.querySelectorAll('[data-sp-del]').forEach(function (b) { b.onclick = function () { delStep(b.dataset.spDel); renderPreview(draft, tpl); }; });
+    root.querySelectorAll('[data-sp-add]').forEach(function (b) { b.onclick = function () { addStep(+b.dataset.spAdd); renderPreview(draft, tpl); }; });
+    root.querySelectorAll('[data-stg-up]').forEach(function (b) { b.onclick = function () { moveStage(+b.dataset.stgUp, -1); renderPreview(draft, tpl); }; });
+    root.querySelectorAll('[data-stg-dn]').forEach(function (b) { b.onclick = function () { moveStage(+b.dataset.stgDn, 1); renderPreview(draft, tpl); }; });
+    root.querySelectorAll('[data-stg-del]').forEach(function (b) { b.onclick = function () { delStage(+b.dataset.stgDel); renderPreview(draft, tpl); }; });
+    const addStg = root.querySelector('[data-stg-add]'); if (addStg) addStg.onclick = function () { addStage(); renderPreview(draft, tpl); };
+
+    updateCount();
+
+    function totalSteps() { let n = 0; draft.stages.forEach(function (s) { n += (s.steps || []).length; }); return n; }
+    function updateCount() { const el = document.getElementById('stepCount'); if (el) el.textContent = totalSteps(); }
+    function addStep(si) { draft.stages[si].steps.push({ id: U.uid('sp'), title: '', doneCriteria: '', estTime: '', done: false }); }
+    function delStep(key) { const p = key.split('_'); const si = +p[0], ki = +p[1]; draft.stages[si].steps.splice(ki, 1); }
+    function moveStep(key, dir) {
+      const p = key.split('_'); const si = +p[0], ki = +p[1]; const arr = draft.stages[si].steps;
+      const j = ki + dir; if (j < 0 || j >= arr.length) return;
+      const t = arr[ki]; arr[ki] = arr[j]; arr[j] = t;
+    }
+    function addStage() { draft.stages.push({ id: U.uid('st'), name: '新阶段', steps: [] }); }
+    function delStage(si) { draft.stages.splice(si, 1); }
+    function moveStage(si, dir) {
+      const j = si + dir; if (j < 0 || j >= draft.stages.length) return;
+      const t = draft.stages[si]; draft.stages[si] = draft.stages[j]; draft.stages[j] = t;
+    }
   }
 
   /* ---- 学习历史 ---- */

@@ -3,6 +3,34 @@
 > 格式参考 [Keep a Changelog](https://keepachangelog.com/)。版本号规范：`v1.0` / `v1.1` / `v2.0` …；开发态 `version.json` 为 `dev`。
 > 每次发版必须在此追加条目，并更新 PROJECT.md 第 2 节「当前版本」。
 
+## [v1.3.3] - Project Learning Foundation（项目学习引擎）
+
+> 本版本目标：把「学习」里的 Project（创造）模块从「手工记录工具」升级为「基于本地项目知识库的项目学习引擎」。新增 `ProjectLibrary`（本地项目知识库）+ `ProjectEngine`（项目路线生成器），进度与下一步改为自动计算，创建前可预览并自由调整阶段与步骤。
+
+### Added
+- **`ProjectLibrary`（本地项目知识库，无联网 / 无 AI / 无 LLM）**：纯本地内置数据，挂在 `window.ProjectLibrary`，提供 `match(name)`（按关键词/子串模糊匹配，未命中回退通用项目模板）、`get(id)`、`all()`。首版内置 5 套完整项目模板：
+  - `tpl-ai-workbench` 个人 AI 工作台
+  - `tpl-xhs` 小红书账号
+  - `tpl-taobao` 淘宝自动化
+  - `tpl-website` 个人网站
+  - `tpl-generic` 通用项目（兜底模板）
+  每套模板含：项目介绍、项目目标、适合人群、预计周期、阶段列表（每个阶段含若干步骤，每步含 标题 / 完成标准 / 预计耗时）、推荐学习资料、容易踩坑的问题。
+- **`ProjectEngine`（项目路线自动生成器）**：`buildDraft(name, tpl)` 基于模板深拷贝生成项目草稿（阶段/步骤分配 `U.uid`、`done:false`、记录 `sourceType/libraryId/templateName/resources/pitfalls`、初始版本 `versions:[{v:'0.1'}]`）；`compute(p)` 自动计算总步数/已完成数/进度百分比/下一步（首个未完成步骤标题，全完成则 `🎉 全部完成`，零步骤则 `添加你的第一步`）/当前阶段；`recompute(p)` 回写 `progress/nextAction/currentStage`；`create(draft)` 经 `recompute` 后 `S.add('projects', p)`。
+- **进度自动计算（取消手工填写百分比）**：项目进度不再是用户手填的数字，而是由「已完成步骤数 / 总步骤数」实时计算（`round(done/total*100)`），20 步完成 4 步即 20%、全部完成即 100%。
+- **下一步自动计算（取消手工填写）**：「下一步」自动取第一个未完成的步骤标题，无需用户手工维护。
+- **创建前预览与可调**：输入项目名 → 匹配模板 → 生成完整项目路线预览 → 用户可在创建前任意新增/删除/修改步骤与阶段、调整顺序 → 确认后才 `ProjectEngine.create` 落库。模板是「模板」而非标准答案，允许创建前调整。
+- **创造能力模块重写（向后兼容）**：`buildView` / `openProj` / `addProj` 重构；新增 `projProgress/projNext/projStage` 帮助函数（有 `stages` 用 `ProjectEngine.compute`，无 `stages` 的旧项目回退原 `progress`/`nextAction` 与原手工编辑表单 `openProjLegacy`）；项目详情页渲染阶段勾选框（勾选即 `done` + `recompute` + `S.save` + 重渲染）、进度条、介绍/目标/适合人群/预计周期/推荐资料/踩坑提示。
+
+### Changed
+- **数据模型（仅增量，不破坏契约）**：`projects[]` 在原有字段基础上新增 `stages[]`（每阶段含 `id/name/steps[]`，每步含 `id/title/doneCriteria/estTime/done`）、`sourceType`、`libraryId`、`templateName`、`resources[]`、`pitfalls[]`、`currentStage`。通过 `stages` 是否存在区分新旧项目，旧项目（无 `stages`）沿用原进度/下一步/手工编辑，数据契约完全向后兼容。
+- **数据契约 `pgwb_data_v1` 保持 add-only**：未修改/删除任何既有顶层键或字段（含 learn/wealth/body/content/TodayAgent/RuleEngine/AI 学习/英语学习/PWA/版本检测），完全向后兼容。
+
+### 约束遵守
+- 未改动英语学习、AI 学习、财富、身体、自媒体模块；未触碰 TodayAgent、RuleEngine、LearningSource、RemoteSource、PlannerEngine、Memory Engine、任何 LLM、联网能力、Prompt 体系与 Agent/Claude/Cursor/ChatGPT/MCP 等功能；保持既有 UI 风格，无新设计系统。
+- 运行时版本 `version.json` → `1.3.3`。
+- 新增架构文档：`docs/Architecture/ProjectFoundation.md`。
+- 提交：`feat: v1.3.3 Project Learning Foundation (ProjectLibrary + ProjectEngine)`
+
 ## [v1.3.2] - AI 工具课程模板标准化（行动化重构）
 
 > 本版本目标重新定义为：不是增加更多 AI 工具，而是把「一个 AI 工具应该怎么学」这件事做好。所有 AI 工具统一采用同一套 6 段课程模板，后续扩展几十个工具都不会乱。

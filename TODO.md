@@ -10,7 +10,7 @@
 - [ ] **数据契约冻结确认**：确认 `pgwb_data_v1` 字段结构，作为 v1.0 稳定基线。
 - [ ] **首次启动引导**：帮助用户清空示例种子数据或一键导入自己的数据。
 - [ ] **文档体系补全**：本项目 PROJECT/VISION/TODO/CHANGELOG/AI_RULES/README 已初始化（本次任务）。
-- [ ] **Projects / Planner 重构（IMP-004，下一版本）**：引入 `PlannerEngine`，Projects 进度从手工百分比改为计划 / 排期驱动。
+- [x] **Projects 进度自动计算（IMP-004 / v1.3.3 已落地）**：引入 `ProjectLibrary` + `ProjectEngine`，Projects 进度从手工百分比改为「已完成步骤/总步骤」自动计算，下一步自动取首个未完成步骤；创建前可预览并调整阶段/步骤；旧项目向后兼容。
 
 ## P1 — 重要 / 下一迭代
 - [ ] **RuleEngine 接入 OpenAI（仅解释/细化，不决策）**：用 `docs/Prompt/` 中的 Prompt 让 LLM 对 `RuleEngine.getSuggestions()` 返回的 `Suggestion[]` 做自然语言解释与个性化细化；**决策权仍归 RuleEngine**，LLM 不得自行生成或增删建议（参考 `Home.md`/`Study.md` 等）。
@@ -55,3 +55,4 @@
 - [x] 学习历史点击回看（v1.2.2）：历史记录点击恢复完整内容（英语匹配 EN_LIB 复原文章/单词/语法/测验）
 - [x] 学习引擎基础 Learning Foundation（v1.3.1）：LearningLibrary + LearningSource 数据源抽象（英语8/AI11/产品2，不再写死4篇；RemoteSource 为 V1.3.2 联网预留）；英语模块改读 Library；学习历史升级「查看历史笔记 / 继续学习 / 重新学习」
 - [x] AI 工具学习中心（v1.3.1）+ 课程模板标准化（v1.3.2）：AI 页从抽象表单重构为 11 个真实 AI 工具的课程中心（由 `AIToolMod` 驱动）；v1.3.2 进一步把所有工具统一为 6 段固定模板（是什么/核心能力/实战案例/实际操作/今日任务/小测验）并行动化重写（去百科化），新增工具只填同一组字段即可复用模板。
+- [x] Project 学习引擎基础（v1.3.3）：ProjectLibrary 本地项目知识库（5 套模板：个人 AI 工作台 / 小红书账号 / 淘宝自动化 / 个人网站 / 通用兜底）+ ProjectEngine 项目路线生成器；进度/下一步自动计算，创建前预览可调，旧项目向后兼容。
