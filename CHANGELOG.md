@@ -3,6 +3,15 @@
 > 格式参考 [Keep a Changelog](https://keepachangelog.com/)。版本号规范：`v1.0` / `v1.1` / `v2.0` …；开发态 `version.json` 为 `dev`。
 > 每次发版必须在此追加条目，并更新 PROJECT.md 第 2 节「当前版本」。
 
+## [v1.1.0] - Today OS 首页 AI 决策中心（当前部署）
+
+### Added
+- **Today OS 首页架构**：首页重构为「AI CEO Dashboard」，9 段式结构（欢迎区 / 今日三件 / 财富·学习·身体·自媒体摘要 / 今日最大风险 / 今日最大机会 / 复盘提醒）。
+- **Agent 架构**：新增 `TodayAgent`（首页唯一入口，负责汇总）+ `StudyAgent` / `WealthAgent` / `FitnessAgent` / `MediaAgent` 桩；当前为 Mock/真实摘要混合，未接入真实 AI。
+- 新增仪表盘所需 CSS（沿用既有设计变量）；其余 5 个页面与数据契约不变。
+- 运行时版本 `version.json` → `1.1.0`（已打开页面将收到「发现新版本」提示）。
+- 提交：`feat: build Today AI dashboard architecture`
+
 ## [未发布] AI 接管入口（docs 提交）
 
 ### Added

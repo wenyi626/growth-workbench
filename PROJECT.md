@@ -20,7 +20,7 @@
 
 | 项 | 值 |
 | --- | --- |
-| 当前版本号 | `1.0.0`（运行时版本源 `version.json`；v1.0.0 引入版本更新机制） |
+| 当前版本号 | `1.1.0`（运行时版本源 `version.json`；v1.1.0 引入 Today OS 首页 AI 决策中心） |
 | 最近一次提交 | `feat: version update detection and pwa update flow`（v1.0.0） |
 | 发布状态 | 已部署 GitHub Pages，PWA 已可用 |
 | 版本标签规范 | 正式发版使用 `v1.0`、`v1.1`、`v2.0` …（见第 13 节） |
@@ -31,7 +31,7 @@
 
 | 标签 | key | 主要负责模块 | 核心功能 |
 | --- | --- | --- | --- |
-| 🏠 今日 | `today` | `Pages.today` | 每日计划、AI 生成今日计划、复盘回顾、快捷入口 |
+| 🏠 今日 | `today` | `Pages.today` + `TodayAgent` | **AI CEO Dashboard（Today OS）**：欢迎区、今日三件、财富/学习/身体/自媒体摘要、今日最大风险与机会、复盘提醒 |
 | 📚 学习 | `learn` | `Pages.learn` + `EnglishMod` | 学习记录（主题/分类/来源/理解度/产出）、英语模块（生成/测验/词库） |
 | 💰 财富 | `wealth` | `Pages.wealth` | 资产、交易、财富快照、图表（环形/折线/柱状）、AI 财富复盘 |
 | 🏃 身体 | `body` | `Pages.body` | 运动记录、体重/围度等身体指标、图表、AI 身体报告 |
@@ -124,6 +124,7 @@
 | `AI`（本地规则） | `generateTodayPlan` `selfAnalysis` `wealthReview` `bodyReport` `parseExercise` `checkSentence` `genContentIdeas` `generateEnglish` |
 | `EnglishMod` | `open` `openQuiz` `openBankQuiz` |
 | `Pages` | `today` `learn` `wealth` `body` `content` `profile`（各页渲染器） |
+| `TodayAgent` | `getDashboard` / `regen`（首页 AI 决策中心；聚合 Study/Wealth/Fitness/Media Agent，当前 Mock/真实摘要混合） |
 | `App` | 路由器（hash 路由 + `refresh()` 刷新当前页） |
 
 ---
@@ -161,6 +162,7 @@
 - [x] GitHub Pages 部署（main 根目录，HTTPS）
 - [x] 版本自动检测与「发现新版本」弹窗 + PWA `skipWaiting` 更新流（v1.0.0）
 - [x] AI Prompt 管理体系（`docs/Prompt/`，9 个文件 + `PromptGuide.md` 规范）
+- [x] Today OS 首页架构（v1.1.0）：`TodayAgent` 汇总 + `StudyAgent`/`WealthAgent`/`FitnessAgent`/`MediaAgent` 桩，9 段式 AI CEO Dashboard（Mock/真实摘要混合）
 
 ---
 

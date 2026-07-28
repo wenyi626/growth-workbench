@@ -486,6 +486,21 @@ input, textarea, select { font-family: inherit; font-size: 15px; }
 @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
 
   </style>
+<style>
+/* === v1.1 Today OS Dashboard（新增样式，沿用既有设计变量） === */
+.tt-greet{font-size:15px;font-weight:700;margin-top:2px}
+.tt-oneliner{font-size:12px;color:var(--text-2);margin-top:6px;line-height:1.45}
+.dash-summary{padding:14px}
+.dash-summary .ds-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.dash-summary .ds-row:last-of-type{border-bottom:none}
+.dash-summary .ds-row span{color:var(--text-2);font-size:13px}
+.dash-summary .ds-row b{font-size:14px}
+.dash-summary .ds-advice{margin-top:8px;font-size:12px;color:var(--text-2);background:rgba(127,127,127,.08);padding:8px 10px;border-radius:10px;line-height:1.5}
+.risk-card{border-left:4px solid #e0564f;background:linear-gradient(90deg,rgba(224,86,79,.10),transparent)}
+.opp-card{border-left:4px solid var(--accent);background:linear-gradient(90deg,rgba(25,178,122,.10),transparent)}
+.rc-tag{font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:4px}
+.rc-text{font-size:14px;line-height:1.5}
+</style>
 </head>
 <body>
   <div id="app">
@@ -1753,100 +1768,103 @@ window.Pages.today = (function () {
   function render() {
     const t = U.todayStr();
     const d = S.data;
-    const plan = AI.generateTodayPlan(false);
     const prof = d.profile;
+    const dash = window.TodayAgent.getDashboard();
+    const plan = AI.generateTodayPlan(false);
     const comp = completion(plan);
-    const ws = wealthSummary(), bs = bodySummary();
-
-    const en = AI.generateEnglish(false);
-    const ideas = AI.genContentIdeas(1)[0];
-
+    const rvDone = reviewDone();
     const timeChips = [1,2,3,4].map(h => `<button class="chip ${prof.availableTime===h?'active':''}" data-time="${h}">${h}小时</button>`).join('');
 
-    const stepsHtml = plan.tasks.map(st => {
-      const cls = st.status === 'done' ? 'done' : '';
-      const actHtml = st.status === 'done'
-        ? `<button class="mini-btn" data-step-reopen="${st.id}">重做</button>`
-        : st.status === 'doing'
-          ? `<button class="mini-btn primary" data-step-pause="${st.id}">暂停</button><button class="mini-btn success" data-step-done="${st.id}">完成</button>`
-          : `<button class="mini-btn primary" data-step-start="${st.id}">开始</button><button class="mini-btn" data-step-done="${st.id}">完成</button>`;
-      return `<div class="step ${cls}" data-step="${st.id}">
-        <div class="step-badge">${st.status==='done'?'✓':st.n}</div>
-        <div class="step-body">
-          <div class="step-title">${U.escapeHtml(st.title)}</div>
-          <div class="step-meta"><span>预计 ${st.minutes} 分</span><span class="step-timer" data-timer="${st.id}">${st.actual?('已用 '+fmtTimer(st.actual)):''}</span></div>
-          <div class="step-actions">${actHtml}<button class="mini-btn" data-step-note="${st.id}">笔记</button></div>
-        </div></div>`;
-    }).join('');
-
-    const rvDone = reviewDone();
+    // 2. 今日三件最重要的事：优先用已有计划步骤（保留功能），否则占位
+    const hasSteps = plan.tasks && plan.tasks.length;
+    const stepsHtml = hasSteps
+      ? plan.tasks.slice(0,3).map(st => {
+          const cls = st.status === 'done' ? 'done' : '';
+          const actHtml = st.status === 'done'
+            ? `<button class="mini-btn" data-step-reopen="${st.id}">重做</button>`
+            : st.status === 'doing'
+              ? `<button class="mini-btn primary" data-step-pause="${st.id}">暂停</button><button class="mini-btn success" data-step-done="${st.id}">完成</button>`
+              : `<button class="mini-btn primary" data-step-start="${st.id}">开始</button><button class="mini-btn" data-step-done="${st.id}">完成</button>`;
+          return `<div class="step ${cls}" data-step="${st.id}">
+            <div class="step-badge">${st.status==='done'?'✓':st.n}</div>
+            <div class="step-body">
+              <div class="step-title">${U.escapeHtml(st.title)}</div>
+              <div class="step-meta"><span>预计 ${st.minutes} 分</span><span class="step-timer" data-timer="${st.id}">${st.actual?('已用 '+fmtTimer(st.actual)):''}</span></div>
+              <div class="step-actions">${actHtml}<button class="mini-btn" data-step-note="${st.id}">笔记</button></div>
+            </div></div>`;
+        }).join('')
+      : dash.top3.map((it,i) => `<div class="step"><div class="step-badge">${i+1}</div><div class="step-body"><div class="step-title">${U.escapeHtml(it)}</div><div class="step-meta"><span class="muted">AI 待生成</span></div></div></div>`).join('');
 
     return `
-    <!-- 顶部状态 -->
+    <!-- 1. 欢迎区域 -->
     <div class="card">
       <div class="today-top">
         <div class="tt-left">
           <div class="tt-date">${U.parseDate(t).getMonth()+1}月${U.parseDate(t).getDate()}日 · ${U.weekday()}</div>
-          <div class="tt-time">今天给自己 <strong>${prof.availableTime}</strong><small> 小时</small></div>
-          <div class="chips" style="margin-top:10px">${timeChips}
-            <button class="chip" data-time="custom">自定义</button>
-          </div>
+          <div class="tt-greet">${dash.greeting}，${U.escapeHtml(prof.name)} 👋</div>
+          <div class="tt-oneliner">${U.escapeHtml(dash.oneLiner)}</div>
+          <div class="chips" style="margin-top:10px">${timeChips}<button class="chip" data-time="custom">自定义</button></div>
         </div>
         ${ring(comp)}
       </div>
     </div>
 
-    <!-- 今日主线 -->
-    <div class="card hero">
-      <span class="hero-tag">🌟 今日主线</span>
-      <h2>${U.escapeHtml(plan.theme)}</h2>
-      <p class="hero-line">为什么今天值得学：${U.escapeHtml(plan.whyToday)}</p>
-      <div class="hero-output">
-        <div class="lbl">今日最终产出</div>
-        <div class="val">${U.escapeHtml(plan.finalOutput)}</div>
-      </div>
-      <div class="hero-etime">预估 ${Math.round((plan.estimatedTime||180)/60*10)/10} 小时 · 与我有关：${U.escapeHtml(plan.relatedToMe)}</div>
-      <div class="hero-actions">
-        <button class="ghost-btn" data-edit-main>编辑主线</button>
-        <button class="ghost-btn" data-regen-main>换一个主题</button>
-      </div>
+    <!-- 2. 今日三件最重要的事 -->
+    <div class="sec-title"><h2>今日三件最重要的事</h2><span class="act" data-edit-main2>调整</span></div>
+    <div class="card" style="padding-top:6px">${stepsHtml || '<div class="empty"><div class="e-sub">还没有路线，先调整今日主线</div></div>'}</div>
+
+    <!-- 3. 财富摘要 -->
+    <div class="sec-title"><h2>💰 财富摘要</h2><span class="act" data-open="wealth">查看</span></div>
+    <div class="card dash-summary">
+      <div class="ds-row"><span>总资产</span><b>${U.money(dash.wealth.total)}</b></div>
+      <div class="ds-row"><span>增长</span><b class="pill ${dash.wealth.growth>=0?'up':'down'}">${U.pct(dash.wealth.growthPct)} 较上月</b></div>
+      <div class="ds-advice">💡 ${U.escapeHtml(dash.wealth.advice)}</div>
     </div>
 
-    <!-- 今日路线 -->
-    <div class="sec-title"><h2>今日路线</h2><span class="act" data-edit-main2>调整</span></div>
-    <div class="card" style="padding-top:6px">${stepsHtml || '<div class="empty"><div class="e-sub">还没有路线，先编辑今日主线</div></div>'}</div>
+    <!-- 4. 学习摘要 -->
+    <div class="sec-title"><h2>📚 学习摘要</h2><span class="act" data-open="learn">查看</span></div>
+    <div class="card dash-summary">
+      <div class="ds-row"><span>最近学习</span><b>${U.escapeHtml(dash.study.recent)}</b></div>
+      <div class="ds-advice">💡 ${U.escapeHtml(dash.study.advice)}</div>
+    </div>
 
-    <!-- 关联任务 -->
-    <div class="sec-title"><h2>今日关联</h2></div>
+    <!-- 5. 身体摘要 -->
+    <div class="sec-title"><h2>🏃 身体摘要</h2><span class="act" data-open="body">查看</span></div>
+    <div class="card dash-summary">
+      <div class="ds-row"><span>运动</span><b>${U.escapeHtml(dash.body.exercise)}</b></div>
+      <div class="ds-row"><span>睡眠</span><b>${U.escapeHtml(dash.body.sleep)}</b></div>
+      <div class="ds-row"><span>体重</span><b>${U.escapeHtml(dash.body.weight)}</b></div>
+      <div class="ds-advice">💡 ${U.escapeHtml(dash.body.advice)}</div>
+    </div>
+
+    <!-- 6. 自媒体摘要 -->
+    <div class="sec-title"><h2>📱 自媒体摘要</h2><span class="act" data-open="content">查看</span></div>
+    <div class="card dash-summary">
+      <div class="ds-row"><span>昨日数据</span><b>${U.escapeHtml(dash.media.yesterday)}</b></div>
+      <div class="ds-advice">💡 ${U.escapeHtml(dash.media.advice)}</div>
+    </div>
+
+    <!-- 7. 今日最大风险 -->
+    <div class="card risk-card">
+      <div class="rc-tag">⚠️ 今日最大风险</div>
+      <div class="rc-text">${U.escapeHtml(dash.risk)}</div>
+    </div>
+
+    <!-- 8. 今日最大机会 -->
+    <div class="card opp-card">
+      <div class="rc-tag">✨ 今日最大机会</div>
+      <div class="rc-text">${U.escapeHtml(dash.opportunity)}</div>
+    </div>
+
+    <!-- 9. 晚上复盘提醒 -->
     <div class="mini-row">
-      <div class="mini" data-open="english">
-        <div class="m-ico">🇬🇧</div><div class="m-title">今日英语</div>
-        <div class="m-val small">${U.escapeHtml(en.title)}</div>
-        <div class="m-go">›</div>
-      </div>
-      <div class="mini" data-open="content">
-        <div class="m-ico">📱</div><div class="m-title">今日内容机会</div>
-        <div class="m-val small">${U.escapeHtml(ideas.hot)}</div>
-        <div class="m-go">›</div>
-      </div>
-      <div class="mini" data-open="wealth">
-        <div class="m-ico">💰</div><div class="m-title">财富状态</div>
-        <div class="m-val">${U.money(ws.total)}</div>
-        <div class="pill ${ws.delta>=0?'up':'down'}" style="margin-top:4px">${U.pct(ws.delta/ws.total*100)} 较上次</div>
-      </div>
-      <div class="mini" data-open="body">
-        <div class="m-ico">🏃</div><div class="m-title">今日身体</div>
-        <div class="m-val">${bs.exDays}/${bs.monthDays} 天运动</div>
-        <div class="m-val small" style="margin-top:2px">体重 ${bs.lastW}kg</div>
-      </div>
       <div class="mini full" data-open="review">
         <div class="m-ico">🌙</div>
-        <div class="m-title">今日复盘 ${rvDone?'· 已完成':'· 待完成'}</div>
+        <div class="m-title">今晚复盘提醒 ${rvDone?'· 已完成':'· 待完成'}</div>
         <div class="m-val small">${rvDone?'今天已经复盘，明天见':'睡前 3 分钟：今天比昨天多了什么？'}</div>
         <div class="m-go">›</div>
       </div>
     </div>
-
     <div style="height:8px"></div>
     `;
   }
@@ -1874,27 +1892,24 @@ window.Pages.today = (function () {
       App.refresh();
     });
 
-    // 主线编辑/重生成
+    // 主线编辑（保留「今日三件」调整入口）
     view.querySelectorAll('[data-edit-main],[data-edit-main2]').forEach(b => b.onclick = editMain);
-    view.querySelector('[data-regen-main]').onclick = () => {
-      AI.generateTodayPlan(true); App.refresh(); U.toast('已为你换一个主线主题');
-    };
 
-    // 步骤操作
+    // 步骤操作（保留已有功能）
     view.querySelectorAll('[data-step-start]').forEach(b => b.onclick = () => startStep(b.dataset.stepStart));
     view.querySelectorAll('[data-step-pause]').forEach(b => b.onclick = () => pauseStep(b.dataset.stepPause));
     view.querySelectorAll('[data-step-done]').forEach(b => b.onclick = () => doneStep(b.dataset.stepDone));
     view.querySelectorAll('[data-step-reopen]').forEach(b => b.onclick = () => reopenStep(b.dataset.stepReopen));
     view.querySelectorAll('[data-step-note]').forEach(b => b.onclick = () => noteStep(b.dataset.stepNote));
 
-    // 关联入口
+    // 各模块入口
     view.querySelectorAll('[data-open]').forEach(el => el.onclick = () => {
       const k = el.dataset.open;
-      if (k === 'english') return openEnglish();
-      if (k === 'content') return App.go('content');
+      if (k === 'review') return openReview();
+      if (k === 'learn') return App.go('learn');
       if (k === 'wealth') return App.go('wealth');
       if (k === 'body') return App.go('body');
-      if (k === 'review') return openReview();
+      if (k === 'content') return App.go('content');
     });
 
     // 启动进行中计时器
@@ -3134,6 +3149,104 @@ window.App = (function () {
 document.addEventListener('DOMContentLoaded', App.load);
 
 
+</script>
+<script>
+  /* === Today OS Agents：首页 AI 决策中心（v1.1，架构占位，Mock 数据） === */
+  window.StudyAgent = (function () {
+    function summary() {
+      var ls = (S.data.learning || []).slice().sort(function (a, b) { return b.date.localeCompare(a.date); });
+      var recent = ls.length ? ls[0].topic : '（暂无学习记录）';
+      return { recent: recent, advice: '今天挑 1 个概念做「输出型」练习：写一段自己的话或画一张图。' };
+    }
+    return { summary: summary };
+  })();
+
+  window.WealthAgent = (function () {
+    function summary() {
+      var ws = (S.data.wealthSnapshots || []).slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
+      var last = ws[ws.length - 1] || { totalAssets: 0 };
+      var prev = ws[ws.length - 2] || last;
+      var total = last.totalAssets;
+      var growth = total - prev.totalAssets;
+      var growthPct = prev.totalAssets ? (growth / prev.totalAssets * 100) : 0;
+      return { total: total, growth: growth, growthPct: growthPct,
+        advice: '科技仓位偏高，考虑放慢定投节奏，留出现金等待再平衡机会。' };
+    }
+    return { summary: summary };
+  })();
+
+  window.FitnessAgent = (function () {
+    function summary() {
+      var w = (S.data.weights || []).slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
+      var last = w[w.length - 1];
+      var ex = (S.data.exercises || []).slice().sort(function (a, b) { return b.date.localeCompare(a.date); });
+      var lastEx = ex[0];
+      return {
+        exercise: lastEx ? (lastEx.type + ' ' + lastEx.duration + ' 分钟') : '今天还没动',
+        sleep: last ? (last.sleep + 'h') : '—',
+        weight: last ? (last.weight + 'kg') : '—',
+        advice: '今天安排一次 30 分钟有氧，优先恢复而不是加量。'
+      };
+    }
+    return { summary: summary };
+  })();
+
+  window.MediaAgent = (function () {
+    function summary() {
+      var cs = (S.data.contents || []).slice().sort(function (a, b) { return b.date.localeCompare(a.date); });
+      var yest = cs[0];
+      var yesterday = yest ? ('阅读 ' + yest.views + ' · 赞 ' + yest.likes + ' · 涨粉 ' + yest.followersGained) : '暂无数据';
+      return { yesterday: yesterday, advice: '今天围绕「普通人如何用 AI 做产品」出一版图文，延续高互动选题。' };
+    }
+    return { summary: summary };
+  })();
+
+  window.TodayAgent = (function () {
+    function greeting() {
+      var h = new Date().getHours();
+      if (h < 6) return '凌晨好';
+      if (h < 12) return '早上好';
+      if (h < 14) return '中午好';
+      if (h < 18) return '下午好';
+      if (h < 22) return '晚上好';
+      return '夜深了';
+    }
+    var ONE_LINERS = [
+      '今天不追求做很多事，只把最重要的一件推进一步。',
+      '把不确定性交给系统，把判断力留给自己。',
+      '先用 10 分钟复盘昨天，再决定今天往哪走。'
+    ];
+    var RISKS = [
+      '科技仓位偏高，若继续定投会短期浮亏，注意现金缓冲。',
+      '今天若只刷不做，学习会停在「知道」层面，务必有产出。',
+      '睡眠不足会拉低明天的判断力，今晚别熬。'
+    ];
+    var OPS = [
+      '市场回调时是低位补仓窗口，可按计划小额定投。',
+      '「AI 做产品」选题互动高，今天可乘势发一篇。',
+      '把活动复盘流程自动化，每天能省下 50 分钟。'
+    ];
+    var seed = 0;
+    function regen() { seed = (seed + 1) % ONE_LINERS.length; }
+    function getDashboard() {
+      var s = window.StudyAgent.summary();
+      var w = window.WealthAgent.summary();
+      var f = window.FitnessAgent.summary();
+      var m = window.MediaAgent.summary();
+      return {
+        greeting: greeting(),
+        oneLiner: ONE_LINERS[seed],
+        top3: ['推进今日主线产出', '完成一次 30 分钟运动', '写一条内容或做复盘'],
+        wealth: { total: w.total, growth: w.growth, growthPct: w.growthPct, advice: w.advice },
+        study: s,
+        body: f,
+        media: m,
+        risk: RISKS[seed],
+        opportunity: OPS[seed]
+      };
+    }
+    return { getDashboard: getDashboard, regen: regen };
+  })();
 </script>
 <script>
   /* === Service Worker 注册 + 版本更新检测（新增功能，不改动业务逻辑） === */
