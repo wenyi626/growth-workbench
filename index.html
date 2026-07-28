@@ -18,6 +18,24 @@
   <link rel="apple-touch-startup-image" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)" href="splash-834x1194.png" />
   <link rel="apple-touch-startup-image" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)" href="splash-1024x1366.png" />
   <style>
+    /* === 版本更新提示（新增，不影响业务） === */
+    .update-toast {
+      position: fixed; left: 50%; transform: translateX(-50%);
+      bottom: calc(var(--safe-bottom) + 84px); z-index: 60;
+      width: calc(100% - 32px); max-width: 448px;
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: 18px; box-shadow: var(--shadow);
+      padding: 14px 14px 14px 16px; display: flex; align-items: center; gap: 12px;
+      animation: utIn .28s cubic-bezier(.34,1.4,.64,1);
+    }
+    @keyframes utIn { from { opacity: 0; transform: translate(-50%, 12px); } to { opacity: 1; transform: translate(-50%, 0); } }
+    .update-toast .ut-ico { font-size: 22px; line-height: 1; }
+    .update-toast .ut-body { flex: 1; min-width: 0; }
+    .update-toast .ut-title { font-weight: 700; font-size: 15px; letter-spacing: -.2px; }
+    .update-toast .ut-sub { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+    .update-toast .ut-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+  </style>
+  <style>
 /* =========================================================
    我的个人成长工作台 · 设计系统
    简洁 / 现代 / 有成长感 / 移动端优先
@@ -3118,11 +3136,75 @@ document.addEventListener('DOMContentLoaded', App.load);
 
 </script>
 <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('./sw.js').catch(function (e) { console.warn('SW 注册失败', e); });
+  /* === Service Worker 注册 + 版本更新检测（新增功能，不改动业务逻辑） === */
+  (function () {
+    var loadedVersion = null;
+    var popupShown = false;
+
+    function fetchVersion(cb) {
+      fetch('./version.json?t=' + Date.now(), { cache: 'no-store' })
+        .then(function (r) { return r.json(); })
+        .then(function (d) { cb(d && d.version); })
+        .catch(function () { cb(null); });
+    }
+
+    function showUpdate() {
+      if (popupShown) return;
+      popupShown = true;
+      var el = document.createElement('div');
+      el.className = 'update-toast';
+      el.innerHTML =
+        '<div class="ut-ico">✨</div>' +
+        '<div class="ut-body"><div class="ut-title">发现新版本</div>' +
+        '<div class="ut-sub">已发布新内容，是否立即更新？</div></div>' +
+        '<div class="ut-actions"><button class="btn btn-primary btn-sm" id="utNow">立即更新</button>' +
+        '<button class="btn btn-sm" id="utLater">稍后更新</button></div>';
+      document.body.appendChild(el);
+      el.querySelector('#utNow').onclick = function () {
+        var sw = navigator.serviceWorker;
+        if (sw && sw.getRegistration) {
+          sw.getRegistration().then(function (reg) {
+            if (reg && reg.waiting) {
+              var done = false;
+              reg.waiting.addEventListener('statechange', function () {
+                if (this.state === 'activated' && !done) { done = true; location.reload(); }
+              });
+              reg.waiting.postMessage('skip');
+            } else { location.reload(); }
+          });
+        } else { location.reload(); }
+      };
+      el.querySelector('#utLater').onclick = function () {
+        popupShown = false;          // 允许下次再提示
+        if (el.parentNode) el.parentNode.removeChild(el);
+      };
+    }
+
+    function checkVersion() {
+      fetchVersion(function (v) {
+        if (v && loadedVersion && v !== loadedVersion) showUpdate();
+      });
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('./sw.js').catch(function (e) { console.warn('SW 注册失败', e); });
+      });
+      // 新 SW 接管时再核对一次
+      navigator.serviceWorker.addEventListener('controllerchange', checkVersion);
+    }
+
+    // 记录本次加载的版本
+    function initVersion() { fetchVersion(function (v) { loadedVersion = v; }); }
+    if (document.readyState === 'complete') initVersion();
+    else window.addEventListener('load', initVersion);
+
+    // 每分钟 + 回到前台时检查
+    setInterval(checkVersion, 60000);
+    document.addEventListener('visibilitychange', function () {
+      if (!document.hidden) checkVersion();
     });
-  }
+  })();
 </script>
 </body>
 </html>

@@ -51,3 +51,8 @@ self.addEventListener('fetch', function (event) {
     })
   );
 });
+
+// 由页面触发「立即更新」：跳过 waiting，立即激活新 SW 并接管客户端
+self.addEventListener('message', function (event) {
+  if (event.data === 'skip') self.skipWaiting();
+});

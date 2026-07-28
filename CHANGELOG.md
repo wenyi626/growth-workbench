@@ -3,11 +3,17 @@
 > 格式参考 [Keep a Changelog](https://keepachangelog.com/)。版本号规范：`v1.0` / `v1.1` / `v2.0` …；开发态 `version.json` 为 `dev`。
 > 每次发版必须在此追加条目，并更新 PROJECT.md 第 2 节「当前版本」。
 
+## [v1.0.0] - 版本更新机制（当前部署）
+
+### Added
+- **版本自动检测 + 「发现新版本」弹窗**：`version.json` 作为运行时版本源；`index.html` 内联检测脚本（每分钟 + 回到前台时轮询，对比已加载版本与 `version.json`，不一致即弹窗）。
+- **PWA 更新流**：`sw.js` 新增 `skipWaiting` 消息处理；点击「立即更新」→ `postMessage('skip')` → 新 SW 激活并 `clients.claim()` 立即接管 → 自动刷新到最新版；「稍后更新」关闭弹窗、下次再提示。
+- 配套资源：`manifest.json` 主题色深蓝 `#16335c`、背景 `#f4f7fb`；新增 `icon-1024.png` 并登记进 manifest；刷新 7 张 iOS 启动图。
+- 提交：`feat: version update detection and pwa update flow`
+
 ## [未发布] dev（本地）
 
-### 进行中 / 本地已实现未提交
-- **版本自动检测与更新弹窗**：新增 `version.json`、`index.html` 内联检测脚本（发现新版本 → 立即更新 / 稍后更新）、`icon-1024.png`；`manifest.json` 主题色改为深蓝 `#16335c`、背景色 `#f4f7fb`。
-  - 状态：**本地改动在 working tree，尚未单独提交**（按文档任务约定未纳入本次 `docs` 提交）。待补全 `sw.js` 的 `skipWaiting` 消息处理后，以 `feat:` 单独提交。
+- 文档体系已在 `eb51f87 docs:` 提交并推送；后续功能迭代请按 AI_RULES 维护本文件。
 
 ## [v0.9] PWA 阶段（已部署，未打 tag）
 

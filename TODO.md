@@ -5,9 +5,8 @@
 
 ## P0 — 必须做 / 近期
 
-- [ ] **版本自动检测与「发现新版本」弹窗正式提交**
-  - `version.json` + `index.html` 内联检测脚本 + `icon-1024` 已在本地实现，但**尚未单独提交**（本次文档任务按约定不纳入）。需补全 `sw.js` 的 `skipWaiting` 消息处理后再提交。
-  - 提交信息建议：`feat: 版本自动检测与更新提示`
+- [ ] **（已合并到 v1.0.0）版本自动检测与「发现新版本」弹窗**
+  - 见 CHANGELOG `[v1.0.0]`：已补全 `sw.js` 的 `skipWaiting` 消息处理并随 `feat: version update detection and pwa update flow` 提交。
 - [ ] **数据契约冻结确认**：确认 `pgwb_data_v1` 字段结构，作为 v1.0 稳定基线。
 - [ ] **首次启动引导**：帮助用户清空示例种子数据或一键导入自己的数据。
 - [ ] **文档体系补全**：本项目 PROJECT/VISION/TODO/CHANGELOG/AI_RULES/README 已初始化（本次任务）。
@@ -40,3 +39,4 @@
 - [x] PWA：manifest + Service Worker 离线 + 图标 + iOS 启动图
 - [x] GitHub Pages 部署
 - [x] 文档体系初始化（PROJECT / VISION / TODO / CHANGELOG / AI_RULES / README）
+- [x] 版本自动检测与 PWA 更新流（v1.0.0）：`version.json` 版本源 + 「发现新版本」弹窗 + `sw.js` skipWaiting 更新流
