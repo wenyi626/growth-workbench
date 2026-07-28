@@ -20,7 +20,7 @@
 
 | 项 | 值 |
 | --- | --- |
-| 当前版本号 | `1.2.2`（运行时版本源 `version.json`；v1.2.0 引入 Decision Engine 决策引擎：RuleEngine 唯一决策中心；v1.2.1 修复财富单一数据源、英语「换一篇」、交易编辑/删除；v1.2.2 修复学习历史点击回看） |
+| 当前版本号 | `1.3.1`（运行时版本源 `version.json`；v1.2.0 Decision Engine 决策引擎；v1.2.1 财富 SSOT/英语换一篇/交易编辑删除；v1.2.2 学习历史点击回看；**v1.3.1 学习引擎基础 Learning Foundation：LearningLibrary + LearningSource + 学习历史升级 + 英语读 Library**） |
 | 最近一次提交 | `feat: version update detection and pwa update flow`（v1.0.0） |
 | 发布状态 | 已部署 GitHub Pages，PWA 已可用 |
 | 版本标签规范 | 正式发版使用 `v1.0`、`v1.1`、`v2.0` …（见第 13 节） |
@@ -49,7 +49,7 @@
 | 语言 | 原生 HTML + CSS + JavaScript（ES5/ES6 混用，兼容移动端 WebView） |
 | 框架 | **无框架、无构建步骤、零运行时依赖** |
 | 数据持久化 | `localStorage`（不可用时回退到内存） |
-| 模块化 | 挂在 `window` 上的 IIFE 模块：`U` `S` `Charts` `AI` `EnglishMod` `Pages` `App` |
+| 模块化 | 挂在 `window` 上的 IIFE 模块：`U` `S` `Charts` `AI` `EnglishMod` `Library` `LearningSource` `Pages` `App` |
 | 图表 | 手写 SVG：`Charts.donut` / `Charts.line` / `Charts.bar` |
 | AI | **规则型本地「模拟 AI」**，非联网大模型（`AI.*` 为本地启发式函数） |
 | PWA | `manifest.json` + `sw.js`（离线缓存外壳）、maskable 图标、iOS 启动图 |
@@ -63,10 +63,10 @@
 
 ```
 /workspace
-├── index.html              # 整个应用（约 3100+ 行，内联全部 CSS/JS）
+├── index.html              # 整个应用（约 3500+ 行，内联全部 CSS/JS）
 ├── manifest.json           # PWA 清单（名称/图标/主题色/启动方式）
 ├── sw.js                   # Service Worker（离线缓存 + 导航网络优先回退）
-├── version.json            # 版本号（当前 1.2.2，运行时版本检测源）
+├── version.json            # 版本号（当前 1.3.1，运行时版本检测源）
 ├── icon-192.png            # PWA 图标 192
 ├── icon-512.png            # PWA 图标 512
 ├── icon-maskable-512.png   # 可遮罩图标（Android 安全区）
@@ -122,7 +122,9 @@
 | `S`（数据层） | `load` `save` `data` `setData` `add` `update` `find` `has` `length` `reset` `exportJSON` `importJSON` `restoreFromBackup` |
 | `Charts` | `donut(cfg)` `line(cfg)` `bar(cfg)`（手写 SVG） |
 | `AI`（本地规则） | `generateTodayPlan` `selfAnalysis` `wealthReview` `bodyReport` `parseExercise` `checkSentence` `genContentIdeas` `generateEnglish` |
-| `EnglishMod` | `open` `openQuiz` `openBankQuiz` |
+| `EnglishMod` | `open(lesson, opts)` `openQuiz` `openBankQuiz`（v1.3.1：`open` 支持 `opts.prefill` 回填复述、`opts.updateId` 继续学习更新原记录） |
+| `Library` | `register` `registerAll` `get` `all` `byCategory` `findByTitle` `search` `categories`（v1.3.1 学习对象统一注册中心：英语 / AI工具 / 产品） |
+| `LearningSource` | `addSource` `load` `LocalSource` `RemoteSource`（v1.3.1 数据源抽象：内置 LocalSource 聚合进 Library；`RemoteSource` 为 V1.3.2 联网预留，当前返回空） |
 | `Pages` | `today` `learn` `wealth` `body` `content` `profile`（各页渲染器） |
 | `TodayAgent` | `getDashboard` / `regen`（首页聚合入口；**不再自行生成建议**，改为调用 `RuleEngine.getSuggestions()` 取 Top3；各维度汇总文案仍由 Study/Wealth/Fitness/Media Agent 提供） |
 | `RuleEngine` | `getSuggestions()`（**唯一决策中心**：聚合 5 个 Rule 的 `Suggestion[]`，按 priority 降序、estimatedTime 升序排序后输出） |
@@ -146,7 +148,7 @@
 - `AI.parseExercise` — 解析自然语言运动输入
 - `AI.checkSentence` — 英语句子检查
 - `AI.genContentIdeas` — 生成自媒体选题
-- `AI.generateEnglish` — 英语生成（配合 `EnglishMod`）
+- `AI.generateEnglish` — 英语生成（从 `Library` 的 `en` 类别取课文，配合 `EnglishMod`；不再直接依赖 EN_LIB）
 
 > 若未来要接入**真实大模型 API**，属于重大架构变更：需新增后端代理（避免在前端暴露密钥）、定义调用边界、保持离线降级，并在 AI_RULES 中记录规范。**当前严禁在前端硬编码任何 API Key。**
 
@@ -174,6 +176,7 @@
 - [x] 英语「换一篇」真正切换（v1.2.1 / BUG-002）
 - [x] 交易记录编辑与删除（v1.2.1 / IMP-001，复用现有 UI 与数据契约）
 - [x] 学习历史点击回看（v1.2.2）：历史记录可点击恢复完整内容；英语匹配 EN_LIB 复原文章/单词/语法/测验，其它类别恢复已存摘要/笔记/产出
+- [x] 学习引擎基础 Learning Foundation（v1.3.1）：新增 `Library` 学习对象统一注册中心 + `LearningSource` 数据源抽象（内置 LocalSource 含 英语8篇 / AI工具3篇 / 产品2篇，**不再写死 4 篇**；`RemoteSource` 为 V1.3.2 联网预留）；英语模块改为读取 `Library`（不再直接依赖 EN_LIB）；学习历史升级「查看历史笔记 / 继续学习 / 重新学习」，记录可完整恢复；保留数据契约 `pgwb_data_v1` 不变
 
 ---
 
@@ -199,8 +202,9 @@
 ## 12. 后续开发路线（Roadmap）
 
 1. **v1.0（已达成）**：文档体系 + 版本自动检测与 PWA 更新流（见 v1.0.0）。下一步：数据契约冻结。
-2. **v1.1**：真实选型/复盘增强、内容多平台、英语词库同步。
-3. **v2.0（愿景）**：「AI Personal CEO」——端侧 AI 自动串联四大维度，给出每日优先级与行动建议。详见 VISION.md。
+2. **v1.1（已达成）**：Today OS 首页架构（v1.1.0）+ Decision Engine 决策引擎（v1.2.0）、财富 SSOT / 英语换一篇 / 交易编辑（v1.2.1）、学习历史点击回看（v1.2.2）。
+3. **v1.3（进行中）**：学习引擎基础 Learning Foundation（v1.3.1 已落地：LearningLibrary + LearningSource + 学习历史升级 + 英语读 Library）；**v1.3.2 规划：联网 AI 学习的真实课文源与个性化练习**（当前 `RemoteSource` 仅占位，未实现联网，不触碰数据契约）。
+4. **v2.0（愿景）**：「AI Personal CEO」——端侧 AI 自动串联四大维度，给出每日优先级与行动建议。详见 VISION.md。
 
 ---
 

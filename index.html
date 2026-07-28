@@ -1383,59 +1383,39 @@ window.AI = (function () {
     return { pts:pts, sugg:sugg, score:score, used:used, errCount:gr.errs.length, warnCount:gr.warns.length };
   }
 
-  /* ---------- english content ---------- */
-  const EN_LIB = {
-    ai: { title:'AI agents are moving from demos to daily work', source:'TechCrunch',
-      excerpt:'Rather than replacing people, agents are being wired into existing workflows to handle repetitive steps \u2014 scheduling, summarising, and checking configurations \u2014 while humans keep the judgment calls.',
-      words:[{w:'workflow',def:'\u5de5\u4f5c\u6d41',ex:'embedded into the workflow'},{w:'repetitive',def:'\u91cd\u590d\u7684',ex:'repetitive steps'},{w:'judgment',def:'\u5224\u65ad\uff08\u529b\uff09',ex:'keep the judgment calls'},{w:'configuration',def:'\u914d\u7f6e',ex:'checking configurations'},{w:'wire',def:'\u63a5\u5165/\u8fde\u63a5',ex:'wired into systems'}],
-      expressions:[{ph:'rather than replacing people',zh:'\u800c\u4e0d\u662f\u53d6\u4ee3\u4eba'},{ph:'keep the judgment calls',zh:'\u4fdd\u7559\u9700\u8981\u5224\u65ad\u7684\u51b3\u7b56'}],
-      grammar:{point:'\u73b0\u5728\u8fdb\u884c\u65f6\u8868\u793a\u6b63\u5728\u53d1\u751f\u7684\u53d8\u5316\uff1aare being wired / are moving',ex:'Agents are being wired into workflows.'} },
-    invest: { title:'Why dollar-cost averaging still wins for beginners', source:'Morningstar',
-      excerpt:'Trying to time the market rarely beats a simple plan. By investing a fixed amount on a schedule, you buy more when prices are low and less when they are high \u2014 smoothing your entry over time.',
-      words:[{w:'dollar-cost averaging',def:'\u5b9a\u6295/\u5e73\u5747\u6210\u672c\u6cd5',ex:'DCA smooths entry'},{w:'time the market',def:'\u62e9\u65f6',ex:'rarely beats a plan'},{w:'fixed amount',def:'\u56fa\u5b9a\u91d1\u989d',ex:'invest a fixed amount'},{w:'smooth',def:'\u5e73\u6ed1',ex:'smoothing your entry'},{w:'schedule',def:'\u65f6\u95f4\u8868/\u8ba1\u5212',ex:'on a schedule'}],
-      expressions:[{ph:'beats a simple plan',zh:'\u80dc\u8fc7\u4e00\u4e2a\u7b80\u5355\u7684\u8ba1\u5212'},{ph:'over time',zh:'\u968f\u7740\u65f6\u95f4\u7684\u63a8\u79fb'}],
-      grammar:{point:'when \u5f15\u5bfc\u7684\u65f6\u95f4\u72b6\u8bed\u4ece\u53e5 + \u6bd4\u8f83\u7ea7',ex:'You buy more when prices are low.'} },
-    career: { title:'Operators beat theorists in early-stage work', source:"Lenny's Newsletter",
-      excerpt:'In small teams, the person who can ship and learn beats the person who can only analyse. Doing the work creates the judgment that slides and meetings cannot.',
-      words:[{w:'operator',def:'\u5b9e\u5e72\u8005/\u8fd0\u8425\u8005',ex:'operators ship'},{w:'theorist',def:'\u7406\u8bba\u6d3e',ex:'theorists analyse'},{w:'ship',def:'\u4ea4\u4ed8/\u4e0a\u7ebf',ex:'can ship and learn'},{w:'slide',def:'PPT/\u5e7b\u706f\u7247',ex:'slides and meetings'}],
-      expressions:[{ph:'beats ... in',zh:'\u5728...\u65b9\u9762\u80dc\u8fc7'},{ph:'cannot (replace)',zh:'\u65e0\u6cd5\uff08\u66ff\u4ee3\uff09'}],
-      grammar:{point:'\u6bd4\u8f83\u7ea7 + than \u7ed3\u6784',ex:'The operator beats the theorist.'} },
-    overseas: { title:'What expats actually need before moving abroad', source:'CNN Travel',
-      excerpt:'Beyond visas and savings, the harder part is building a routine in a new system \u2014 healthcare, banking, and a social circle that does not depend on your old life.',
-      words:[{w:'expat',def:'\u79fb\u5c45\u6d77\u5916\u7684\u4eba',ex:'what expats need'},{w:'visa',def:'\u7b7e\u8bc1',ex:'beyond visas'},{w:'routine',def:'\u65e5\u5e38\u8282\u594f/\u60ef\u4f8b',ex:'building a routine'},{w:'healthcare',def:'\u533b\u7597',ex:'healthcare and banking'},{w:'social circle',def:'\u793e\u4ea4\u5708',ex:'a new social circle'}],
-      expressions:[{ph:'beyond ...',zh:'\u9664\u4e86...\u4e4b\u5916'},{ph:'depend on',zh:'\u4f9d\u8d56'}],
-      grammar:{point:'what \u5f15\u5bfc\u7684\u540d\u8bcd\u6027\u4ece\u53e5',ex:'What expats need is routine.'} }
-  };
+  /* ---------- english content ----------
+     英语课文已迁移至 LearningLibrary（由 LearningSource 统一加载）。
+     generateEnglish / findEnglish 仅作委托接口，供英语模块与学习历史调用，不再直接依赖 EN_LIB。 */
+  let currentEnObj = null;
+  const PLAN_EN_MAP = { ai:'en-ai', wealth:'en-invest', en:'en-career', build:'en-career', content:'en-career', body:'en-overseas' };
 
-  let currentEnKey = null;
   function generateEnglish(force) {
     const d = S.data;
     const t = U.todayStr();
     const plan = d.dailyPlans[t];
-    let key = 'ai';
-    if (plan) key = ({ai:'ai', wealth:'invest', en:'career', build:'career', content:'career', body:'overseas'})[plan.cat] || 'ai';
+    const enPool = window.Library.byCategory('en');
+    if (!enPool.length) return null;
+    let def = null;
+    if (plan && PLAN_EN_MAP[plan.cat]) def = enPool.find(o => o.id === PLAN_EN_MAP[plan.cat]) || null;
     const used = d.learning.filter(l => l.category === 'en').map(l => l.topic);
-    const keys = Object.keys(EN_LIB).filter(k => !used.includes(EN_LIB[k].title));
-    let pickKey;
+    const fresh = enPool.filter(o => !used.includes(o.title));
+    let pick;
     if (force) {
-      // 真正「换一篇」：在未学过的课文中随机取一篇，且保证与当前展示的不同
-      const pool = (keys.length ? keys : Object.keys(EN_LIB)).filter(k => k !== currentEnKey);
-      const src = pool.length ? pool : (keys.length ? keys : Object.keys(EN_LIB));
-      pickKey = src[Math.floor(Math.random() * src.length)];
+      // 真正「换一篇」：在未学过的课文中随机取一篇，且保证与当前展示不同
+      const pool = (fresh.length ? fresh : enPool).filter(o => o !== currentEnObj);
+      pick = pool.length ? pool[Math.floor(Math.random() * pool.length)] : enPool[0];
     } else {
-      // 默认每日一文：同一天确定性（与日期挂钩），保持「今日固定课文」的节奏感
-      pickKey = keys.length ? keys[U.parseDate(t).getDate() % keys.length] : key;
+      // 默认每日一文：优先匹配今日主线，否则按日期在未学课文中确定性取一篇
+      pick = fresh.length ? fresh[U.parseDate(t).getDate() % fresh.length] : (def || enPool[0]);
     }
-    currentEnKey = pickKey;
-    return EN_LIB[pickKey] || EN_LIB[key];
+    currentEnObj = pick;
+    return pick;
   }
 
   /* 按标题查找英语课文（学习历史回看时用于恢复完整内容） */
   function findEnglish(topic) {
     if (!topic) return null;
-    const keys = Object.keys(EN_LIB);
-    for (let i = 0; i < keys.length; i++) { if (EN_LIB[keys[i]].title === topic) return EN_LIB[keys[i]]; }
-    return null;
+    return window.Library.byCategory('en').find(o => o.title === topic) || null;
   }
 
   /* ---------- content ideas ---------- */
@@ -1593,7 +1573,8 @@ window.EnglishMod = (function () {
   }
 
   /* 英文学习弹窗 */
-  function open(lesson) {
+  function open(lesson, opts) {
+    opts = opts || {};
     const wordsHtml = (lesson.words || []).map(w =>
       `<div class="item"><div class="item-main"><div class="item-title">${U.escapeHtml(w.w)} <span class="muted tiny">${U.escapeHtml(w.def)}</span></div><div class="item-sub">${U.escapeHtml(w.ex)}</div></div></div>`
     ).join('');
@@ -1607,7 +1588,7 @@ window.EnglishMod = (function () {
       <ul>${exprHtml}</ul>
       <div class="sec-title" style="margin:14px 0 6px"><h2>语法</h2></div>
       <div class="ai-box"><div class="ai-head">📐 语法点</div><p><b>${U.escapeHtml((lesson.grammar||{}).point||'')}</b></p><p class="muted">${U.escapeHtml((lesson.grammar||{}).ex||'')}</p></div>
-      <div class="field" style="margin-top:16px"><label>我的复述 / 造句（写英文）</label><textarea id="mRep" placeholder="用英文写一两句你记住的内容…"></textarea>
+      <div class="field" style="margin-top:16px"><label>我的复述 / 造句（写英文）</label><textarea id="mRep" placeholder="用英文写一两句你记住的内容…">${U.escapeHtml(opts.prefill || '')}</textarea>
         <div class="hint">写完点「检查我的句子」，AI 会帮你批改。</div></div>
       <div id="repFb"></div>
       <div class="tool-row" style="margin-top:8px">
@@ -1617,9 +1598,12 @@ window.EnglishMod = (function () {
     `, () => {
       const rep = (document.getElementById('mRep').value || '').trim();
       saveVocab(lesson);
-      S.add('learning', { date: U.todayStr(), topic: lesson.title, category: 'en', source: lesson.source,
-        summary: (lesson.excerpt || '').slice(0, 120), notes: rep ? ('复述：' + rep) : '完成今日英语', understanding: 3, output: rep ? '英文复述' : '阅读+词汇' });
-      App.closeModal(); U.toast('已记录今日英语'); App.refresh();
+      // 继续学习（updateId 存在）时更新原记录并保留其原始日期；否则新增一条今日记录
+      const orig = opts.updateId ? S.data.learning.find(x => x.id === opts.updateId) : null;
+      const rec = { date: (orig && orig.date) || U.todayStr(), topic: lesson.title, category: 'en', source: lesson.source,
+        summary: (lesson.excerpt || '').slice(0, 120), notes: rep ? ('复述：' + rep) : '完成今日英语', understanding: 3, output: rep ? '英文复述' : '阅读+词汇' };
+      if (opts.updateId) S.update('learning', opts.updateId, rec); else S.add('learning', rec);
+      App.closeModal(); U.toast(opts.updateId ? '已更新学习记录' : '已记录今日英语'); App.refresh();
     }, '标记已学');
 
     // 绑定：检查句子
@@ -1747,6 +1731,150 @@ window.EnglishMod = (function () {
   }
 
   return { open, openQuiz, openBankQuiz };
+})();
+
+
+/* === assets/js/learning/library.js === */
+/* 学习对象注册中心：统一管理英语 / AI工具 / 产品 等学习对象。
+   V1.3.1 新增，为 V1.3.2（AI Learning 联网）预留统一接口。 */
+window.Library = (function () {
+  const items = {};
+  function _slug(s){ return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60); }
+  function register(obj){
+    if(!obj||!obj.title) return null;
+    if(!obj.id) obj.id = _slug(obj.title) || ('lib-'+U.uid('l'));
+    obj.category = obj.category || 'en';
+    items[obj.id] = obj;
+    return obj;
+  }
+  function registerAll(arr){ (arr||[]).forEach(register); return Object.keys(items).length; }
+  function get(id){ return items[id]||null; }
+  function all(){ return Object.values(items); }
+  function byCategory(cat){ return Object.values(items).filter(o=>o.category===cat); }
+  function findByTitle(title){
+    if(!title) return null;
+    return Object.values(items).find(o=>o.title===title)||null;
+  }
+  function search(q){
+    q=(q||'').trim().toLowerCase();
+    if(!q) return all();
+    return Object.values(items).filter(o=>
+      (o.title||'').toLowerCase().includes(q) ||
+      (o.source||'').toLowerCase().includes(q) ||
+      (o.summary||o.excerpt||'').toLowerCase().includes(q));
+  }
+  function categories(){
+    const m={}; Object.values(items).forEach(o=>{ m[o.category]=(m[o.category]||0)+1; }); return m;
+  }
+  return { register, registerAll, get, all, byCategory, findByTitle, search, categories };
+})();
+
+
+/* === assets/js/learning/source.js === */
+/* 学习数据源抽象：当前内置 LocalSource（可扩展内容），并为 V1.3.2 预留 RemoteSource 联网接口。
+   load() 会把所有数据源的内容聚合进 window.Library。 */
+window.LearningSource = (function () {
+
+  /* ---- 内置学习库（跨类别，可继续扩充，不再写死仅 4 篇英语） ---- */
+  const BUILTIN_EN = [
+    { id:'en-ai', category:'en', title:'AI agents are moving from demos to daily work', source:'TechCrunch',
+      excerpt:'Rather than replacing people, agents are being wired into existing workflows to handle repetitive steps — scheduling, summarising, and checking configurations — while humans keep the judgment calls.',
+      words:[{w:'workflow',def:'工作流',ex:'embedded into the workflow'},{w:'repetitive',def:'重复的',ex:'repetitive steps'},{w:'judgment',def:'判断（力）',ex:'keep the judgment calls'},{w:'configuration',def:'配置',ex:'checking configurations'},{w:'wire',def:'接入/连接',ex:'wired into systems'}],
+      expressions:[{ph:'rather than replacing people',zh:'而不是取代人'},{ph:'keep the judgment calls',zh:'保留需要判断的决策'}],
+      grammar:{point:'现在进行时表示正在发生的变化：are being wired / are moving',ex:'Agents are being wired into workflows.'} },
+    { id:'en-invest', category:'en', title:'Why dollar-cost averaging still wins for beginners', source:'Morningstar',
+      excerpt:'Trying to time the market rarely beats a simple plan. By investing a fixed amount on a schedule, you buy more when prices are low and less when they are high — smoothing your entry over time.',
+      words:[{w:'dollar-cost averaging',def:'定投/平均成本法',ex:'DCA smooths entry'},{w:'time the market',def:'择时',ex:'rarely beats a plan'},{w:'fixed amount',def:'固定金额',ex:'invest a fixed amount'},{w:'smooth',def:'平滑',ex:'smoothing your entry'},{w:'schedule',def:'时间表/计划',ex:'on a schedule'}],
+      expressions:[{ph:'beats a simple plan',zh:'胜过一个简单的计划'},{ph:'over time',zh:'随着时间的推移'}],
+      grammar:{point:'when 引导的时间状语从句 + 比较级',ex:'You buy more when prices are low.'} },
+    { id:'en-career', category:'en', title:'Operators beat theorists in early-stage work', source:"Lenny's Newsletter",
+      excerpt:'In small teams, the person who can ship and learn beats the person who can only analyse. Doing the work creates the judgment that slides and meetings cannot.',
+      words:[{w:'operator',def:'实干者/运营者',ex:'operators ship'},{w:'theorist',def:'理论派',ex:'theorists analyse'},{w:'ship',def:'交付/上线',ex:'can ship and learn'},{w:'slide',def:'PPT/幻灯片',ex:'slides and meetings'}],
+      expressions:[{ph:'beats ... in',zh:'在...方面胜过'},{ph:'cannot (replace)',zh:'无法（替代）'}],
+      grammar:{point:'比较级 + than 结构',ex:'The operator beats the theorist.'} },
+    { id:'en-overseas', category:'en', title:'What expats actually need before moving abroad', source:'CNN Travel',
+      excerpt:'Beyond visas and savings, the harder part is building a routine in a new system — healthcare, banking, and a social circle that does not depend on your old life.',
+      words:[{w:'expat',def:'移居海外的人',ex:'what expats need'},{w:'visa',def:'签证',ex:'beyond visas'},{w:'routine',def:'日常节奏/惯例',ex:'building a routine'},{w:'healthcare',def:'医疗',ex:'healthcare and banking'},{w:'social circle',def:'社交圈',ex:'a new social circle'}],
+      expressions:[{ph:'beyond ...',zh:'除了...之外'},{ph:'depend on',zh:'依赖'}],
+      grammar:{point:'what 引导的名词性从句',ex:'What expats need is routine.'} },
+    { id:'en-remote', category:'en', title:'Remote work is a skill, not a perk', source:'Harvard Business Review',
+      excerpt:'Working from anywhere looks like freedom, but it demands a different discipline — clearer writing, firmer boundaries, and the habit of making progress without someone watching.',
+      words:[{w:'remote',def:'远程的',ex:'remote work'},{w:'discipline',def:'自律/纪律',ex:'a different discipline'},{w:'boundary',def:'边界/界限',ex:'firmer boundaries'},{w:'async',def:'异步的',ex:'async communication'},{w:'overlap',def:'重叠/交集',ex:'time overlap'}],
+      expressions:[{ph:'looks like freedom',zh:'看起来像自由'},{ph:'without someone watching',zh:'在没有人盯着的情况下'}],
+      grammar:{point:'make + 宾语 + 形容词 的使役结构',ex:'make progress / make it clear'} },
+    { id:'en-writing', category:'en', title:'Good writing is rewriting', source:'The Atlantic',
+      excerpt:'The first draft is not the article. It is a way to discover what you think. Most of the real writing happens in the second and third pass.',
+      words:[{w:'draft',def:'草稿',ex:'the first draft'},{w:'discover',def:'发现/弄清',ex:'discover what you think'},{w:'revision',def:'修订',ex:'a second revision'},{w:'clutter',def:'杂乱',ex:'cut the clutter'},{w:'clarity',def:'清晰',ex:'pursue clarity'}],
+      expressions:[{ph:'the first draft',zh:'初稿'},{ph:'in the second pass',zh:'在第二轮修改时'}],
+      grammar:{point:'writing 作不可数名词的用法',ex:'Most of the real writing happens later.'} },
+    { id:'en-negotiate', category:'en', title:'Negotiation is not a zero-sum game', source:'Forbes',
+      excerpt:'The best deals leave both sides better off. Before you push for more, find what the other side values that costs you little to give.',
+      words:[{w:'negotiation',def:'谈判',ex:'a tough negotiation'},{w:'counterpart',def:'对手方/对方',ex:'your counterpart'},{w:'leverage',def:'杠杆/筹码',ex:'more leverage'},{w:'concession',def:'让步',ex:'a small concession'},{w:'align',def:'使一致/对齐',ex:'align goals'}],
+      expressions:[{ph:'leave both sides better off',zh:'让双方都更好'},{ph:'costs you little',zh:'你付出很少'}],
+      grammar:{point:'before + 从句 的时间状语',ex:'Before you push for more, find what they value.'} },
+    { id:'en-health', category:'en', title:'Sleep is the cheapest performance drug', source:'NYT',
+      excerpt:'You cannot think clearly, lift well, or stay calm on a sleep deficit. Eight hours is not lazy — it is the foundation that everything else stands on.',
+      words:[{w:'deficit',def:'亏空/不足',ex:'a sleep deficit'},{w:'foundation',def:'基础',ex:'the foundation'},{w:'recover',def:'恢复',ex:'recover faster'},{w:'cognitive',def:'认知的',ex:'cognitive load'},{w:'consistent',def:'持续的/稳定的',ex:'consistent sleep'}],
+      expressions:[{ph:'on a sleep deficit',zh:'睡眠不足状态下'},{ph:'stands on',zh:'建立在...之上'}],
+      grammar:{point:'cannot ... either ... or ... 否定并列',ex:'cannot think clearly, lift well, or stay calm'} }
+  ];
+
+  const BUILTIN_AI = [
+    { id:'ai-agent', category:'ai', title:'AI Agent 与自动化', source:'行业博客 / 官方文档',
+      core:'Agent = 能自主规划、调用工具、循环执行的 AI 系统，不只是问答。',
+      question:'我现在的工作里，哪些流程能被拆成「观察→判断→动作」？',
+      relation:'活动配置检查、周报汇总、竞品监控都能先做规则化。',
+      practice:'拆一个你每周都做的运营动作，写出 3 条可自动化的规则。',
+      output:'一张「流程→规则」对照表' },
+    { id:'ai-data', category:'ai', title:'用 AI 做数据分析', source:'自己的运营后台',
+      core:'让 AI 帮你写 SQL / 透视思路，你负责定义问题和判断结论。',
+      question:'这周哪个指标异常，我想让 AI 帮我找原因？',
+      relation:'活动 ROI、转化漏斗、渠道对比都可用 AI 提速。',
+      practice:'挑一个真实数据问题，用 AI 生成分析框架并验证。',
+      output:'一份含结论的数据分析草稿' },
+    { id:'ai-code', category:'ai', title:'AI 编程工具实操', source:'文档 + 实操',
+      core:'AI 编程（如 Cursor/通义）把想法变成可运行代码，关键是把需求讲清楚。',
+      question:'我手头哪个小工具，值得用 AI 自己做出来？',
+      relation:'这个工作台本身就是例子：先框架，再逐页加功能。',
+      practice:'用 AI 写一个 30 行内的小工具解决一个真实痛点。',
+      output:'一个能用的小工具 / 脚本' }
+  ];
+
+  const BUILTIN_PRODUCT = [
+    { id:'prod-notion', category:'product', title:'用 Notion 搭个人知识库', source:'官方模板 + 实操',
+      summary:'把碎片笔记沉淀为可检索的结构化知识库：数据库 + 视图 + 模板三件套。',
+      points:['用 Database 代替文件夹管理笔记','用模板统一周报/复盘结构','用关联字段串起项目与学习'] },
+    { id:'prod-figma', category:'product', title:'用 Figma 做轻量原型', source:'设计博客',
+      summary:'非设计师也能用 Auto Layout 和组件快速验证界面想法，降低沟通成本。',
+      points:['组件化复用按钮/卡片','用 Auto Layout 做响应式布局','用原型链接模拟主流程'] }
+  ];
+
+  /* LocalSource：内置静态数据源（可继续扩充内容） */
+  function LocalSource(id, data){ return { id:id, type:'local', load:function(){ return data; } }; }
+  /* V1.3.2 预留：联网数据源（当前不实现联网逻辑，load 返回空数组） */
+  function RemoteSource(id, endpoint){ return { id:id, type:'remote', endpoint:endpoint, async:true, load:function(){ return []; } }; }
+
+  const sources = [];
+  function addSource(src){ if(src && typeof src.load==='function') sources.push(src); }
+  let registered = false;
+  function registerBuiltin(){
+    if(registered) return;
+    addSource(LocalSource('builtin-en', BUILTIN_EN));
+    addSource(LocalSource('builtin-ai', BUILTIN_AI));
+    addSource(LocalSource('builtin-product', BUILTIN_PRODUCT));
+    registered = true;
+  }
+  /* 聚合所有数据源内容到 Library（可重复调用，按 id 幂等） */
+  function load(){
+    registerBuiltin();
+    sources.forEach(function(src){
+      const data = src.load()||[];
+      data.forEach(function(o){ window.Library.register(o); });
+    });
+    return window.Library.all().length;
+  }
+  return { addSource, load, LocalSource, RemoteSource, registerBuiltin,
+    builtins: function(){ return { en: BUILTIN_EN, ai: BUILTIN_AI, product: BUILTIN_PRODUCT }; } };
 })();
 
 
@@ -2045,26 +2173,15 @@ window.Pages = window.Pages || {};
 window.Pages.learn = (function () {
   let sub = 'ai';
 
-  const AI_TOPICS = [
-    { topic:'AI Agent 与自动化', source:'行业博客 / 官方文档',
-      core:'Agent = 能自主规划、调用工具、循环执行的 AI 系统，不只是问答。',
-      question:'我现在的工作里，哪些流程能被拆成「观察→判断→动作」？',
-      relation:'活动配置检查、周报汇总、竞品监控都能先做规则化。',
-      practice:'拆一个你每周都做的运营动作，写出 3 条可自动化的规则。',
-      output:'一张「流程→规则」对照表' },
-    { topic:'用 AI 做数据分析', source:'自己的运营后台',
-      core:'让 AI 帮你写 SQL / 透视思路，你负责定义问题和判断结论。',
-      question:'这周哪个指标异常，我想让 AI 帮我找原因？',
-      relation:'活动 ROI、转化漏斗、渠道对比都可用 AI 提速。',
-      practice:'挑一个真实数据问题，用 AI 生成分析框架并验证。',
-      output:'一份含结论的数据分析草稿' },
-    { topic:'AI 编程工具实操', source:'文档 + 实操',
-      core:'AI 编程（如 Cursor/通义）把想法变成可运行代码，关键是把需求讲清楚。',
-      question:'我手头哪个小工具，值得用 AI 自己做出来？',
-      relation:'这个工作台本身就是例子：先框架，再逐页加功能。',
-      practice:'用 AI 写一个 30 行内的小工具解决一个真实痛点。',
-      output:'一个能用的小工具 / 脚本' }
-  ];
+  /* AI 学习内容现已统一存放在 LearningLibrary（category:'ai'），不再写死 AI_TOPICS。
+     这里仅保留「Library AI 对象 → 学习任务表单」的转换函数。 */
+  function aiPrefillFromLib(o) {
+    if (!o) return { topic:'', source:'', core:'', q:'', rel:'', prac:'', out:'' };
+    return {
+      topic: o.title || '', source: o.source || '', core: o.core || '',
+      q: o.question || '', rel: o.relation || '', prac: o.practice || '', out: o.output || ''
+    };
+  }
 
   function render() {
     const seg = `<div class="seg" style="margin-bottom:6px">
@@ -2100,24 +2217,36 @@ window.Pages.learn = (function () {
     <div class="card" style="padding-top:6px"><div class="list">${recHtml}</div></div>`;
   }
 
-  function genAiTask() {
-    const topic = AI_TOPICS[U.parseDate(U.todayStr()).getDate() % AI_TOPICS.length];
+  function genAiTask(opts) {
+    opts = opts || {};
+    let p;
+    if (opts.prefill) {
+      p = opts.prefill;
+    } else {
+      // 默认：从 LearningLibrary 的 AI 类别按日期确定性取一篇
+      const aiLib = window.Library.byCategory('ai');
+      const pick = aiLib.length ? aiLib[U.parseDate(U.todayStr()).getDate() % aiLib.length] : null;
+      p = aiPrefillFromLib(pick);
+    }
     App.openModal('🤖 今日 AI 学习任务', `
-      <div class="field"><label>学习主题</label><input id="aTopic" value="${U.escapeHtml(topic.topic)}"></div>
-      <div class="field"><label>信息来源</label><input id="aSrc" value="${U.escapeHtml(topic.source)}"></div>
-      <div class="field"><label>核心知识</label><textarea id="aCore">${U.escapeHtml(topic.core)}</textarea></div>
-      <div class="field"><label>我的真实问题</label><textarea id="aQ">${U.escapeHtml(topic.question)}</textarea></div>
-      <div class="field"><label>和我的工作有什么关系</label><textarea id="aRel">${U.escapeHtml(topic.relation)}</textarea></div>
-      <div class="field"><label>实践任务</label><textarea id="aPrac">${U.escapeHtml(topic.practice)}</textarea></div>
-      <div class="field"><label>最终产出</label><input id="aOut" value="${U.escapeHtml(topic.output)}"></div>
+      <div class="field"><label>学习主题</label><input id="aTopic" value="${U.escapeHtml(p.topic)}"></div>
+      <div class="field"><label>信息来源</label><input id="aSrc" value="${U.escapeHtml(p.source)}"></div>
+      <div class="field"><label>核心知识</label><textarea id="aCore">${U.escapeHtml(p.core)}</textarea></div>
+      <div class="field"><label>我的真实问题</label><textarea id="aQ">${U.escapeHtml(p.q)}</textarea></div>
+      <div class="field"><label>和我的工作有什么关系</label><textarea id="aRel">${U.escapeHtml(p.rel)}</textarea></div>
+      <div class="field"><label>实践任务</label><textarea id="aPrac">${U.escapeHtml(p.prac)}</textarea></div>
+      <div class="field"><label>最终产出</label><input id="aOut" value="${U.escapeHtml(p.out)}"></div>
       <div class="field"><label>理解程度（1-5）</label><input id="aUnd" type="number" min="1" max="5" value="3"></div>
     `, () => {
-      S.add('learning', {
-        date: U.todayStr(), category: 'ai', topic: val('aTopic'), source: val('aSrc'),
+      // 继续学习（updateId 存在）时更新原记录并保留原始日期；否则新增一条今日记录
+      const orig = opts.updateId ? S.data.learning.find(x => x.id === opts.updateId) : null;
+      const rec = {
+        date: (orig && orig.date) || U.todayStr(), category: 'ai', topic: val('aTopic'), source: val('aSrc'),
         summary: val('aCore'), notes: '问题：' + val('aQ') + ' | 关联：' + val('aRel') + ' | 实践：' + val('aPrac'),
         understanding: parseInt(val('aUnd')) || 3, output: val('aOut')
-      });
-      App.closeModal(); U.toast('已记录 AI 学习'); App.refresh();
+      };
+      if (opts.updateId) S.update('learning', opts.updateId, rec); else S.add('learning', rec);
+      App.closeModal(); U.toast(opts.updateId ? '已更新学习记录' : '已记录 AI 学习'); App.refresh();
     }, '保存学习');
     function val(id){ return document.getElementById(id).value.trim(); }
   }
@@ -2135,7 +2264,7 @@ window.Pages.learn = (function () {
 
     return `
     <div class="card">
-      <div class="card-head"><h3>🇬🇧 今日英语</h3><span class="sub">已学 ${wordsCount} 个词</span></div>
+      <div class="card-head"><h3>🇬🇧 今日英语</h3><span class="sub">已学 ${wordsCount} 个词 · 可选 ${window.Library.byCategory('en').length} 篇</span></div>
       <div class="item" style="border:none;padding:0">
         <div class="item-ico">📄</div>
         <div class="item-main"><div class="item-title">${U.escapeHtml(en.title)}</div>
@@ -2241,24 +2370,47 @@ window.Pages.learn = (function () {
     return html;
   }
 
-  /* ---- 学习历史回看 ---- */
+  /* ---- 学习历史回看：查看历史笔记 / 继续学习 / 重新学习 ---- */
   function openLearnRecord(id) {
     const r = S.data.learning.find(x => x.id === id); if (!r) return;
-    // 英语记录：若能在 EN_LIB 中找到对应课文，直接恢复文章/单词/表达/语法/测验
-    if (r.category === 'en') {
-      const lesson = window.AI.findEnglish(r.topic);
-      if (lesson) { EnglishMod.open(lesson); return; }
-    }
-    // 其它类别或英语未匹配到课文：恢复该记录已保存的全部内容
     const catTxt = { ai:'AI', en:'英语', build:'创造', wealth:'财富', body:'身体', content:'自媒体' }[r.category] || r.category;
+    // 从 Library 找到对应的可交互学习对象（英语 / AI 工具）；产品类当前仅支持查看笔记
+    const libObj = window.Library.findByTitle(r.topic);
+    const interactive = (r.category === 'en' && libObj) || (r.category === 'ai' && libObj);
+
+    const actions = interactive ? `
+      <div class="tool-row" style="margin-top:16px">
+        <button class="btn btn-primary" data-continue>继续学习</button>
+        <button class="btn" data-relearn>重新学习</button>
+      </div>` : '';
+
     App.openModal(U.escapeHtml(r.topic), `
       <div class="field"><label>类别</label><div class="muted">${catTxt} · ${U.fmtDateCN(r.date)}</div></div>
       ${r.source ? `<div class="field"><label>来源</label><div class="muted">${U.escapeHtml(r.source)}</div></div>` : ''}
       ${r.summary ? `<div class="field"><label>摘要</label><div class="card" style="box-shadow:none">${U.escapeHtml(r.summary)}</div></div>` : ''}
-      ${r.notes ? `<div class="field"><label>笔记 / 复述</label><div class="card" style="box-shadow:none">${U.escapeHtml(r.notes)}</div></div>` : ''}
+      ${r.notes ? `<div class="field"><label>我的笔记 / 复述</label><div class="card" style="box-shadow:none">${U.escapeHtml(r.notes)}</div></div>` : ''}
       ${r.output ? `<div class="field"><label>产出</label><div class="muted">${U.escapeHtml(r.output)}</div></div>` : ''}
       <div class="muted tiny" style="margin-top:6px">理解 ${r.understanding || '-'}/5</div>
-    `, () => App.closeModal(), '关闭');
+      ${actions}
+    `, () => App.closeModal(), interactive ? '查看笔记' : '关闭');
+
+    setTimeout(() => {
+      const cont = document.querySelector('[data-continue]');
+      if (cont) cont.onclick = () => { App.closeModal(); continueLearning(r, libObj); };
+      const rl = document.querySelector('[data-relearn]');
+      if (rl) rl.onclick = () => { App.closeModal(); relearn(r, libObj); };
+    }, 30);
+  }
+
+  /* 继续学习：以历史记录的内容回填交互式学习，完成后更新原记录（保留原始日期） */
+  function continueLearning(r, libObj) {
+    if (r.category === 'en' && libObj) EnglishMod.open(libObj, { prefill: (r.notes || '').replace(/^复述：/, ''), updateId: r.id });
+    else if (r.category === 'ai' && libObj) genAiTask({ prefill: aiPrefillFromLib(libObj), updateId: r.id });
+  }
+  /* 重新学习：以全新状态重新走一遍交互式学习，完成后新增一条今日学习记录 */
+  function relearn(r, libObj) {
+    if (r.category === 'en' && libObj) EnglishMod.open(libObj, {});
+    else if (r.category === 'ai' && libObj) genAiTask({});
   }
 
   function bind() {
@@ -3135,6 +3287,8 @@ window.App = (function () {
 
   function load() {
     S.load();
+    // V1.3.1 加载学习数据源（LocalSource 内置库）到 LearningLibrary
+    if (window.LearningSource) window.LearningSource.load();
     applyTheme(S.data.settings.theme || 'light');
     // 底部导航
     document.querySelectorAll('.tab').forEach(b => b.onclick = () => go(b.dataset.tab));

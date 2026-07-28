@@ -3,6 +3,21 @@
 > 格式参考 [Keep a Changelog](https://keepachangelog.com/)。版本号规范：`v1.0` / `v1.1` / `v2.0` …；开发态 `version.json` 为 `dev`。
 > 每次发版必须在此追加条目，并更新 PROJECT.md 第 2 节「当前版本」。
 
+## [v1.3.1] - 学习引擎基础 Learning Foundation
+
+### Added（学习基础设施）
+- **LearningLibrary（学习对象统一注册中心 `window.Library`）**：统一管理英语 / AI工具 / 产品 等学习对象，提供 `register` / `byCategory` / `findByTitle` / `search` / `categories` 等接口，为 V1.3.2（联网 AI 学习）预留统一扩展点。
+- **LearningSource（数据源抽象 `window.LearningSource`）**：内置 `LocalSource` 聚合可扩展的本地内容（**英语 8 篇 / AI 工具 3 篇 / 产品 2 篇**，不再写死仅 4 篇英语）；`RemoteSource` 为 V1.3.2 联网预留（`load()` 当前返回空，不实现联网逻辑）。`App.load()` 启动时调用 `LearningSource.load()` 把内容灌入 `Library`。
+- **英语模块重构读取 `Library`**：`AI.generateEnglish` / `AI.findEnglish` 改为从 `Library` 取课文（`category:'en'`），不再直接依赖 `EN_LIB`；英语课文统一迁移至 `LearningSource` 内置库。
+
+### Changed
+- **学习历史升级（查看历史笔记 / 继续学习 / 重新学习）**：`openLearnRecord` 弹出记录详情，可「继续学习」（回填历史笔记并 **更新原记录、保留原始日期**）或「重新学习」（全新状态、新增一条今日记录）；英语/AI 记录可完整恢复文章/单词/语法/测验与已存摘要/笔记/产出/理解度。`EnglishMod.open` 新增 `opts.prefill` / `opts.updateId` 支持回填与续学。
+
+### 约束遵守
+- 未改动数据契约 `pgwb_data_v1`；未触碰 Planner / Project / Memory Engine、TodayAgent、RuleEngine、财富/身体/自媒体模块与 UI 风格；保持 localStorage 兼容、PWA 正常。
+- 运行时版本 `version.json` → `1.3.1`。
+- 提交：`feat: v1.3.1 learning foundation (Library + LearningSource + history upgrade)`
+
 ## [v1.2.2] - 学习历史点击回看（当前版本）
 
 ### Fixed
