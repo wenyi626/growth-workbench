@@ -3,6 +3,13 @@
 > 格式参考 [Keep a Changelog](https://keepachangelog.com/)。版本号规范：`v1.0` / `v1.1` / `v2.0` …；开发态 `version.json` 为 `dev`。
 > 每次发版必须在此追加条目，并更新 PROJECT.md 第 2 节「当前版本」。
 
+## [未发布] AI Prompt 管理体系（docs 提交）
+
+### Added
+- 新增 `docs/Prompt/` 目录与 9 个文件：`PromptGuide.md`（管理规范）、`AI.md`（总体行为规范）、`Home/Study/Wealth/Fitness/Media/Review.md`（模块 Prompt 框架）、`Development.md`（开发类 Prompt）。
+- 将所有 AI Prompt 从代码中独立，统一在此管理；未来接入真实模型时从本目录读取，不在 `index.html` 写死。
+- 提交：`docs: initialize AI prompt management system`
+
 ## [v1.0.0] - 版本更新机制（当前部署）
 
 ### Added

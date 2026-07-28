@@ -142,6 +142,8 @@
 
 > 若未来要接入**真实大模型 API**，属于重大架构变更：需新增后端代理（避免在前端暴露密钥）、定义调用边界、保持离线降级，并在 AI_RULES 中记录规范。**当前严禁在前端硬编码任何 API Key。**
 
+> **Prompt 管理**：所有 AI Prompt 已从代码中独立，统一维护在 `docs/Prompt/`（`PromptGuide.md` 定义规范，各模块一个文件）。未来接入真实模型时，Prompt 从此目录读取，不在 `index.html` 写死。
+
 ---
 
 ## 9. 已完成功能（截至 `d98691c`）
@@ -157,6 +159,7 @@
 - [x] PWA：manifest + Service Worker 离线 + 图标（192/512/maskable/1024）+ iOS 启动图
 - [x] GitHub Pages 部署（main 根目录，HTTPS）
 - [x] 版本自动检测与「发现新版本」弹窗 + PWA `skipWaiting` 更新流（v1.0.0）
+- [x] AI Prompt 管理体系（`docs/Prompt/`，9 个文件 + `PromptGuide.md` 规范）
 
 ---
 
@@ -203,3 +206,11 @@
 2. 运行 `git log --oneline -10` 与 `git status` 确认当前代码与未提交改动。
 3. 确认本次任务范围（是否允许改 UI/数据契约）。
 4. 按 AI_RULES 的「开发流程」执行，完成后同步更新文档再提交。
+
+## 15. AI Prompt 管理体系（docs/Prompt/）
+
+- 所有 AI Prompt 已从代码中独立，统一维护在 **`docs/Prompt/`** 目录（规范见 `docs/Prompt/PromptGuide.md`）。
+- 规范：`PromptGuide.md` 定义统一模板（Role / Goal / Context / Input / Constraints / Output）与命名/新增规则；`AI.md` 为总体行为规范。
+- 模块文件：`Home` / `Study` / `Wealth` / `Fitness` / `Media` / `Review`（对应六大业务模块），`Development.md` 为开发类 Prompt。
+- 现状：当前 `AI.*` 为本地规则；未来接入真实模型时，Prompt 从此目录读取，不在 `index.html` 写死。
+- 维护：新增/调整 Prompt 改 `docs/Prompt/` 文件并同步 `CHANGELOG.md`，**不修改业务代码**（见 `AI_RULES.md`）。
