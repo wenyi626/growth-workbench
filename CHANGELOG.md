@@ -3,6 +3,13 @@
 > 格式参考 [Keep a Changelog](https://keepachangelog.com/)。版本号规范：`v1.0` / `v1.1` / `v2.0` …；开发态 `version.json` 为 `dev`。
 > 每次发版必须在此追加条目，并更新 PROJECT.md 第 2 节「当前版本」。
 
+## [未发布] AI 接管入口（docs 提交）
+
+### Added
+- 新增 `PROJECT_BOOTSTRAP.md`：整个项目**唯一的 AI 接管入口**（9 节：文件作用 / 接管流程 / 开发原则 / 文档维护 / Git 工作流 / 行为规范 / 输出规范 / 新聊天规范 / 长期维护）。
+- 任何新 AI 接手前必读，禁止依赖聊天记录；唯一可信来源为 GitHub 最新代码 + 6 份根文档 + `docs/`。
+- 提交：`docs: add PROJECT_BOOTSTRAP for AI onboarding`
+
 ## [未发布] AI Prompt 管理体系（docs 提交）
 
 ### Added

@@ -2,6 +2,7 @@
 
 > 本文件是项目的**唯一长期记忆**。任何重要修改完成后，都必须同步更新本文件以及对应的 README / VISION / TODO / CHANGELOG / AI_RULES。
 > 新会话（或上下文被重置、出现「400 input length too long」）时，**先读这 6 份文档**，再开始任何工作。
+> 🤖 **AI 接管入口**：任何新 AI 接手本项目前，必须先读 **`PROJECT_BOOTSTRAP.md`**（唯一入口，禁止依赖聊天记录）。
 
 ---
 
@@ -202,7 +203,7 @@
 
 当出现以下任一情况：**上下文被重置 / 模型提示「400 input length too long」/ 开启新聊天**，请按顺序执行：
 
-1. 依次阅读：`PROJECT.md` → `VISION.md` → `TODO.md` → `CHANGELOG.md` → `AI_RULES.md` → `README.md`。
+1. 首先阅读项目唯一入口 **`PROJECT_BOOTSTRAP.md`**，按其规定的「AI 接管流程」完成接管（其内已包含完整文档清单与代码扫描步骤）。
 2. 运行 `git log --oneline -10` 与 `git status` 确认当前代码与未提交改动。
 3. 确认本次任务范围（是否允许改 UI/数据契约）。
 4. 按 AI_RULES 的「开发流程」执行，完成后同步更新文档再提交。
@@ -214,3 +215,10 @@
 - 模块文件：`Home` / `Study` / `Wealth` / `Fitness` / `Media` / `Review`（对应六大业务模块），`Development.md` 为开发类 Prompt。
 - 现状：当前 `AI.*` 为本地规则；未来接入真实模型时，Prompt 从此目录读取，不在 `index.html` 写死。
 - 维护：新增/调整 Prompt 改 `docs/Prompt/` 文件并同步 `CHANGELOG.md`，**不修改业务代码**（见 `AI_RULES.md`）。
+
+## 16. AI 接管入口（PROJECT_BOOTSTRAP.md）
+
+- **唯一入口**：`PROJECT_BOOTSTRAP.md` 是整个项目面向 AI 的单一接管入口。任何新 AI（WorkBuddy / Claude / GPT / Gemini / Cursor / Codex 等）开始工作前必须先读它，禁止依赖聊天记录。
+- 它统管：接管流程、开发原则、文档维护、Git 工作流、AI 行为规范、输出规范、新聊天规范、长期维护原则（共 9 节）。
+- 本文（`PROJECT.md`）是「长期记忆」，负责沉淀细节；`PROJECT_BOOTSTRAP.md` 是「入口与流程」，负责引导接管。两者配合。
+- 若新增文档 / 修改规范 / 调整 Git 或 Prompt 管理，必须同步更新 `PROJECT_BOOTSTRAP.md`（见其第 9 节）。
