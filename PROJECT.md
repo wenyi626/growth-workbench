@@ -20,7 +20,7 @@
 
 | 项 | 值 |
 | --- | --- |
-| 当前版本号 | `1.2.1`（运行时版本源 `version.json`；v1.2.0 引入 Decision Engine 决策引擎：RuleEngine 唯一决策中心；v1.2.1 修复财富单一数据源、英语「换一篇」、交易编辑/删除） |
+| 当前版本号 | `1.2.2`（运行时版本源 `version.json`；v1.2.0 引入 Decision Engine 决策引擎：RuleEngine 唯一决策中心；v1.2.1 修复财富单一数据源、英语「换一篇」、交易编辑/删除；v1.2.2 修复学习历史点击回看） |
 | 最近一次提交 | `feat: version update detection and pwa update flow`（v1.0.0） |
 | 发布状态 | 已部署 GitHub Pages，PWA 已可用 |
 | 版本标签规范 | 正式发版使用 `v1.0`、`v1.1`、`v2.0` …（见第 13 节） |
@@ -66,7 +66,7 @@
 ├── index.html              # 整个应用（约 3100+ 行，内联全部 CSS/JS）
 ├── manifest.json           # PWA 清单（名称/图标/主题色/启动方式）
 ├── sw.js                   # Service Worker（离线缓存 + 导航网络优先回退）
-├── version.json            # 版本号（当前 1.2.1，运行时版本检测源）
+├── version.json            # 版本号（当前 1.2.2，运行时版本检测源）
 ├── icon-192.png            # PWA 图标 192
 ├── icon-512.png            # PWA 图标 512
 ├── icon-maskable-512.png   # 可遮罩图标（Android 安全区）
@@ -173,6 +173,7 @@
 - [x] 财富数据单一数据源 SSOT（v1.2.1 / BUG-001）：`S.wealthTotal()` 统一首页 / TodayAgent / 财富页 / RuleEngine / WealthAgent 的当前总资产读数
 - [x] 英语「换一篇」真正切换（v1.2.1 / BUG-002）
 - [x] 交易记录编辑与删除（v1.2.1 / IMP-001，复用现有 UI 与数据契约）
+- [x] 学习历史点击回看（v1.2.2）：历史记录可点击恢复完整内容；英语匹配 EN_LIB 复原文章/单词/语法/测验，其它类别恢复已存摘要/笔记/产出
 
 ---
 

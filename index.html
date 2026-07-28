@@ -1430,6 +1430,14 @@ window.AI = (function () {
     return EN_LIB[pickKey] || EN_LIB[key];
   }
 
+  /* 按标题查找英语课文（学习历史回看时用于恢复完整内容） */
+  function findEnglish(topic) {
+    if (!topic) return null;
+    const keys = Object.keys(EN_LIB);
+    for (let i = 0; i < keys.length; i++) { if (EN_LIB[keys[i]].title === topic) return EN_LIB[keys[i]]; }
+    return null;
+  }
+
   /* ---------- content ideas ---------- */
   const TRENDS = [
     { hot:'AI \u5e2e\u4f60\u505aExcel/\u5468\u62a5', whyHot:'\u6253\u5de5\u4eba\u82e6\u91cd\u590d\u52b3\u52a8\u4e45\u5df2\uff0c\u76f8\u5173\u8bdd\u9898\u5bb9\u6613\u7206', angle:'\u6211\u4e0d\u662f\u7a0b\u5e8f\u5458\uff0c\u4f46\u7528 AI \u628a\u6d3b\u52a8\u5468\u62a5\u4ece1\u5c0f\u65f6\u538b\u523010\u5206\u949f' },
@@ -1566,7 +1574,7 @@ window.AI = (function () {
 
   function catName(c) { return ({ai:'AI',en:'\u82f1\u8bed',build:'\u521b\u9020',wealth:'\u8d22\u5bcc',body:'\u8eab\u4f53',content:'\u81ea\u5a92\u4f53'})[c] || c; }
 
-  return { generateTodayPlan, generateEnglish, genContentIdeas, wealthReview, parseExercise, bodyReport, selfAnalysis, checkSentence, THEMES };
+  return { generateTodayPlan, generateEnglish, findEnglish, genContentIdeas, wealthReview, parseExercise, bodyReport, selfAnalysis, checkSentence, THEMES };
 })();
 
 
@@ -2119,7 +2127,7 @@ window.Pages.learn = (function () {
     const en = AI.generateEnglish(false);
     const enRecs = S.data.learning.filter(l => l.category === 'en');
     const wordsCount = enRecs.length * 5;
-    const listHtml = enRecs.slice(-8).reverse().map(r => `<div class="item">
+    const listHtml = enRecs.slice(-8).reverse().map(r => `<div class="item" data-learn="${r.id}" style="cursor:pointer">
       <div class="item-ico">🇬🇧</div>
       <div class="item-main"><div class="item-title">${U.escapeHtml(r.topic)}</div>
       <div class="item-sub">${U.fmtDateCN(r.date)} · ${U.escapeHtml((r.notes||'').slice(0,30))}</div></div>
@@ -2222,7 +2230,7 @@ window.Pages.learn = (function () {
       if (r.date !== lastDate) { html += `<div class="sec-title" style="margin:16px 4px 8px"><h2>${U.fmtDateCN(r.date)}</h2></div>`; lastDate = r.date; }
       const tagCls = {ai:'ai',en:'en',build:'build',wealth:'wealth',body:'body',content:'content'}[r.category] || '';
       const tagTxt = {ai:'AI',en:'英语',build:'创造',wealth:'财富',body:'身体',content:'自媒体'}[r.category] || r.category;
-      html += `<div class="card" style="box-shadow:var(--shadow-soft);margin-top:10px">
+      html += `<div class="card" data-learn="${r.id}" style="box-shadow:var(--shadow-soft);margin-top:10px;cursor:pointer">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div class="item-title">${U.escapeHtml(r.topic)}</div><span class="tag ${tagCls}">${tagTxt}</span></div>
         <div class="muted tiny" style="margin-top:4px">${U.escapeHtml((r.summary||'').slice(0,80))}</div>
@@ -2231,6 +2239,26 @@ window.Pages.learn = (function () {
       </div>`;
     });
     return html;
+  }
+
+  /* ---- 学习历史回看 ---- */
+  function openLearnRecord(id) {
+    const r = S.data.learning.find(x => x.id === id); if (!r) return;
+    // 英语记录：若能在 EN_LIB 中找到对应课文，直接恢复文章/单词/表达/语法/测验
+    if (r.category === 'en') {
+      const lesson = window.AI.findEnglish(r.topic);
+      if (lesson) { EnglishMod.open(lesson); return; }
+    }
+    // 其它类别或英语未匹配到课文：恢复该记录已保存的全部内容
+    const catTxt = { ai:'AI', en:'英语', build:'创造', wealth:'财富', body:'身体', content:'自媒体' }[r.category] || r.category;
+    App.openModal(U.escapeHtml(r.topic), `
+      <div class="field"><label>类别</label><div class="muted">${catTxt} · ${U.fmtDateCN(r.date)}</div></div>
+      ${r.source ? `<div class="field"><label>来源</label><div class="muted">${U.escapeHtml(r.source)}</div></div>` : ''}
+      ${r.summary ? `<div class="field"><label>摘要</label><div class="card" style="box-shadow:none">${U.escapeHtml(r.summary)}</div></div>` : ''}
+      ${r.notes ? `<div class="field"><label>笔记 / 复述</label><div class="card" style="box-shadow:none">${U.escapeHtml(r.notes)}</div></div>` : ''}
+      ${r.output ? `<div class="field"><label>产出</label><div class="muted">${U.escapeHtml(r.output)}</div></div>` : ''}
+      <div class="muted tiny" style="margin-top:6px">理解 ${r.understanding || '-'}/5</div>
+    `, () => App.closeModal(), '关闭');
   }
 
   function bind() {
@@ -2242,6 +2270,7 @@ window.Pages.learn = (function () {
     const testEn = view.querySelector('[data-test-en]'); if (testEn) testEn.onclick = () => EnglishMod.openQuiz(AI.generateEnglish(false).words, AI.generateEnglish(false).title);
     const testBank = view.querySelector('[data-test-bank]'); if (testBank) testBank.onclick = () => EnglishMod.openBankQuiz();
     view.querySelectorAll('[data-proj]').forEach(c => c.onclick = () => openProj(c.dataset.proj));
+    view.querySelectorAll('[data-learn]').forEach(c => c.onclick = () => openLearnRecord(c.dataset.learn));
     const addP = view.querySelector('[data-add-proj]'); if (addP) addP.onclick = addProj;
     App.setHeader('学习', '信息 → 学习 → 行动 → 产出');
   }

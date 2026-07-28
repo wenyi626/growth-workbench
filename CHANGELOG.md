@@ -3,6 +3,21 @@
 > 格式参考 [Keep a Changelog](https://keepachangelog.com/)。版本号规范：`v1.0` / `v1.1` / `v2.0` …；开发态 `version.json` 为 `dev`。
 > 每次发版必须在此追加条目，并更新 PROJECT.md 第 2 节「当前版本」。
 
+## [v1.2.2] - 学习历史点击回看（当前版本）
+
+### Fixed
+- **学习历史点击无反应（实现遗漏）**：`historyView()` 历史卡片与「英语学习历史」列表新增 `data-learn`，点击调用 `openLearnRecord(id)`。
+  - 英语记录：按 `topic` 匹配 `EN_LIB` 课文 → `EnglishMod.open()` 完整复原 **文章 / 重点单词 / 重要表达 / 语法 / 测验**；
+  - 其它类别或英语未匹配到课文：弹出模态恢复该记录已保存的**摘要 / 笔记 / 产出 / 理解度**。
+  - 复用现有 UI 与数据契约，未改动 `pgwb_data_v1`。
+
+### Known Limitation（保留至 V1.3）
+- **英语 `EN_LIB` 仍为静态库（4 篇）**：「换一篇」仅在库内随机切换，并非「更新学习内容」。新增真实课文源与 `Learning Engine` 属 V1.3 范围；按约定本版本不做联网或任何半成品方案。
+
+### 其他
+- 运行时版本 `version.json` → `1.2.2`。
+- 提交：`fix: v1.2.2 learning history click-to-review`
+
 ## [v1.2.1] - 财富单一数据源 / 英语换一篇 / 交易编辑删除（当前版本）
 
 ### Fixed
