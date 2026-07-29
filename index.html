@@ -2652,6 +2652,153 @@ window.LearningSource = (function () {
 })();
 
 
+/* === assets/js/trends.js === */
+/* V1.5.0 Hot Trends Foundation：热点数据源（仿 RemoteSource）+ 热点库。
+   原则：CI 生成的静态 JSON（无 Key、无常驻后端）；远程失败→缓存→本地兜底；
+        不影响 LearningSource/Library/ProjectLibrary；不写 pgwb_data_v1（用户数据仍在 S.data.contents）。 */
+window.TrendSource = (function () {
+  const ENDPOINT = './data/trends-daily.json';
+  const CACHE_KEY = 'pgwb_trends_cache_v1';
+  const CATS = ['ai', 'tech', 'investment', 'xhs'];
+  /* 离线兜底：远端与缓存皆不可用时展示少量本地热点，不依赖 AI 模块私有 TRENDS */
+  const LOCAL_FALLBACK = [
+    { cat:'ai', hot:'用 AI 把重复活变成可复用模板', whyHot:'打工人苦重复久矣', whyWorthWriting:'普通人也能用 AI 提效的真实切入点', angle:'我不是程序员，但用 AI 把周报从1小时压到10分钟', titles:['我用 AI 把周报压到10分钟','普通女生也能做的 AI 提效','AI 不是玩具是杠杆'], valueTag:['creation','work'], fitAccount:'AI工具号' },
+    { cat:'investment', hot:'先搞懂自己买的是什么再买', whyHot:'利率与不确定性下大家想搞懂投资', whyWorthWriting:'帮新手建立「先懂再买」的框架', angle:'我用「目标配置」对抗追涨杀跌', titles:['普通人的美股第一步','先搞懂再买','目标配置对抗追涨杀跌'], valueTag:['investment'], fitAccount:'投资理财号' },
+    { cat:'xhs', hot:'普通女生的存钱与开源复盘', whyHot:'真实财务叙事有共鸣', whyWorthWriting:'用真实经历讲理财，比说教有用', angle:'工资不高，但用定投和复盘让钱有方向', titles:['在上海存钱复盘','普通女生理财','定投让我不焦虑'], valueTag:['investment','creation'], fitAccount:'自媒体号' },
+    { cat:'ai', hot:'把想法做成小产品', whyHot:'人人想有被动收入但怕代码', whyWorthWriting:'非程序员也能用 AI 开发', angle:'我的成长工作台诞生记', titles:['非程序员做产品','用 AI 把想法变产品','小产品起步'], valueTag:['creation','work'], fitAccount:'独立开发号' },
+    { cat:'ai', hot:'用英语获取信息的真实方法', whyHot:'学英语焦虑重，实用派稀缺', whyWorthWriting:'靠主题阅读攒专业词汇比背单词书有用', angle:'我不背单词书，靠主题阅读攒专业词汇', titles:['用英语获取信息','主题阅读攒词汇','实用英语派'], valueTag:['creation'], fitAccount:'英语成长号' },
+    { cat:'xhs', hot:'女性力量训练误区', whyHot:'健身内容常偏有氧，力量叙事有新意', whyWorthWriting:'从只练臀腿到补上肢，记录真实身体变化', angle:'我从只练臀腿到补上肢，记录真实变化', titles:['女生力量训练','别只练臀腿','真实身体变化'], valueTag:['creation'], fitAccount:'身体管理号' }
+  ];
+
+  const store = new Map();
+  let generatedAt = null;
+  let lastSource = null;     // 'network' | 'cache' | 'local' | null
+  let cachedAt = null;
+
+  function safeStorage() {
+    try { const k = '__pgwb_tc__'; localStorage.setItem(k, '1'); localStorage.removeItem(k); return localStorage; }
+    catch (e) { const m = {}; return { getItem: function (k) { return (k in m ? m[k] : null); }, setItem: function (k, v) { m[k] = String(v); }, removeItem: function (k) { delete m[k]; } }; }
+  }
+  function readCache() {
+    try { const raw = safeStorage().getItem(CACHE_KEY); if (!raw) return null; return JSON.parse(raw); } catch (e) { return null; }
+  }
+  function writeCache(obj) {
+    try { safeStorage().setItem(CACHE_KEY, JSON.stringify(obj)); } catch (e) {}
+  }
+  function slug(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 50); }
+
+  function validate(o) {
+    if (!o || typeof o !== 'object') return false;
+    if (!o.hot || !o.cat) return false;
+    if (CATS.indexOf(o.cat) < 0) return false;
+    return true;
+  }
+  function normalize(o) {
+    if (!validate(o)) return null;
+    const cat = o.cat;
+    const id = 'tr-' + cat + '-' + (o.id ? String(o.id) : (slug(o.hot) || U.uid('tr')));
+    return {
+      id: id, cat: cat,
+      hot: o.hot, whyHot: o.whyHot || '', source: o.source || '',
+      sourceType: o.sourceType || (cat === 'xhs' ? 'manual' : 'scrape'),
+      url: o.url || '', date: o.date || '', summary: o.summary || '',
+      valueTag: Array.isArray(o.valueTag) ? o.valueTag : [],
+      whyWorthWriting: o.whyWorthWriting || '', fitAccount: o.fitAccount || '',
+      angle: o.angle || '', titles: Array.isArray(o.titles) ? o.titles : [],
+      trendScore: (typeof o.trendScore === 'number') ? o.trendScore : 50
+    };
+  }
+  function inject(list) {
+    store.clear();
+    (list || []).forEach(function (o) { const n = normalize(o); if (n) store.set(n.id, n); });
+  }
+  function sortScore(arr) { return arr.slice().sort(function (a, b) { return (b.trendScore || 0) - (a.trendScore || 0); }); }
+
+  function load() { return 0; }  // 同步不阻塞；远程走 loadRemote
+
+  function loadRemote() {
+    return fetch(ENDPOINT, { cache: 'no-cache' })
+      .then(function (res) { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+      .then(function (json) {
+        const list = Array.isArray(json) ? json : (json && Array.isArray(json.trends) ? json.trends : []);
+        generatedAt = (json && json.generatedAt) || null;
+        inject(list);
+        cachedAt = Date.now(); lastSource = 'network';
+        writeCache({ generatedAt: generatedAt, cachedAt: cachedAt, trends: list });
+        return store.size;
+      })
+      .catch(function (err) {
+        console.warn('[TrendSource] 远程热点加载失败，尝试缓存：', err);
+        const cached = readCache();
+        if (cached && Array.isArray(cached.trends) && cached.trends.length) {
+          generatedAt = cached.generatedAt || null; cachedAt = cached.cachedAt || null; lastSource = 'cache';
+          inject(cached.trends); return -1;
+        }
+        if (LOCAL_FALLBACK.length) {
+          generatedAt = null; cachedAt = null; lastSource = 'local';
+          inject(LOCAL_FALLBACK); return -2;
+        }
+        return 0;
+      });
+  }
+
+  /* ---------- 主题去重（前端安全网，保障同一批数据不出现同主题霸榜） ---------- */
+  const THEME_BRANDS = ['openai','chatgpt','gpt-4','gpt-5','gpt','anthropic','claude','gemini',
+    'google','meta ai','meta','llama','mistral','deepseek','xai','grok','copilot','cursor',
+    'github','apple','tesla','nvidia','微软','谷歌','阿里','通义','千问','百度','文心','腾讯','字节',
+    '小红书','抖音','微信','b站','雪球','比特币','ethereum','eth','solana'];
+  function themeKey(hot) {
+    const s = String(hot || '').toLowerCase();
+    for (let i = 0; i < THEME_BRANDS.length; i++) { if (s.indexOf(THEME_BRANDS[i]) >= 0) return THEME_BRANDS[i]; }
+    const m = s.replace(/[^a-z0-9一-龥]/g, '').slice(0, 6);
+    return m || 'misc';
+  }
+  // 按 cat|主题 折叠：同一主题仅保留 trendScore 最高的一条（入参需已按分降序）
+  function dedupeByTheme(arr) {
+    const seen = {}; const out = [];
+    (arr || []).forEach(function (t) {
+      const k = t.cat + '|' + themeKey(t.hot);
+      if (seen[k]) return; seen[k] = 1; out.push(t);
+    });
+    return out;
+  }
+
+  /* ---------- 查询 API（TrendLibrary） ---------- */
+  function all() { return Array.from(store.values()); }
+  function byCat(cat, limit) {
+    const arr = dedupeByTheme(sortScore(all().filter(function (t) { return t.cat === cat; })));
+    return limit ? arr.slice(0, limit) : arr;
+  }
+  function today(limit) { return dedupeByTheme(sortScore(all())).slice(0, limit || 5); }
+  function weekly(limit) { return dedupeByTheme(sortScore(all())).slice(0, limit || 10); }
+  function search(q) {
+    q = (q || '').toLowerCase();
+    if (!q) return [];
+    return all().filter(function (t) {
+      return (t.hot + ' ' + t.whyWorthWriting + ' ' + (t.titles || []).join(' ')).toLowerCase().indexOf(q) >= 0;
+    });
+  }
+  function freshnessText() {
+    if (lastSource === 'local') return '离线·本地热点';
+    if (lastSource === 'cache') {
+      const ageH = cachedAt ? (Date.now() - cachedAt) / 36e5 : 9999;
+      if (ageH < 1) return '缓存·刚刚';
+      if (ageH < 24) return '缓存·' + Math.round(ageH) + ' 小时前';
+      const d = Math.round(ageH / 24);
+      return '缓存·' + d + ' 天前' + (d > 7 ? '（已过期，建议刷新）' : '');
+    }
+    return '已更新';
+  }
+
+  window.TrendLibrary = {
+    all: all, byCat: byCat, today: today, weekly: weekly, search: search, freshnessText: freshnessText,
+    themeKey: themeKey, dedupeByTheme: dedupeByTheme,
+    source: function () { return lastSource; }
+  };
+
+  return { load: load, loadRemote: loadRemote };
+})();
+
 /* === assets/js/pages/today.js === */
 /* 今日首页 */
 window.Pages = window.Pages || {};
@@ -3868,16 +4015,19 @@ window.Pages.body = (function () {
 /* 自媒体模块 */
 window.Pages = window.Pages || {};
 window.Pages.content = (function () {
-  let sub = 'idea';
+  let sub = 'trend';
+  var trendSub = 'today';
 
   function render() {
     const seg = `<div class="seg" style="margin-bottom:6px">
-      <button class="${sub==='idea'?'active':''}" data-csub="idea">内容机会</button>
-      <button class="${sub==='data'?'active':''}" data-csub="data">内容数据</button>
-      <button class="${sub==='analysis'?'active':''}" data-csub="analysis">数据分析</button>
+      <button class="${sub==='trend'?'active':''}" data-csub="trend">热点</button>
+      <button class="${sub==='idea'?'active':''}" data-csub="idea">选题</button>
+      <button class="${sub==='data'?'active':''}" data-csub="data">我的内容</button>
+      <button class="${sub==='analysis'?'active':''}" data-csub="analysis">分析</button>
     </div>`;
     let body = '';
-    if (sub==='idea') body = ideaView();
+    if (sub==='trend') body = trendView();
+    else if (sub==='idea') body = ideaView();
     else if (sub==='data') body = dataView();
     else body = analysisView();
     return seg + body;
@@ -3906,6 +4056,93 @@ window.Pages.content = (function () {
     </div>
     ${cards}
     <div class="notice">不复制热门，用「真实问题 → 我的选择 → 实际行动 → 结果 → 复盘」产出内容。</div>`;
+  }
+
+  /* ---- 热点（联网，每日更新） ---- */
+  function trendView() {
+    const L = window.TrendLibrary;
+    if (!L) return '<div class="card"><div class="empty"><div class="e-ico">📡</div><div class="e-sub">热点模块加载中…</div></div></div>';
+    const tseg = `<div class="seg" style="margin-bottom:8px">
+      <button class="${trendSub==='today'?'active':''}" data-tsub="today">今天</button>
+      <button class="${trendSub==='weekly'?'active':''}" data-tsub="weekly">本周</button>
+      <button class="${trendSub==='ai'?'active':''}" data-tsub="ai">AI</button>
+      <button class="${trendSub==='investment'?'active':''}" data-tsub="investment">投资</button>
+      <button class="${trendSub==='xhs'?'active':''}" data-tsub="xhs">小红书</button>
+    </div>`;
+    let list;
+    if (trendSub==='today') list = L.today(10);
+    else if (trendSub==='weekly') list = L.weekly(10);
+    else if (trendSub==='ai') list = L.byCat('ai', 10);
+    else if (trendSub==='investment') list = L.byCat('investment', 10);
+    else list = L.byCat('xhs', 20);
+    const banner = `<div class="notice" style="margin-bottom:8px">数据 ${U.escapeHtml(L.freshnessText())} · 来源：${trendSub==='xhs'?'人工维护':(trendSub==='investment'?'财经资讯（无实时行情）':'真实抓取 + AI 总结')}</div>`;
+    if (!list.length) return tseg + banner + '<div class="card"><div class="empty"><div class="e-ico">📭</div><div class="e-sub">暂无热点，稍后刷新</div></div></div>';
+    const cards = list.map(function (t) {
+      const titles = (t.titles && t.titles.length) ? t.titles : [t.hot];
+      return `<div class="card" style="border-left:3px solid var(--c-content)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="tag content">${catLabel(t.cat)}</span>
+          <span class="muted tiny">🔥 ${t.trendScore} · ${U.escapeHtml(t.source || '')}</span>
+        </div>
+        <div class="item-title" style="margin-top:8px">${U.escapeHtml(t.hot)}</div>
+        <div class="muted tiny" style="margin-top:6px"><b style="color:var(--text)">为什么值得写：</b>${U.escapeHtml(t.whyWorthWriting || t.whyHot)}</div>
+        <div class="muted tiny" style="margin-top:4px"><b style="color:var(--text)">适合账号：</b>${U.escapeHtml(t.fitAccount || '—')}</div>
+        <div class="muted tiny" style="margin-top:4px"><b style="color:var(--text)">推荐角度：</b>${U.escapeHtml(t.angle || '—')}</div>
+        <div class="muted tiny" style="margin-top:4px"><b style="color:var(--text)">推荐标题：</b>${U.escapeHtml(titles.join(' / '))}</div>
+        <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          ${t.url ? `<a class="link" href="${U.escapeHtml(t.url)}" target="_blank" rel="noopener" title="在来源站点查看">🔗 查看来源 ↗</a>` : ''}
+          <button class="btn btn-sm btn-primary" data-use-trend="${t.id}">用这个选题创作</button>
+        </div>
+      </div>`;
+    }).join('');
+    return tseg + banner + cards;
+  }
+
+  function catLabel(cat) {
+    return ({ ai:'AI', tech:'科技', investment:'投资', xhs:'小红书' })[cat] || cat;
+  }
+  function catToTopic(cat) {
+    return ({ ai:'AI', tech:'科技', investment:'投资', xhs:'自媒体' })[cat] || 'AI';
+  }
+  // 模板化生成「半成品草稿」提纲（不调用 LLM，纯模板）
+  function buildOutline(t) {
+    const hot = t.hot || '';
+    const summary = t.summary || t.whyHot || '';
+    const why = t.whyWorthWriting || '';
+    const angle = t.angle || '';
+    const lines = [
+      '【开头】为什么最近很多人在讨论这个？',
+      '最近「' + hot + '」频繁出现在各类讨论里。' + (summary ? ('简单说，' + summary) : '它戳中了很多人真实的需求。'),
+      '',
+      '【正文】',
+      '1. 热点是什么？' + hot + (summary ? ('——' + summary) : ''),
+      '2. 为什么重要？' + (why || '它背后是更大的趋势变化，值得认真看待。'),
+      '3. 对普通人有什么影响？' + (angle || '值得结合自己的真实经历来讲，而不是复述新闻。'),
+      '',
+      '【结尾】我的观点是什么？',
+      (angle || '在这里写下你自己的判断、做法和下一步行动建议。')
+    ];
+    return lines.join('\n');
+  }
+
+  function createFromTrend(id) {
+    const L = window.TrendLibrary; if (!L) return;
+    const t = L.all().find(function (x) { return x.id === id; }); if (!t) return;
+    const titles = (t.titles && t.titles.length) ? t.titles : [t.hot];
+    const rec = {
+      id: U.uid('ct'), date: U.todayStr(),
+      title: titles[0],
+      topic: catToTopic(t.cat),
+      type: '图文', status: '草稿',
+      platform: '小红书',
+      inspiration: t.hot + (t.source ? '（来源：' + t.source + '）' : ''),
+      angle: t.angle || '',
+      outline: buildOutline(t),
+      views: 0, likes: 0, saves: 0, comments: 0, shares: 0, followersGained: 0, notes: ''
+    };
+    const saved = S.add('contents', rec);
+    U.toast('已生成半成品草稿，继续编辑');
+    addContent(null, saved);
   }
 
   /* ---- 内容数据 ---- */
@@ -3973,18 +4210,24 @@ window.Pages.content = (function () {
 
   function addContent(prefill, rec) {
     const isEdit = !!rec;
-    const topics = ['AI','投资','职业','英语','个人成长','身体管理','产品创造','海外生活','女性成长'];
+    const topics = ['AI','投资','职业','英语','个人成长','身体管理','产品创造','海外生活','女性成长','科技','自媒体'];
     const types = ['图文','短视频','笔记','直播'];
     const statuses = ['已发布','草稿','计划中'];
+    const platforms = ['小红书','公众号','抖音','微博','B站','其他'];
     const topicV = (rec && rec.topic) || prefill || 'AI';
     const typeV = (rec && rec.type) || '图文';
     const statusV = (rec && rec.status) || '已发布';
+    const platV = (rec && rec.platform) || '小红书';
     App.openModal(isEdit ? '编辑内容数据' : '记录一条内容', `
       <div class="field"><label>日期</label><input id="cDate" type="date" value="${isEdit?rec.date:U.todayStr()}"></div>
       <div class="field"><label>标题</label><input id="cTitle" value="${isEdit?U.escapeHtml(rec.title):(prefill?U.escapeHtml(prefill):'')}" placeholder="内容标题"></div>
       <div class="field"><label>内容主题</label><select id="cTopic">${topics.map(t=>`<option ${topicV===t?'selected':''}>${t}</option>`).join('')}</select></div>
       <div class="field"><label>内容类型</label><select id="cType">${types.map(t=>`<option ${typeV===t?'selected':''}>${t}</option>`).join('')}</select></div>
+      <div class="field"><label>发布平台</label><select id="cPlat">${platforms.map(t=>`<option ${platV===t?'selected':''}>${t}</option>`).join('')}</select></div>
       <div class="field"><label>状态</label><select id="cStatus">${statuses.map(s=>`<option ${statusV===s?'selected':''}>${s}</option>`).join('')}</select></div>
+      <div class="field"><label>灵感来源</label><textarea id="cInsp" placeholder="来自哪条热点 / 哪个真实经历">${isEdit?U.escapeHtml(rec.inspiration||''):''}</textarea></div>
+      <div class="field"><label>推荐角度</label><textarea id="cAngle" placeholder="真实问题 → 我的选择 → 行动 → 结果 → 复盘">${isEdit?U.escapeHtml(rec.angle||''):''}</textarea></div>
+      <div class="field"><label>内容提纲（半成品草稿）</label><textarea id="cOutline" style="min-height:160px;font-family:var(--mono,monospace);white-space:pre-wrap" placeholder="点击「用这个选题」会自动生成模板提纲，可继续编辑">${isEdit?U.escapeHtml(rec.outline||''):''}</textarea></div>
       <div class="mini-row">
         <div class="field"><label>曝光</label><input id="cViews" type="number" value="${isEdit?(rec.views||0):0}"></div>
         <div class="field"><label>点赞</label><input id="cLikes" type="number" value="${isEdit?(rec.likes||0):0}"></div>
@@ -4000,6 +4243,7 @@ window.Pages.content = (function () {
       <div class="field"><label>备注</label><textarea id="cNote" placeholder="发布平台、复盘感受…">${isEdit?U.escapeHtml(rec.notes||''):''}</textarea></div>
     `, () => {
       const patch = { date:val('cDate'), title:val('cTitle')||'未命名', topic:val('cTopic'), type:val('cType'), status:val('cStatus'),
+        platform:val('cPlat'), inspiration:val('cInsp'), angle:val('cAngle'), outline:val('cOutline'),
         views:parseInt(val('cViews'))||0, likes:parseInt(val('cLikes'))||0, saves:parseInt(val('cSaves'))||0,
         comments:parseInt(val('cComments'))||0, shares:parseInt(val('cShares'))||0, followersGained:parseInt(val('cFoll'))||0, notes:val('cNote') };
       if (isEdit) { S.update('contents', rec.id, patch); U.toast('已更新'); }
@@ -4018,6 +4262,8 @@ window.Pages.content = (function () {
   function bind() {
     const view = document.getElementById('view');
     view.querySelectorAll('[data-csub]').forEach(b => b.onclick = () => { sub = b.dataset.csub; App.refresh(); });
+    view.querySelectorAll('[data-tsub]').forEach(b => b.onclick = () => { trendSub = b.dataset.tsub; App.refresh(); });
+    view.querySelectorAll('[data-use-trend]').forEach(b => b.onclick = () => createFromTrend(b.dataset.useTrend));
     view.querySelectorAll('[data-use-idea]').forEach(b => b.onclick = () => useIdea(parseInt(b.dataset.useIdea)));
     const addC = view.querySelector('[data-add-content]'); if (addC) addC.onclick = () => addContent(null);
     view.querySelectorAll('[data-content]').forEach(c => c.onclick = () => {
@@ -4025,6 +4271,10 @@ window.Pages.content = (function () {
       App.openModal('内容详情', `
         <div class="item-title">${U.escapeHtml(rec.title)}</div>
         <div class="muted tiny" style="margin-top:4px">${U.fmtDateCN(rec.date)} · ${U.escapeHtml(rec.topic)} · ${U.escapeHtml(rec.type)} · ${U.escapeHtml(rec.status)}</div>
+        ${rec.platform?('<div class="muted tiny" style="margin-top:4px"><b>平台：</b>'+U.escapeHtml(rec.platform)+'</div>'):''}
+        ${rec.inspiration?('<div class="muted tiny" style="margin-top:4px"><b>灵感来源：</b>'+U.escapeHtml(rec.inspiration)+'</div>'):''}
+        ${rec.angle?('<div class="muted tiny" style="margin-top:4px"><b>推荐角度：</b>'+U.escapeHtml(rec.angle)+'</div>'):''}
+        ${rec.outline?('<div class="muted tiny" style="margin-top:6px;white-space:pre-wrap"><b>内容提纲：</b><br>'+U.escapeHtml(rec.outline)+'</div>'):''}
         <div class="stat-grid" style="margin-top:12px">
           <div class="stat"><div class="s-val">${U.num(rec.views)}</div><div class="s-lbl">曝光</div></div>
           <div class="stat"><div class="s-val">${U.num(rec.likes)}</div><div class="s-lbl">点赞</div></div>
@@ -4235,6 +4485,10 @@ window.App = (function () {
     // V1.4.1 异步拉取远程英语课文（RemoteSource → Library），非阻塞、失败静默降级，不影响 App 启动
     if (window.LearningSource && window.LearningSource.loadRemote) {
       try { window.LearningSource.loadRemote(); } catch (e) { /* 任何异常都不影响 App 启动 */ }
+    }
+    // V1.5.0 异步拉取热点（TrendSource → TrendLibrary），非阻塞、失败按 缓存→本地 降级；完成后刷新当前页（若正看内容中心）
+    if (window.TrendSource && window.TrendSource.loadRemote) {
+      try { window.TrendSource.loadRemote().then(function(){ try { App.refresh(); } catch (e) {} }).catch(function(){}); } catch (e) {}
     }
     applyTheme(S.data.settings.theme || 'light');
     // 底部导航

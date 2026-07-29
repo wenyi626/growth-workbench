@@ -1,0 +1,706 @@
+{
+  "generatedAt": "2026-07-29T08:00:00+08:00",
+  "source": "CI+manual",
+  "trends": [
+    {
+      "id": "ai-claude-longctx",
+      "cat": "ai",
+      "hot": "Claude 新模型在长上下文代码库理解上明显提升",
+      "whyHot": "长上下文+代码库理解是工程师刚需",
+      "source": "Hacker News",
+      "sourceType": "scrape",
+      "url": "https://hn.algolia.com/?q=Claude",
+      "date": "2026-07-29",
+      "summary": "新模型能一次读懂更大的仓库，跨文件改动更准。",
+      "valueTag": [
+        "creation",
+        "work"
+      ],
+      "whyWorthWriting": "真实工程收益：少贴代码、少来回",
+      "fitAccount": "AI工具号 / 独立开发号",
+      "angle": "我把一个 3 万行的老仓库交给它，记录它第一次搞懂主流程的时刻",
+      "titles": [
+        "Claude 读懂大仓库后，我的改代码方式变了",
+        "长上下文模型到底能帮工程师什么",
+        "我把 3 万行老仓库交给 Claude 的一天"
+      ],
+      "trendScore": 92
+    },
+    {
+      "id": "ai-local-agent",
+      "cat": "ai",
+      "hot": "开源小模型在本地跑通 Agent 工作流",
+      "whyHot": "隐私与成本推动本地化",
+      "source": "GitHub",
+      "sourceType": "scrape",
+      "url": "https://github.com/search?q=Agent",
+      "date": "2026-07-29",
+      "summary": "7B~14B 本地模型已能串联工具做多步任务。",
+      "valueTag": [
+        "creation",
+        "work"
+      ],
+      "whyWorthWriting": "普通人也能玩 Agent，不依赖云端",
+      "fitAccount": "独立开发号 / AI工具号",
+      "angle": "我用一个开源模型在笔记本上跑通『网页→摘要→日历』",
+      "titles": [
+        "笔记本上的小模型也能跑 Agent 了",
+        "本地 Agent 工作流，隐私又便宜",
+        "不联网也能用的个人助手"
+      ],
+      "trendScore": 88
+    },
+    {
+      "id": "ai-rag-reason",
+      "cat": "ai",
+      "hot": "RAG 从『检索+拼接』走向『推理检索』",
+      "whyHot": "RAG 落地痛点：答非所问",
+      "source": "arXiv",
+      "sourceType": "scrape",
+      "url": "https://arxiv.org/search/?searchtype=all&query=RAG",
+      "date": "2026-07-29",
+      "summary": "新范式先推理要查什么，再检索，质量明显提升。",
+      "valueTag": [
+        "creation",
+        "work"
+      ],
+      "whyWorthWriting": "做知识库的人最该懂的升级",
+      "fitAccount": "AI工具号 / 知识管理号",
+      "angle": "我的第二大脑为什么从『搜到就贴』改成『先想再搜』",
+      "titles": [
+        "RAG 别再『搜到就贴』了",
+        "我的第二大脑升级成推理检索",
+        "为什么你的知识库答非所问"
+      ],
+      "trendScore": 85
+    },
+    {
+      "id": "ai-mcp-eco",
+      "cat": "ai",
+      "hot": "MCP 生态工具数量半年翻数倍",
+      "whyHot": "标准化让 AI 能接更多工具",
+      "source": "GitHub",
+      "sourceType": "scrape",
+      "url": "https://github.com/search?q=MCP",
+      "date": "2026-07-29",
+      "summary": "Model Context Protocol 已成事实标准，连接器激增。",
+      "valueTag": [
+        "work"
+      ],
+      "whyWorthWriting": "想接业务数据的必看趋势",
+      "fitAccount": "独立开发号 / AI工具号",
+      "angle": "我用 3 个 MCP 把 Notion、日历、数据库连起来了",
+      "titles": [
+        "MCP 是 AI 圈的 USB",
+        "3 个 MCP 把我的工具连起来了",
+        "普通人该懂的 AI 连接标准"
+      ],
+      "trendScore": 80
+    },
+    {
+      "id": "ai-code-review",
+      "cat": "ai",
+      "hot": "AI 编程助手开始接管『代码评审』环节",
+      "whyHot": "评审是团队最痛的重复劳动",
+      "source": "Hacker News",
+      "sourceType": "scrape",
+      "url": "https://hn.algolia.com/?q=AI%E7%BC%96%E7%A8%8B%E5%8A%A9%E6%89%8B%E5%BC%80%E5%A7%8B%E6%8E%A5%E7%AE%A1",
+      "date": "2026-07-29",
+      "summary": "自动找 bug、给建议，人类只做最终判断。",
+      "valueTag": [
+        "work"
+      ],
+      "whyWorthWriting": "团队提效的真实切入点",
+      "fitAccount": "职场成长号 / 独立开发号",
+      "angle": "我们让 AI 先审一遍 PR，人只看它不敢定的部分",
+      "titles": [
+        "让 AI 先审 PR，人只看拿不准的",
+        "代码评审这种苦活该交给 AI",
+        "我们团队的评审自动化实测"
+      ],
+      "trendScore": 83
+    },
+    {
+      "id": "ai-screenshot-proto",
+      "cat": "ai",
+      "hot": "多模态模型让『截图即原型』成为现实",
+      "whyHot": "设计→开发链路被压缩",
+      "source": "Product Hunt",
+      "sourceType": "scrape",
+      "url": "https://www.producthunt.com/search?q=%E5%A4%9A%E6%A8%A1%E6%80%81%E6%A8%A1%E5%9E%8B%E8%AE%A9%E3%80%8E%E6%88%AA%E5%9B%BE%E5%8D%B3",
+      "date": "2026-07-29",
+      "summary": "截一张图就能生成可交互界面草稿。",
+      "valueTag": [
+        "creation"
+      ],
+      "whyWorthWriting": "非设计师也能快速验证想法",
+      "fitAccount": "独立开发号 / 产品创造号",
+      "angle": "我把一张草图截图丢进去，10 分钟出了可点原型",
+      "titles": [
+        "截图就能出原型，非设计师狂喜",
+        "10 分钟把草图变成可点页面",
+        "多模态模型压缩了设计链路"
+      ],
+      "trendScore": 78
+    },
+    {
+      "id": "ai-kb-roi",
+      "cat": "ai",
+      "hot": "企业把 AI 助手塞进内部知识库后的真实 ROI",
+      "whyHot": "老板关心投入产出",
+      "source": "科技媒体",
+      "sourceType": "scrape",
+      "url": "https://36kr.com/search/articles/ROI",
+      "date": "2026-07-29",
+      "summary": "客服/培训场景省下的人力可被量化。",
+      "valueTag": [
+        "work"
+      ],
+      "whyWorthWriting": "用数据讲清 AI 值不值",
+      "fitAccount": "职场成长号 / AI工具号",
+      "angle": "我们接入内部知识库 90 天，记录省下的工时",
+      "titles": [
+        "AI 知识库 90 天，省了多少工时",
+        "老板最关心的 AI ROI 怎么算",
+        "内部知识库不是玩具是省钱工具"
+      ],
+      "trendScore": 76
+    },
+    {
+      "id": "ai-context-eng",
+      "cat": "ai",
+      "hot": "提示词工程正在被『上下文工程』取代",
+      "whyHot": "关注点从话术转向信息组织",
+      "source": "Hacker News",
+      "sourceType": "scrape",
+      "url": "https://hn.algolia.com/?q=%E6%8F%90%E7%A4%BA%E8%AF%8D%E5%B7%A5%E7%A8%8B%E6%AD%A3%E5%9C%A8%E8%A2%AB%E3%80%8E%E4%B8%8A",
+      "date": "2026-07-29",
+      "summary": "会喂上下文比会写咒语更重要。",
+      "valueTag": [
+        "work",
+        "creation"
+      ],
+      "whyWorthWriting": "新手少走弯路的认知升级",
+      "fitAccount": "AI工具号 / 英语成长号",
+      "angle": "我不再背提示词模板，改练『给足上下文』",
+      "titles": [
+        "别背提示词模板了，练喂上下文",
+        "提示词工程正在被取代",
+        "会喂信息比会写咒语重要"
+      ],
+      "trendScore": 74
+    },
+    {
+      "id": "ai-voice-cx",
+      "cat": "ai",
+      "hot": "AI 语音 Agent 在客服场景的落地成本下降",
+      "whyHot": "语音是自然的交互入口",
+      "source": "行业报告",
+      "sourceType": "scrape",
+      "url": "https://www.huxiu.com/search?q=Agent",
+      "date": "2026-07-29",
+      "summary": "TTS+ASR+模型联动，单次通话成本大降。",
+      "valueTag": [
+        "work"
+      ],
+      "whyWorthWriting": "小团队也能做语音助手",
+      "fitAccount": "独立开发号 / 职场成长号",
+      "angle": "我用一个开源语音 Agent 替自己接了 80% 的重复咨询",
+      "titles": [
+        "我用语音 Agent 接了八成重复咨询",
+        "客服成本是怎么被语音 AI 打下来的",
+        "小团队也能做的语音助手"
+      ],
+      "trendScore": 72
+    },
+    {
+      "id": "ai-ondevice",
+      "cat": "ai",
+      "hot": "端侧模型（手机本地跑）开始能干活",
+      "whyHot": "隐私+离线是刚需",
+      "source": "arXiv",
+      "sourceType": "scrape",
+      "url": "https://arxiv.org/search/?searchtype=all&query=%E7%AB%AF%E4%BE%A7%E6%A8%A1%E5%9E%8B%E6%89%8B%E6%9C%BA%E6%9C%AC%E5%9C%B0%E8%B7%91%E5%BC%80",
+      "date": "2026-07-29",
+      "summary": "手机端小模型已能摘要、翻译、提醒。",
+      "valueTag": [
+        "creation",
+        "work"
+      ],
+      "whyWorthWriting": "隐私敏感场景的新解法",
+      "fitAccount": "AI工具号 / 身体管理号",
+      "angle": "我把每天的语音备忘录交给端侧模型整理，不出云",
+      "titles": [
+        "手机本地模型能干活了",
+        "我的语音备忘录不再出云",
+        "端侧模型解决的隐私痛点"
+      ],
+      "trendScore": 70
+    },
+    {
+      "id": "tech-eu-aiact",
+      "cat": "tech",
+      "hot": "欧盟 AI Act 对中小团队合规成本的影响",
+      "whyHot": "合规从大厂议题变成全员议题",
+      "source": "科技媒体",
+      "sourceType": "scrape",
+      "url": "https://36kr.com/search/articles/Act",
+      "date": "2026-07-29",
+      "summary": "高风险场景需文档与评估，小团队也要补课。",
+      "valueTag": [
+        "work"
+      ],
+      "whyWorthWriting": "做产品的合规意识前置",
+      "fitAccount": "独立开发号 / 职场成长号",
+      "angle": "我的小产品上线前，被 AI Act 逼着补的 3 份文档",
+      "titles": [
+        "小产品上线前被 AI Act 逼补的文档",
+        "欧盟 AI 法案和你有关系吗",
+        "合规不再是巨头的专利"
+      ],
+      "trendScore": 75
+    },
+    {
+      "id": "tech-rust-backend",
+      "cat": "tech",
+      "hot": "Rust 在后端服务的采用率持续上升",
+      "whyHot": "性能与安全的长期主义",
+      "source": "Hacker News",
+      "sourceType": "scrape",
+      "url": "https://hn.algolia.com/?q=Rust",
+      "date": "2026-07-29",
+      "summary": "多家公司把热点路径从 Go/Node 迁到 Rust。",
+      "valueTag": [
+        "work"
+      ],
+      "whyWorthWriting": "技术选型有依据的参考",
+      "fitAccount": "独立开发号 / 代码评审号",
+      "angle": "我把一个高并发接口用 Rust 重写后的耗时对比",
+      "titles": [
+        "我把高并发接口用 Rust 重写后",
+        "Rust 为什么在后端口越来越常见",
+        "一次重写的耗时对比"
+      ],
+      "trendScore": 68
+    },
+    {
+      "id": "tech-browser-ai",
+      "cat": "tech",
+      "hot": "浏览器内置 AI API 开始试点",
+      "whyHot": "AI 能力下沉到平台层",
+      "source": "科技媒体",
+      "sourceType": "scrape",
+      "url": "https://36kr.com/search/articles/API",
+      "date": "2026-07-29",
+      "summary": "Prompt API / Summarizer 等原生接口出现。",
+      "valueTag": [
+        "creation",
+        "work"
+      ],
+      "whyWorthWriting": "前端开发的新玩具",
+      "fitAccount": "独立开发号 / 产品创造号",
+      "angle": "我用浏览器原生 Summarizer 做了个网页速读插件",
+      "titles": [
+        "浏览器原生 AI API 能玩什么",
+        "我用 Summarizer 做了个速读插件",
+        "前端的新玩具来了"
+      ],
+      "trendScore": 66
+    },
+    {
+      "id": "tech-local-first",
+      "cat": "tech",
+      "hot": "隐私优先的 local-first 架构回潮",
+      "whyHot": "数据主权意识增强",
+      "source": "Hacker News",
+      "sourceType": "scrape",
+      "url": "https://hn.algolia.com/?q=local-first",
+      "date": "2026-07-29",
+      "summary": "本地优先+端同步，离线也能用。",
+      "valueTag": [
+        "work"
+      ],
+      "whyWorthWriting": "和个人知识库强相关",
+      "fitAccount": "知识管理号 / AI工具号",
+      "angle": "我的笔记从『全在云』改成『本地优先』后的体验",
+      "titles": [
+        "我的笔记改成本地优先之后",
+        "local-first 为什么回潮",
+        "数据主权意识增强的一年"
+      ],
+      "trendScore": 64
+    },
+    {
+      "id": "tech-webgpu",
+      "cat": "tech",
+      "hot": "WebGPU 让浏览器跑大模型推理变实用",
+      "whyHot": "前端也能做推理",
+      "source": "Hacker News",
+      "sourceType": "scrape",
+      "url": "https://hn.algolia.com/?q=WebGPU",
+      "date": "2026-07-29",
+      "summary": "浏览器内低延迟推理成为现实。",
+      "valueTag": [
+        "creation"
+      ],
+      "whyWorthWriting": "前端人的新机会",
+      "fitAccount": "独立开发号 / AI工具号",
+      "angle": "我在网页里跑了一个小模型做实时滤镜",
+      "titles": [
+        "网页里跑模型做实时滤镜",
+        "WebGPU 让前端也能做推理",
+        "浏览器推理实用了吗"
+      ],
+      "trendScore": 62
+    },
+    {
+      "id": "inv-fed-cut",
+      "cat": "investment",
+      "hot": "美联储降息预期下，普通人的现金该放哪",
+      "whyHot": "利率拐点影响每笔闲钱",
+      "source": "华尔街见闻",
+      "sourceType": "rss",
+      "url": "https://wallstreetcn.com/search?q=%E7%BE%8E%E8%81%94%E5%82%A8%E9%99%8D%E6%81%AF%E9%A2%84%E6%9C%9F%E4%B8%8B%E6%99%AE%E9%80%9A",
+      "date": "2026-07-29",
+      "summary": "降息预期下货基/定存收益承压，需重新摆布。",
+      "valueTag": [
+        "investment"
+      ],
+      "whyWorthWriting": "帮普通人对冲利率变化",
+      "fitAccount": "投资理财号 / 女性成长号",
+      "angle": "我把活期、定存、货基重新排了优先级",
+      "titles": [
+        "降息预期下，我的现金重新摆位",
+        "闲钱该放哪？看利率拐点",
+        "普通人的现金管理课"
+      ],
+      "trendScore": 90
+    },
+    {
+      "id": "inv-gold-high",
+      "cat": "investment",
+      "hot": "黄金创历史新高后的配置逻辑",
+      "whyHot": "避险资产被重新定价",
+      "source": "CNBC",
+      "sourceType": "rss",
+      "url": "https://www.cnbc.com/search/?query=%E9%BB%84%E9%87%91%E5%88%9B%E5%8E%86%E5%8F%B2%E6%96%B0%E9%AB%98%E5%90%8E%E7%9A%84%E9%85%8D",
+      "date": "2026-07-29",
+      "summary": "央行购金+不确定性推高金价。",
+      "valueTag": [
+        "investment"
+      ],
+      "whyWorthWriting": "讲清『为什么配、配多少』",
+      "fitAccount": "投资理财号",
+      "angle": "我从『不碰黄金』到设 5% 上限的真实原因",
+      "titles": [
+        "黄金新高后我还配不配",
+        "我给黄金设 5% 上限的理由",
+        "避险资产被重新定价"
+      ],
+      "trendScore": 86
+    },
+    {
+      "id": "inv-magnificent",
+      "cat": "investment",
+      "hot": "美股七巨头估值分化，定投策略要不要调",
+      "whyHot": "集中度风险被讨论",
+      "source": "财经 RSS",
+      "sourceType": "rss",
+      "url": "https://www.investing.com/news/",
+      "date": "2026-07-29",
+      "summary": "少数巨头占比过高，定投需再平衡。",
+      "valueTag": [
+        "investment"
+      ],
+      "whyWorthWriting": "定投者的实操提醒",
+      "fitAccount": "投资理财号 / 职场成长号",
+      "angle": "我把周定投从『无脑买』改成『看占比再买』",
+      "titles": [
+        "七巨头太贵，定投要不要改",
+        "我的定投从盲买变看占比",
+        "集中度风险怎么破"
+      ],
+      "trendScore": 82
+    },
+    {
+      "id": "inv-deposit-rate",
+      "cat": "investment",
+      "hot": "人民币利率下行，货基收益还能看吗",
+      "whyHot": "无风险收益在塌",
+      "source": "财经媒体",
+      "sourceType": "rss",
+      "url": "https://xueqiu.com/search?q=%E4%BA%BA%E6%B0%91%E5%B8%81%E5%88%A9%E7%8E%87%E4%B8%8B%E8%A1%8C%E8%B4%A7%E5%9F%BA%E6%94%B6",
+      "date": "2026-07-29",
+      "summary": "货基七日年化下行，现金管理要换思路。",
+      "valueTag": [
+        "investment"
+      ],
+      "whyWorthWriting": "普通人的现金管理课",
+      "fitAccount": "投资理财号 / 女性成长号",
+      "angle": "我的零钱从货基挪到哪了（附对比）",
+      "titles": [
+        "货基收益塌了，零钱挪去哪",
+        "人民币利率下行怎么办",
+        "无风险收益在消失"
+      ],
+      "trendScore": 78
+    },
+    {
+      "id": "inv-spx-div",
+      "cat": "investment",
+      "hot": "标普 500 分红再投资的长期复利案例",
+      "whyHot": "时间的力量最朴素",
+      "source": "雪球",
+      "sourceType": "rss",
+      "url": "https://xueqiu.com/search?q=%E6%A0%87%E6%99%AE500%E5%88%86%E7%BA%A2%E5%86%8D%E6%8A%95%E8%B5%84",
+      "date": "2026-07-29",
+      "summary": "分红再投资 30 年的差额惊人。",
+      "valueTag": [
+        "investment"
+      ],
+      "whyWorthWriting": "用真实数字讲复利",
+      "fitAccount": "投资理财号",
+      "angle": "我算了笔账：分红再投资 20 年差出一辆车的钱",
+      "titles": [
+        "分红再投资 20 年差出一辆车",
+        "最朴素的复利案例",
+        "标普分红再投资算笔账"
+      ],
+      "trendScore": 74
+    },
+    {
+      "id": "inv-target-alloc",
+      "cat": "investment",
+      "hot": "普通人如何用『目标配置』对抗追涨杀跌",
+      "whyHot": "行为金融落地",
+      "source": "雪球",
+      "sourceType": "rss",
+      "url": "https://xueqiu.com/search?q=%E6%99%AE%E9%80%9A%E4%BA%BA%E5%A6%82%E4%BD%95%E7%94%A8%E3%80%8E%E7%9B%AE%E6%A0%87%E9%85%8D",
+      "date": "2026-07-29",
+      "summary": "先定目标比例，再机械再平衡。",
+      "valueTag": [
+        "investment"
+      ],
+      "whyWorthWriting": "反人性的可操作框架",
+      "fitAccount": "投资理财号 / 女性成长号",
+      "angle": "我用『目标配置』管住自己不追涨杀跌",
+      "titles": [
+        "我用目标配置管住手",
+        "别追涨杀跌的可操作框架",
+        "普通人的再平衡法"
+      ],
+      "trendScore": 72
+    },
+    {
+      "id": "inv-reits",
+      "cat": "investment",
+      "hot": "REITs 作为抗通胀资产被重新讨论",
+      "whyHot": "房租与通胀挂钩",
+      "source": "财经 RSS",
+      "sourceType": "rss",
+      "url": "https://www.investing.com/news/",
+      "date": "2026-07-29",
+      "summary": "REITs 现金流受租金支撑。",
+      "valueTag": [
+        "investment"
+      ],
+      "whyWorthWriting": "给组合加一类资产",
+      "fitAccount": "投资理财号",
+      "angle": "我把 REITs 加进组合的 3 个理由和 1 个顾虑",
+      "titles": [
+        "我给组合加了 REITs",
+        "抗通胀资产为什么被重提",
+        "REITs 的 3 理由 1 顾虑"
+      ],
+      "trendScore": 68
+    },
+    {
+      "id": "inv-crypto-alloc",
+      "cat": "investment",
+      "hot": "加密资产纳入组合的配置上限怎么定",
+      "whyHot": "高风险资产如何控仓",
+      "source": "财经媒体",
+      "sourceType": "rss",
+      "url": "https://xueqiu.com/search?q=%E5%8A%A0%E5%AF%86%E8%B5%84%E4%BA%A7%E7%BA%B3%E5%85%A5%E7%BB%84%E5%90%88%E7%9A%84%E9%85%8D",
+      "date": "2026-07-29",
+      "summary": "小比例卫星仓位，不押身家。",
+      "valueTag": [
+        "investment"
+      ],
+      "whyWorthWriting": "理性看待加密",
+      "fitAccount": "投资理财号 / 独立开发号",
+      "angle": "我为什么只给加密 3% 的上限",
+      "titles": [
+        "我只给加密 3% 上限",
+        "高风险资产怎么控仓",
+        "理性看待加密"
+      ],
+      "trendScore": 66
+    },
+    {
+      "id": "inv-usd-deposit",
+      "cat": "investment",
+      "hot": "美元定存利率见顶信号与换汇时机",
+      "whyHot": "汇率与利率双变量",
+      "source": "财经媒体",
+      "sourceType": "rss",
+      "url": "https://xueqiu.com/search?q=%E7%BE%8E%E5%85%83%E5%AE%9A%E5%AD%98%E5%88%A9%E7%8E%87%E8%A7%81%E9%A1%B6%E4%BF%A1%E5%8F%B7",
+      "date": "2026-07-29",
+      "summary": "美债收益率见顶迹象出现。",
+      "valueTag": [
+        "investment"
+      ],
+      "whyWorthWriting": "换汇时点的常识",
+      "fitAccount": "投资理财号",
+      "angle": "我等美元定存见顶信号的踩坑记录",
+      "titles": [
+        "等美元定存见顶的踩坑",
+        "换汇时点的常识",
+        "汇率利率双变量"
+      ],
+      "trendScore": 64
+    },
+    {
+      "id": "inv-index-fee",
+      "cat": "investment",
+      "hot": "指数基金费率内战对长期收益的影响",
+      "whyHot": "成本即收益",
+      "source": "雪球",
+      "sourceType": "rss",
+      "url": "https://xueqiu.com/search?q=%E6%8C%87%E6%95%B0%E5%9F%BA%E9%87%91%E8%B4%B9%E7%8E%87%E5%86%85%E6%88%98%E5%AF%B9%E9%95%BF",
+      "date": "2026-07-29",
+      "summary": "费率每降 0.1%，长期复利差很多。",
+      "valueTag": [
+        "investment"
+      ],
+      "whyWorthWriting": "省到就是赚到",
+      "fitAccount": "投资理财号 / 女性成长号",
+      "angle": "我把高费率基金换成低费率后的 10 年差额",
+      "titles": [
+        "低费率基金省出一辆车",
+        "成本即收益",
+        "我把高费率换了之后"
+      ],
+      "trendScore": 60
+    },
+    {
+      "id": "xhs-ai-side",
+      "cat": "xhs",
+      "hot": "普通女生用 AI 做副业的真实路径",
+      "whyHot": "AI 副业是高频搜索词",
+      "source": "小红书(人工)",
+      "sourceType": "manual",
+      "url": "https://www.xiaohongshu.com/search_result?keyword=%E6%99%AE%E9%80%9A%E5%A5%B3%E7%94%9F%E7%94%A8AI%E5%81%9A%E5%89%AF%E4%B8%9A",
+      "date": "2026-07-29",
+      "summary": "从工具到变现的可复制步骤。",
+      "valueTag": [
+        "creation"
+      ],
+      "whyWorthWriting": "真实可复制的副业起步",
+      "fitAccount": "自媒体号 / 女性成长号",
+      "angle": "我用 AI 接到的第一单，以及踩过的坑",
+      "titles": [
+        "普通女生用 AI 做副业",
+        "我接到的第一单 AI 活",
+        "非技术副业起步清单"
+      ],
+      "trendScore": 88
+    },
+    {
+      "id": "xhs-sh-save",
+      "cat": "xhs",
+      "hot": "在上海独居的省钱+存钱复盘",
+      "whyHot": "真实财务叙事有共鸣",
+      "source": "小红书(人工)",
+      "sourceType": "manual",
+      "url": "https://www.xiaohongshu.com/search_result?keyword=%E5%9C%A8%E4%B8%8A%E6%B5%B7%E7%8B%AC%E5%B1%85%E7%9A%84%E7%9C%81%E9%92%B1%2B%E5%AD%98",
+      "date": "2026-07-29",
+      "summary": "房租/餐饮/订阅的逐项优化。",
+      "valueTag": [
+        "creation",
+        "investment"
+      ],
+      "whyWorthWriting": "用真实账单讲存钱",
+      "fitAccount": "自媒体号 / 女性成长号",
+      "angle": "我在上海月存 5 千的真实账单拆解",
+      "titles": [
+        "在上海月存 5 千的账单",
+        "独居女生的省钱复盘",
+        "真实财务叙事最打动人"
+      ],
+      "trendScore": 84
+    },
+    {
+      "id": "xhs-nocode-prod",
+      "cat": "xhs",
+      "hot": "非程序员把想法做成小产品的踩坑记",
+      "whyHot": "非技术做产品是热点",
+      "source": "小红书(人工)",
+      "sourceType": "manual",
+      "url": "https://www.xiaohongshu.com/search_result?keyword=%E9%9D%9E%E7%A8%8B%E5%BA%8F%E5%91%98%E6%8A%8A%E6%83%B3%E6%B3%95%E5%81%9A%E6%88%90%E5%B0%8F",
+      "date": "2026-07-29",
+      "summary": "用 AI+无代码从 0 到上线。",
+      "valueTag": [
+        "creation",
+        "work"
+      ],
+      "whyWorthWriting": "给非程序员的勇气",
+      "fitAccount": "自媒体号 / 独立开发号",
+      "angle": "我做的第一个小产品，赚到第一笔 9.9",
+      "titles": [
+        "非程序员做的第一个产品",
+        "我赚到第一笔 9.9",
+        "无代码+AI 从 0 到上线"
+      ],
+      "trendScore": 80
+    },
+    {
+      "id": "xhs-output-input",
+      "cat": "xhs",
+      "hot": "职场新人用『输出倒逼输入』做个人成长",
+      "whyHot": "成长方法论受欢迎",
+      "source": "小红书(人工)",
+      "sourceType": "manual",
+      "url": "https://www.xiaohongshu.com/search_result?keyword=%E8%81%8C%E5%9C%BA%E6%96%B0%E4%BA%BA%E7%94%A8%E3%80%8E%E8%BE%93%E5%87%BA%E5%80%92%E9%80%BC",
+      "date": "2026-07-29",
+      "summary": "写/做/教是最好的学。",
+      "valueTag": [
+        "creation",
+        "work"
+      ],
+      "whyWorthWriting": "可落地的成长法",
+      "fitAccount": "职场成长号 / 自媒体号",
+      "angle": "我靠每周发 1 篇，逼自己读完了 12 本书",
+      "titles": [
+        "靠输出倒逼输入一年",
+        "每周发 1 篇逼自己读书",
+        "新人成长方法论"
+      ],
+      "trendScore": 76
+    },
+    {
+      "id": "xhs-account-year",
+      "cat": "xhs",
+      "hot": "用记账+定投把工资变资产的年度总结",
+      "whyHot": "年度复盘类内容长尾好",
+      "source": "小红书(人工)",
+      "sourceType": "manual",
+      "url": "https://www.xiaohongshu.com/search_result?keyword=%E7%94%A8%E8%AE%B0%E8%B4%A6%2B%E5%AE%9A%E6%8A%95%E6%8A%8A%E5%B7%A5%E8%B5%84%E5%8F%98",
+      "date": "2026-07-29",
+      "summary": "记账看流向，定投做积累。",
+      "valueTag": [
+        "investment",
+        "creation"
+      ],
+      "whyWorthWriting": "一年可视化的力量",
+      "fitAccount": "自媒体号 / 女性成长号",
+      "angle": "我记了一年账+定投，资产曲线第一次上扬",
+      "titles": [
+        "记账+定投一年资产上扬",
+        "我的年度财务复盘",
+        "工资变资产的真实路径"
+      ],
+      "trendScore": 72
+    }
+  ]
+}

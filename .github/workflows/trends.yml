@@ -1,0 +1,38 @@
+name: Generate Daily Trends
+
+on:
+  schedule:
+    - cron: '0 0 * * *'          # 每天 UTC 00:00（北京 08:00）生成
+  workflow_dispatch: {}           # 支持手动触发
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Generate trends JSON
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LLM_KEY: ${{ secrets.LLM_KEY }}        # 可选：留空则用规则模板生成衍生字段
+          LLM_BASE: ${{ secrets.LLM_BASE }}      # 可选：OpenAI 兼容端点
+        run: python scripts/gen_trends.py
+
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "no changes"
+          else
+            git commit -m "chore(trends): daily update $(date +%F)"
+            git push
+          fi

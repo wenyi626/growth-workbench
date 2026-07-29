@@ -3,6 +3,28 @@
 > 格式参考 [Keep a Changelog](https://keepachangelog.com/)。版本号规范：`v1.0` / `v1.1` / `v2.0` …；开发态 `version.json` 为 `dev`。
 > 每次发版必须在此追加条目，并更新 PROJECT.md 第 2 节「当前版本」。
 
+## [v1.5.0] - Hot Trends Foundation（热点中心）
+
+> 本版本目标：让自媒体（Content）模块**真正联网并每日更新**——从纯本地 `TRENDS` 数组升级为可每日刷新的热点中心（Content Center）。这是 Content Center 升级，**不是** AI/英语/Project 扩展，不动 `LearningSource`/`Library`/`ProjectLibrary`，不破坏 `pgwb_data_v1`。
+
+### Added
+- **`TrendSource` + `TrendLibrary` 新模块**（仿 `RemoteSource` 范式，独立内存 + 独立缓存键 `pgwb_trends_cache_v1`）：`TrendSource.loadRemote()` 异步拉取 `data/trends-daily.json` → `normalize`（按 `cat` 路由，`id` 前缀 `tr-<cat>-`）→ 注入 `TrendLibrary`；远程失败按 `缓存 → 本地兜底` 逐级降级，绝不白屏。
+- **内容中心「热点」页**：新增 `热点` 一级子页（与 `选题`/`我的内容`/`分析` 并列），分段切换 `今天 / 本周 / AI / 投资 / 小红书`；每条热点突出 `为什么值得写` / `适合账号` / `推荐角度` / `推荐标题` + `trendScore` 排序，而非新闻摘要。
+- **选题闭环（热点 → 半成品草稿 → 内容库）**：热点卡「用这个选题创作」按钮 → 直接 `S.add('contents', …)` 创建草稿（预填 `标题 / 平台 / 灵感来源 / 推荐角度 / 内容提纲`）并打开编辑弹窗继续编辑；内容记录新增 `platform` / `inspiration` / `angle` / `outline` 字段，详情弹窗同步展示。用户进入内容库即拥有一篇可继续编辑的**半成品草稿**，而非空白记录。
+- **热点数据结构（v2）**：每条含 `hot / whyHot / source / url / date / summary / valueTag / whyWorthWriting / fitAccount / angle / titles / trendScore`；`trendScore`（1–100）用于排序，由来源热度/讨论量/时效性/创作价值综合。
+- **热点种子 `data/trends-daily.json`**：手工策展 **30 条**（AI 10 / 科技 5 / 投资 10 / 小红书 5 人工维护），满足今日 10 / 本周 10 / AI 10 / 投资 10 / 小红书 5 规模上限。
+- **CI 每日生成流水线**：`.github/workflows/trends.yml`（每日 UTC 00:00）+ `scripts/gen_trends.py`（仅标准库）：真实抓取 HN Algolia / arXiv RSS / GitHub API / 科技·财经 RSS；小红书走人工维护 `data/xhs-manual.json`；投资热点**仅来自财经 RSS，不含实时行情拉取**（实时行情留待未来版本）；LLM（仅存 CI Secrets）**只生成** `whyWorthWriting / fitAccount / angle / titles` 四类衍生字段，不虚构热点；质量门（价值标签 + 反套路黑名单）+ 规模上限。
+- **缓存策略**：启动非阻塞刷新；`pgwb_trends_cache_v1` 存 `{generatedAt, cachedAt, trends}`；新鲜度分级提示（≤24h 正常 / 1–7 天软提示 / >7 天强提示 / 离线回退本地兜底），旧热点跨次保留。
+- **半成品草稿提纲（模板化，不调用 LLM）**：`buildOutline(trend)` 按固定模板生成「开头（为什么最近很多人在讨论这个？）→ 正文（1.热点是什么 / 2.为什么重要 / 3.对普通人有什么影响）→ 结尾（我的观点是什么？）」，用热点真实字段（`hot/summary/whyWorthWriting/angle`）填充，得到可继续编辑的草稿；纯前端、零 API 成本、零延迟。
+- **主题去重（连续 7 天窗口，防霸榜）**：前端 `TrendSource.dedupeByTheme()` 以 `cat|themeKey(hot)` 折叠同主题（仅留 `trendScore` 最高一条）；CI 端 `scripts/gen_trends.py` 额外维护滚动历史 `data/trends-history.json`（最近 7 天发布的主题），次日对重复主题**降权**（`trendScore - 8×出现次数`，下限 45）或**剔除**（≥3 次）；同一天同主题仅保留一条。保障热点新鲜度与主题多样性。
+
+### Changed
+- 运行时版本 `version.json` → `1.5.0`。
+
+### 约束遵守
+- 无后端常驻服务；前端不暴露任何 Key（Key 仅存 CI Secrets / GitHub Actions）。
+- 不影响 `LearningSource` / `Library` / `ProjectLibrary`；不写 `pgwb_data_v1`（用户内容仍在 `S.data.contents`）。
+
 ## [v1.4.2] - Learning Content Expansion（学习内容扩展）
 
 > 本版本目标：扩充学习内容供给，把内容池从「英语 / AI 工具 / 项目模板」三路并进，未来可持续新增而**不改动 `index.html` 内容逻辑**。仅做内容扩展，不重构架构、不统一存储。
