@@ -20,8 +20,8 @@
 
 | 项 | 值 |
 | --- | --- |
-| 当前版本号 | `1.3.3`（运行时版本源 `version.json`；v1.2.0 Decision Engine；v1.2.1 财富 SSOT/英语换一篇/交易编辑删除；v1.2.2 学习历史点击回看；v1.3.1 学习引擎基础 Learning Foundation（Library + LearningSource + 学习历史升级 + 英语读 Library + AI 工具学习中心 AIToolMod）；**v1.3.2 AI 工具课程模板标准化（统一 6 段行动化模板，11 个真实工具去百科化）**；**v1.3.3 Project 学习引擎基础（ProjectLibrary + ProjectEngine，进度/下一步自动计算，创建前可预览调整）**） |
-| 最近一次提交 | `feat: v1.3.3 Project Learning Foundation (ProjectLibrary + ProjectEngine)` |
+| 当前版本号 | `1.4.2`（运行时版本源 `version.json`；v1.2.0 Decision Engine；v1.2.1 财富 SSOT/英语换一篇/交易编辑删除；v1.2.2 学习历史点击回看；v1.3.1 学习引擎基础 Learning Foundation（Library + LearningSource + 学习历史升级 + 英语读 Library + AI 工具学习中心 AIToolMod）；**v1.3.2 AI 工具课程模板标准化（统一 6 段行动化模板，11 个真实工具去百科化）**；**v1.3.3 Project 学习引擎基础（ProjectLibrary + ProjectEngine，进度/下一步自动计算，创建前可预览调整）**；**v1.4.1 RemoteSource English（英语联网课文：RemoteSource 真正拉取同源静态 JSON，归一化后并入 Library，失败静默降级本地 8 篇）**；**v1.4.2 Learning Content Expansion（RemoteSource 支持 english/ai/project 三类型，新增 ai-courses.json + project-cases.json，扩充 english-lessons.json；英语 33 / AI 24 / 项目案例 20，内容供给大幅扩充，架构职责不变）**） |
+| 最近一次提交 | `（v1.4.1 与 v1.4.2 改动均未提交，待验收后一并 commit/push）` |
 | 发布状态 | 已部署 GitHub Pages，PWA 已可用 |
 | 版本标签规范 | 正式发版使用 `v1.0`、`v1.1`、`v2.0` …（见第 13 节） |
 
@@ -124,7 +124,7 @@
 | `AI`（本地规则） | `generateTodayPlan` `selfAnalysis` `wealthReview` `bodyReport` `parseExercise` `checkSentence` `genContentIdeas` `generateEnglish` |
 | `EnglishMod` | `open(lesson, opts)` `openQuiz` `openBankQuiz`（v1.3.1：`open` 支持 `opts.prefill` 回填复述、`opts.updateId` 继续学习更新原记录） |
 | `Library` | `register` `registerAll` `get` `all` `byCategory` `findByTitle` `search` `categories`（v1.3.1 学习对象统一注册中心：英语 8 篇 / AI 工具 11 个 / 产品 2 篇） |
-| `LearningSource` | `addSource` `load` `LocalSource` `RemoteSource`（v1.3.1 数据源抽象：内置 LocalSource 聚合进 Library；`RemoteSource` 为 V1.3.2 联网预留，当前返回空） |
+| `LearningSource` | `addSource` `load` `loadRemote` `LocalSource` `RemoteSource`（v1.3.1 数据源抽象；v1.4.1 `RemoteSource` 真正联网：`fetchLessons`/`validate`/`normalize`，`loadRemote` 异步并入远程课文并静默降级本地） |
 | `AIToolMod` | `open(tool, opts)` `scoreQuiz(tool)`（v1.3.2 统一课程模板渲染器：`open` 用固定 6 段模板（是什么/核心能力/实战案例/实际操作/今日任务/小测验）渲染任意工具课，支持 `opts.prefill`/`opts.updateId` 回填与续学；`scoreQuiz` 批改单选测验） |
 | `ProjectLibrary` | `match(name)` `get(id)` `all()`（v1.3.3 本地项目知识库：内置 5 套模板，按关键词/子串模糊匹配，未命中回退通用模板；无联网/无 AI/无 LLM） |
 | `ProjectEngine` | `buildDraft(name,tpl)` `compute(p)` `recompute(p)` `create(draft)`（v1.3.3 项目路线自动生成器：深拷贝模板生成草稿，自动计算进度/下一步/当前阶段并落库） |
@@ -187,6 +187,7 @@
 ---
 
 - [x] Project 学习引擎基础（v1.3.3）：新增 `ProjectLibrary`（本地项目知识库，5 套模板：个人 AI 工作台 / 小红书账号 / 淘宝自动化 / 个人网站 / 通用兜底，含阶段与步骤的完成标准与预计耗时、推荐资料、踩坑提示）+ `ProjectEngine`（基于模板自动生成完整项目路线）；项目进度与下一步改为自动计算（已完成步骤数/总步骤数），取消手工填写百分比；创建前可预览并自由新增/删除/修改/重排阶段与步骤；旧项目（无 `stages`）沿用原手工编辑与进度字段，数据契约完全向后兼容；新增架构文档 `docs/Architecture/ProjectFoundation.md`。
+- [x] RemoteSource English（v1.4.1）：`RemoteSource` 从占位空壳升级为真正联网数据源（`fetchLessons`/`validate`/`normalize`），新增 `data/english-lessons.json` 静态课文（5 篇，含 `type:'english'`，2 篇带可选 `quiz`），`LearningSource.loadRemote()` 在 `App.load` 非阻塞并入并静默降级；本地 8 篇数据结构不变、`EnglishMod` 不因此大改 UI；不触碰其它模块、不接 LLM。
 
 ## 10. 已知 Bug / 待确认
 
@@ -211,7 +212,7 @@
 
 1. **v1.0（已达成）**：文档体系 + 版本自动检测与 PWA 更新流（见 v1.0.0）。下一步：数据契约冻结。
 2. **v1.1（已达成）**：Today OS 首页架构（v1.1.0）+ Decision Engine 决策引擎（v1.2.0）、财富 SSOT / 英语换一篇 / 交易编辑（v1.2.1）、学习历史点击回看（v1.2.2）。
-3. **v1.3（收尾）**：学习引擎基础 Learning Foundation（v1.3.1 已落地：LearningLibrary + LearningSource + 学习历史升级 + 英语读 Library + AI 工具学习中心 AIToolMod）；**v1.3.2 已落地：AI 工具课程模板标准化**——所有 AI 工具统一 6 段固定模板、行动化重写（去百科化），新增工具只填同一组字段即可复用模板；**联网 AI 学习（`RemoteSource` 真实课文源）顺延至后续版本**，不在本版本实现联网、不改动数据契约；**v1.3.3 已落地：Project 学习引擎基础（ProjectLibrary + ProjectEngine，进度/下一步自动计算，创建前预览可调）**。
+3. **v1.3（收尾）**：学习引擎基础 Learning Foundation（v1.3.1 已落地：LearningLibrary + LearningSource + 学习历史升级 + 英语读 Library + AI 工具学习中心 AIToolMod）；**v1.3.2 已落地：AI 工具课程模板标准化**——所有 AI 工具统一 6 段固定模板、行动化重写（去百科化），新增工具只填同一组字段即可复用模板；**联网 AI 学习（`RemoteSource` 真实课文源）顺延至后续版本**，不在本版本实现联网、不改动数据契约；**v1.3.3 已落地：Project 学习引擎基础（ProjectLibrary + ProjectEngine，进度/下一步自动计算，创建前预览可调）**；**v1.4.1 已落地：RemoteSource English（英语联网课文，远程+本地合并、失败降级本地 8 篇）**。
 4. **v2.0（愿景）**：「AI Personal CEO」——端侧 AI 自动串联四大维度，给出每日优先级与行动建议。详见 VISION.md。
 
 ---

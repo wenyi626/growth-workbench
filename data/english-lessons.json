@@ -1,0 +1,1238 @@
+[
+  {
+    "id": "remote-work",
+    "type": "english",
+    "title": "Remote work is quietly rewriting the office",
+    "source": "Bloomberg",
+    "excerpt": "Companies are no longer asking whether people can work from anywhere, but how to keep culture alive when the hallway conversations are gone. The office is becoming a place for coordination, not just desks.",
+    "words": [
+      {
+        "w": "hallway",
+        "def": "走廊",
+        "ex": "the hallway conversations are gone"
+      },
+      {
+        "w": "coordinate",
+        "def": "协调",
+        "ex": "a place for coordination"
+      },
+      {
+        "w": "culture",
+        "def": "文化",
+        "ex": "keep culture alive"
+      },
+      {
+        "w": "anywhere",
+        "def": "任何地方",
+        "ex": "work from anywhere"
+      },
+      {
+        "w": "desk",
+        "def": "工位/书桌",
+        "ex": "not just desks"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "ask whether",
+        "zh": "质疑是否"
+      },
+      {
+        "ph": "keep ... alive",
+        "zh": "让……延续下去"
+      }
+    ],
+    "grammar": {
+      "point": "现在进行时表正在发生的持续变化：is becoming / are asking",
+      "ex": "The office is becoming a place for coordination."
+    }
+  },
+  {
+    "id": "small-models",
+    "type": "english",
+    "title": "Small models are eating tasks once reserved for giants",
+    "source": "The Verge",
+    "excerpt": "A model that fits on a laptop can now handle summarising, classifying, and drafting that used to need a massive cloud service. Cheaper and private often beats bigger and centralised.",
+    "words": [
+      {
+        "w": "reserve",
+        "def": "保留/预留",
+        "ex": "tasks reserved for giants"
+      },
+      {
+        "w": "classify",
+        "def": "分类",
+        "ex": "classifying text"
+      },
+      {
+        "w": "draft",
+        "def": "起草",
+        "ex": "drafting emails"
+      },
+      {
+        "w": "centralised",
+        "def": "集中的",
+        "ex": "bigger and centralised"
+      },
+      {
+        "w": "private",
+        "def": "私有的/隐私的",
+        "ex": "cheaper and private"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "eat (into)",
+        "zh": "逐步侵占/蚕食"
+      },
+      {
+        "ph": "used to",
+        "zh": "过去常常（现在不）"
+      }
+    ],
+    "grammar": {
+      "point": "that 引导的定语从句修饰名词：tasks that used to need ...",
+      "ex": "Tasks that used to need a cloud service."
+    }
+  },
+  {
+    "id": "reading-systems",
+    "type": "english",
+    "title": "Reading more won't save you — systems will",
+    "source": "James Clear",
+    "excerpt": "Consuming information feels like progress, but without a system to apply it, most of it evaporates. The edge comes from turning reading into small, repeatable actions.",
+    "words": [
+      {
+        "w": "consume",
+        "def": "消耗/吸收（信息）",
+        "ex": "consuming information"
+      },
+      {
+        "w": "evaporate",
+        "def": "蒸发/消失",
+        "ex": "most of it evaporates"
+      },
+      {
+        "w": "edge",
+        "def": "优势",
+        "ex": "the edge comes from"
+      },
+      {
+        "w": "repeatable",
+        "def": "可重复的",
+        "ex": "repeatable actions"
+      },
+      {
+        "w": "apply",
+        "def": "应用",
+        "ex": "a system to apply it"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "feel like",
+        "zh": "感觉像是"
+      },
+      {
+        "ph": "turn ... into",
+        "zh": "把……变成"
+      }
+    ],
+    "grammar": {
+      "point": "without + 名词/动名词 表条件缺失：without a system to apply it",
+      "ex": "Without a system, most of it evaporates."
+    }
+  },
+  {
+    "id": "clear-writing",
+    "type": "english",
+    "title": "Why writing clearly is a quiet competitive advantage",
+    "source": "Harvard Business Review",
+    "excerpt": "Clear writing forces clear thinking. When you can explain an idea in a few plain sentences, you spot the gaps that vague language hides. It is a skill that compounds.",
+    "words": [
+      {
+        "w": "competitive",
+        "def": "竞争的",
+        "ex": "competitive advantage"
+      },
+      {
+        "w": "vague",
+        "def": "模糊的",
+        "ex": "vague language"
+      },
+      {
+        "w": "spot",
+        "def": "发现/识别",
+        "ex": "spot the gaps"
+      },
+      {
+        "w": "compound",
+        "def": "复利式增长",
+        "ex": "a skill that compounds"
+      },
+      {
+        "w": "plain",
+        "def": "平实的/简单的",
+        "ex": "plain sentences"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "force ... to",
+        "zh": "迫使……去做"
+      },
+      {
+        "ph": "hide (from)",
+        "zh": "掩盖/隐藏"
+      }
+    ],
+    "grammar": {
+      "point": "when 引导时间状语从句 + 定语从句：When you can explain an idea ... you spot the gaps",
+      "ex": "When you can explain it, you spot the gaps."
+    },
+    "quiz": [
+      {
+        "q": "What does clear writing force you to do?",
+        "a": "Write longer emails",
+        "b": "Think clearly",
+        "c": "Avoid plain words",
+        "d": "Hide gaps",
+        "answer": "b"
+      },
+      {
+        "q": "The writer says a skill that compounds is one that:",
+        "a": "fades quickly",
+        "b": "grows in value over time",
+        "c": "needs a team",
+        "d": "is vague",
+        "answer": "b"
+      }
+    ]
+  },
+  {
+    "id": "finishing",
+    "type": "english",
+    "title": "The quiet power of finishing what you start",
+    "source": "Atomic Habits",
+    "excerpt": "Starting is easy; finishing is rare. Each completed project builds trust in yourself, while each abandoned one quietly erodes it. Momentum comes from closures, not intentions.",
+    "words": [
+      {
+        "w": "erode",
+        "def": "侵蚀/削弱",
+        "ex": "quietly erodes it"
+      },
+      {
+        "w": "momentum",
+        "def": "势头",
+        "ex": "momentum comes from closures"
+      },
+      {
+        "w": "closure",
+        "def": "了结/收尾",
+        "ex": "closures, not intentions"
+      },
+      {
+        "w": "intention",
+        "def": "意图",
+        "ex": "not intentions"
+      },
+      {
+        "w": "abandon",
+        "def": "放弃",
+        "ex": "each abandoned one"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "build trust in",
+        "zh": "建立对……的信任"
+      },
+      {
+        "ph": "come from",
+        "zh": "源于"
+      }
+    ],
+    "grammar": {
+      "point": "each + 单数名词 作主语，谓语用单数：Each completed project builds trust",
+      "ex": "Each abandoned one erodes it."
+    },
+    "quiz": [
+      {
+        "q": "According to the text, momentum comes from:",
+        "a": "good intentions",
+        "b": "starting many things",
+        "c": "closures / finishing",
+        "d": "long plans",
+        "answer": "c"
+      },
+      {
+        "q": "What does an abandoned project do?",
+        "a": "Builds trust",
+        "b": "Erodes trust",
+        "c": "Creates momentum",
+        "d": "Nothing",
+        "answer": "b"
+      }
+    ]
+  },
+  {
+    "id": "context-switching",
+    "type": "english",
+    "title": "The hidden tax of context switching",
+    "source": "Harvard Business Review",
+    "excerpt": "Every time you jump from writing to Slack to code, your brain pays a reload cost. The work itself is rarely the bottleneck; the switching is.",
+    "words": [
+      {
+        "w": "context switching",
+        "def": "任务切换",
+        "ex": "jump from writing to code"
+      },
+      {
+        "w": "reload",
+        "def": "重新加载",
+        "ex": "pays a reload cost"
+      },
+      {
+        "w": "bottleneck",
+        "def": "瓶颈",
+        "ex": "rarely the bottleneck"
+      },
+      {
+        "w": "cognitive",
+        "def": "认知的",
+        "ex": "cognitive cost"
+      },
+      {
+        "w": "overhead",
+        "def": "额外开销",
+        "ex": "constant overhead"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "pay a cost",
+        "zh": "付出代价"
+      },
+      {
+        "ph": "rarely the bottleneck",
+        "zh": "很少是瓶颈所在"
+      }
+    ],
+    "grammar": {
+      "point": "the + 比较级… the + 比较级…：The more you switch, the less you finish.",
+      "ex": "The more you switch, the less you finish."
+    }
+  },
+  {
+    "id": "onboarding",
+    "type": "english",
+    "title": "Good onboarding beats good features",
+    "source": "Lenny's Newsletter",
+    "excerpt": "A user who understands your product in ten seconds is worth ten who are impressed but confused. Clarity is a feature.",
+    "words": [
+      {
+        "w": "onboarding",
+        "def": "新用户引导",
+        "ex": "good onboarding"
+      },
+      {
+        "w": "impressed",
+        "def": "被打动的",
+        "ex": "impressed but confused"
+      },
+      {
+        "w": "confused",
+        "def": "困惑的",
+        "ex": "still confused"
+      },
+      {
+        "w": "clarity",
+        "def": "清晰",
+        "ex": "clarity is a feature"
+      },
+      {
+        "w": "retain",
+        "def": "留存",
+        "ex": "retain users"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "worth ten who…",
+        "zh": "抵得上十个……的人"
+      },
+      {
+        "ph": "in ten seconds",
+        "zh": "在十秒内"
+      }
+    ],
+    "grammar": {
+      "point": "who 引导定语从句修饰名词：users who understand your product",
+      "ex": "users who understand your product"
+    }
+  },
+  {
+    "id": "slow-mornings",
+    "type": "english",
+    "title": "Slow mornings make sharp decisions",
+    "source": "Atomic Habits",
+    "excerpt": "Rushing from bed to backlog trains your day to run you. A calm first hour is not lost time; it is the interest on every decision after.",
+    "words": [
+      {
+        "w": "backlog",
+        "def": "待办堆积",
+        "ex": "bed to backlog"
+      },
+      {
+        "w": "calm",
+        "def": "平静的",
+        "ex": "a calm first hour"
+      },
+      {
+        "w": "interest",
+        "def": "利息/回报",
+        "ex": "the interest on decisions"
+      },
+      {
+        "w": "decision",
+        "def": "决策",
+        "ex": "sharp decisions"
+      },
+      {
+        "w": "routine",
+        "def": "日常",
+        "ex": "a calm routine"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "run you",
+        "zh": "让你被牵着走"
+      },
+      {
+        "ph": "not lost time",
+        "zh": "不是被浪费的时间"
+      }
+    ],
+    "grammar": {
+      "point": "not A; it is B 强调结构：It is not lost time; it is the interest.",
+      "ex": "It is not lost time; it is the interest."
+    }
+  },
+  {
+    "id": "meetings-tax",
+    "type": "english",
+    "title": "Meetings are a tax on doing",
+    "source": "Harvard Business Review",
+    "excerpt": "Every calendar block is borrowed from the work it was meant to support. The best teams protect maker time like a scarce resource.",
+    "words": [
+      {
+        "w": "borrow",
+        "def": "借用/占用",
+        "ex": "borrowed from the work"
+      },
+      {
+        "w": "scarce",
+        "def": "稀缺的",
+        "ex": "a scarce resource"
+      },
+      {
+        "w": "maker time",
+        "def": "专注创造时间",
+        "ex": "protect maker time"
+      },
+      {
+        "w": "block",
+        "def": "时间段",
+        "ex": "calendar block"
+      },
+      {
+        "w": "protect",
+        "def": "保护",
+        "ex": "protect like a resource"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "borrowed from",
+        "zh": "从……中被挤占"
+      },
+      {
+        "ph": "protect … like a scarce resource",
+        "zh": "像稀缺资源一样保护……"
+      }
+    ],
+    "grammar": {
+      "point": "every + 单数名词作主语，谓语用单数：Every block is borrowed.",
+      "ex": "Every block is borrowed."
+    }
+  },
+  {
+    "id": "boring-middle",
+    "type": "english",
+    "title": "The boring middle is where projects die",
+    "source": "Seth Godin",
+    "excerpt": "Starting is exciting and shipping is satisfying, but the long unglamorous middle is where most work quietly stops.",
+    "words": [
+      {
+        "w": "unglamorous",
+        "def": "不起眼的",
+        "ex": "the unglamorous middle"
+      },
+      {
+        "w": "quietly",
+        "def": "悄悄地",
+        "ex": "quietly stops"
+      },
+      {
+        "w": "ship",
+        "def": "发布/交付",
+        "ex": "shipping is satisfying"
+      },
+      {
+        "w": "excitement",
+        "def": "兴奋",
+        "ex": "starting is exciting"
+      },
+      {
+        "w": "abandon",
+        "def": "放弃",
+        "ex": "work gets abandoned"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "where … die",
+        "zh": "……在何处消亡"
+      },
+      {
+        "ph": "most work stops",
+        "zh": "大部分工作停在这里"
+      }
+    ],
+    "grammar": {
+      "point": "where 引导定语从句：The boring middle is where projects die.",
+      "ex": "The boring middle is where projects die."
+    }
+  },
+  {
+    "id": "doc-before-code",
+    "type": "english",
+    "title": "Write the doc before the code",
+    "source": "Google Engineering",
+    "excerpt": "A short design note forces the thinking that the code would otherwise hide. If you cannot explain it in prose, you are not ready to build it.",
+    "words": [
+      {
+        "w": "prose",
+        "def": "散文/文字",
+        "ex": "explain it in prose"
+      },
+      {
+        "w": "design note",
+        "def": "设计说明",
+        "ex": "a short design note"
+      },
+      {
+        "w": "hide",
+        "def": "隐藏",
+        "ex": "the code would hide"
+      },
+      {
+        "w": "force",
+        "def": "迫使",
+        "ex": "forces the thinking"
+      },
+      {
+        "w": "ready",
+        "def": "准备好的",
+        "ex": "not ready to build"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "force the thinking",
+        "zh": "逼出真正的思考"
+      },
+      {
+        "ph": "not ready to",
+        "zh": "还没准备好去……"
+      }
+    ],
+    "grammar": {
+      "point": "if 条件句 + 情态动词被动：If you cannot explain it, you are not ready.",
+      "ex": "If you cannot explain it, you are not ready."
+    }
+  },
+  {
+    "id": "pricing-feature",
+    "type": "english",
+    "title": "Pricing is a feature, not an afterthought",
+    "source": "The Pragmatic Engineer",
+    "excerpt": "How you charge shapes how people use what you built. A price is a position; it tells the customer what this is for.",
+    "words": [
+      {
+        "w": "afterthought",
+        "def": "事后才想到的",
+        "ex": "not an afterthought"
+      },
+      {
+        "w": "position",
+        "def": "定位",
+        "ex": "a price is a position"
+      },
+      {
+        "w": "charge",
+        "def": "收费",
+        "ex": "how you charge"
+      },
+      {
+        "w": "shape",
+        "def": "塑造",
+        "ex": "shapes how people use"
+      },
+      {
+        "w": "customer",
+        "def": "客户",
+        "ex": "tells the customer"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "not an afterthought",
+        "zh": "不是事后补丁"
+      },
+      {
+        "ph": "tells the customer",
+        "zh": "告诉客户……"
+      }
+    ],
+    "grammar": {
+      "point": "how 引导从句作主语：How you charge shapes how people use it.",
+      "ex": "How you charge shapes how people use it."
+    }
+  },
+  {
+    "id": "small-teams",
+    "type": "english",
+    "title": "Small teams ship faster than big ones",
+    "source": "Amazon Builder's Library",
+    "excerpt": "Communication cost grows with the square of headcount. A two-person team often outruns a twenty-person one because nothing gets lost in translation.",
+    "words": [
+      {
+        "w": "headcount",
+        "def": "人头数",
+        "ex": "square of headcount"
+      },
+      {
+        "w": "outrun",
+        "def": "跑赢",
+        "ex": "outruns a twenty-person one"
+      },
+      {
+        "w": "translation",
+        "def": "转译/传达",
+        "ex": "lost in translation"
+      },
+      {
+        "w": "communication",
+        "def": "沟通",
+        "ex": "communication cost"
+      },
+      {
+        "w": "square",
+        "def": "平方",
+        "ex": "grows with the square"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "grows with",
+        "zh": "随……增长"
+      },
+      {
+        "ph": "outrun",
+        "zh": "超过/跑赢"
+      }
+    ],
+    "grammar": {
+      "point": "比较级 + than：A two-person team outruns a twenty-person one.",
+      "ex": "A two-person team outruns a twenty-person one."
+    }
+  },
+  {
+    "id": "feedback-loop",
+    "type": "english",
+    "title": "The feedback loop is the real product",
+    "source": "Reid Hoffman",
+    "excerpt": "Ship, listen, adjust. A company that learns faster from users will beat one that plans longer. The loop, not the launch, compounds.",
+    "words": [
+      {
+        "w": "loop",
+        "def": "闭环",
+        "ex": "the feedback loop"
+      },
+      {
+        "w": "adjust",
+        "def": "调整",
+        "ex": "listen, adjust"
+      },
+      {
+        "w": "launch",
+        "def": "发布",
+        "ex": "not the launch"
+      },
+      {
+        "w": "compound",
+        "def": "复利式增长",
+        "ex": "the loop compounds"
+      },
+      {
+        "w": "listen",
+        "def": "倾听",
+        "ex": "ship, listen, adjust"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "ship, listen, adjust",
+        "zh": "发布、倾听、调整"
+      },
+      {
+        "ph": "beat one that …",
+        "zh": "胜过那个……的（公司）"
+      }
+    ],
+    "grammar": {
+      "point": "that 引导定语从句：a company that learns faster from users",
+      "ex": "a company that learns faster from users"
+    }
+  },
+  {
+    "id": "miscommunication",
+    "type": "english",
+    "title": "Miscommunication compounds quietly",
+    "source": "Crucial Conversations",
+    "excerpt": "One unclear message becomes two wrong assumptions, then four wasted hours. Most failures are not technical; they are linguistic.",
+    "words": [
+      {
+        "w": "assumption",
+        "def": "假设",
+        "ex": "wrong assumptions"
+      },
+      {
+        "w": "waste",
+        "def": "浪费",
+        "ex": "wasted hours"
+      },
+      {
+        "w": "linguistic",
+        "def": "语言上的",
+        "ex": "they are linguistic"
+      },
+      {
+        "w": "unclear",
+        "def": "不清楚的",
+        "ex": "one unclear message"
+      },
+      {
+        "w": "failure",
+        "def": "失败",
+        "ex": "most failures"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "compounds quietly",
+        "zh": "悄悄积压放大"
+      },
+      {
+        "ph": "not technical; they are linguistic",
+        "zh": "不是技术问题，是语言问题"
+      }
+    ],
+    "grammar": {
+      "point": "one … becomes two … then four … 递进排比结构",
+      "ex": "One unclear message becomes two wrong assumptions."
+    }
+  },
+  {
+    "id": "cashflow",
+    "type": "english",
+    "title": "Cash flow beats revenue on hard days",
+    "source": "Financial Times",
+    "excerpt": "A business can post huge sales and still miss payroll. What you keep and can spend matters more than what you booked.",
+    "words": [
+      {
+        "w": "post",
+        "def": "公布/录得",
+        "ex": "post huge sales"
+      },
+      {
+        "w": "payroll",
+        "def": "工资发放",
+        "ex": "miss payroll"
+      },
+      {
+        "w": "book",
+        "def": "记账/入账",
+        "ex": "what you booked"
+      },
+      {
+        "w": "keep",
+        "def": "保留",
+        "ex": "what you keep"
+      },
+      {
+        "w": "spend",
+        "def": "支出",
+        "ex": "can spend"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "miss payroll",
+        "zh": "发不出工资"
+      },
+      {
+        "ph": "book sales",
+        "zh": "账面销售额"
+      }
+    ],
+    "grammar": {
+      "point": "what 引导名词性从句：What you keep matters more than what you booked.",
+      "ex": "What you keep matters more than what you booked."
+    }
+  },
+  {
+    "id": "defaults",
+    "type": "english",
+    "title": "Defaults decide behavior more than advice",
+    "source": "Nir Eyal",
+    "excerpt": "People do what is easiest by default, not what is wisest after debate. Design the default and you design the action.",
+    "words": [
+      {
+        "w": "default",
+        "def": "默认（设置）",
+        "ex": "by default"
+      },
+      {
+        "w": "easiest",
+        "def": "最容易的",
+        "ex": "what is easiest"
+      },
+      {
+        "w": "wisest",
+        "def": "最明智的",
+        "ex": "what is wisest"
+      },
+      {
+        "w": "debate",
+        "def": "争论",
+        "ex": "after debate"
+      },
+      {
+        "w": "design",
+        "def": "设计",
+        "ex": "design the default"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "by default",
+        "zh": "默认情况下"
+      },
+      {
+        "ph": "design the action",
+        "zh": "也就设计了行为"
+      }
+    ],
+    "grammar": {
+      "point": "more than 比较结构：Defaults decide behavior more than advice.",
+      "ex": "Defaults decide behavior more than advice."
+    }
+  },
+  {
+    "id": "boredom-signal",
+    "type": "english",
+    "title": "Boredom is a signal, not a problem",
+    "source": "Cal Newport",
+    "excerpt": "When the mind is unstimulated it starts connecting dots that busyness hides. Boredom is the doorway to original thought.",
+    "words": [
+      {
+        "w": "unstimulated",
+        "def": "未被刺激的",
+        "ex": "the mind is unstimulated"
+      },
+      {
+        "w": "connect",
+        "def": "连接",
+        "ex": "connecting dots"
+      },
+      {
+        "w": "busyness",
+        "def": "忙碌",
+        "ex": "busyness hides"
+      },
+      {
+        "w": "doorway",
+        "def": "入口",
+        "ex": "the doorway to"
+      },
+      {
+        "w": "original",
+        "def": "原创的",
+        "ex": "original thought"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "connecting dots",
+        "zh": "把点连成线（产生洞见）"
+      },
+      {
+        "ph": "doorway to",
+        "zh": "……的入口"
+      }
+    ],
+    "grammar": {
+      "point": "when 引导时间状语从句：When the mind is unstimulated it starts connecting.",
+      "ex": "When the mind is unstimulated it starts connecting dots."
+    }
+  },
+  {
+    "id": "second-draft",
+    "type": "english",
+    "title": "The second draft is where the work lives",
+    "source": "Anne Lamott",
+    "excerpt": "The first version is just you telling yourself the story. The real craft shows up when you cut, reorder, and sharpen.",
+    "words": [
+      {
+        "w": "version",
+        "def": "版本",
+        "ex": "the first version"
+      },
+      {
+        "w": "craft",
+        "def": "技艺",
+        "ex": "the real craft"
+      },
+      {
+        "w": "cut",
+        "def": "删减",
+        "ex": "when you cut"
+      },
+      {
+        "w": "reorder",
+        "def": "重排",
+        "ex": "reorder"
+      },
+      {
+        "w": "sharpen",
+        "def": "打磨",
+        "ex": "sharpen"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "tell yourself the story",
+        "zh": "给自己讲清来龙去脉"
+      },
+      {
+        "ph": "shows up",
+        "zh": "显现出来"
+      }
+    ],
+    "grammar": {
+      "point": "where 引导定语从句：The second draft is where the work lives.",
+      "ex": "The second draft is where the work lives."
+    }
+  },
+  {
+    "id": "trust-moments",
+    "type": "english",
+    "title": "Trust is built in small moments",
+    "source": "Stephen Covey",
+    "excerpt": "Big promises impress; small consistencies convince. A team believes you because you showed up right a hundred quiet times.",
+    "words": [
+      {
+        "w": "promise",
+        "def": "承诺",
+        "ex": "big promises"
+      },
+      {
+        "w": "impress",
+        "def": "打动",
+        "ex": "impress"
+      },
+      {
+        "w": "consistency",
+        "def": "一致性",
+        "ex": "small consistencies"
+      },
+      {
+        "w": "convince",
+        "def": "信服",
+        "ex": "convince"
+      },
+      {
+        "w": "show up",
+        "def": "出现/兑现",
+        "ex": "you showed up"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "big promises impress",
+        "zh": "大承诺只是打动"
+      },
+      {
+        "ph": "show up",
+        "zh": "兑现/到场"
+      }
+    ],
+    "grammar": {
+      "point": "because 引导原因从句：A team believes you because you showed up right.",
+      "ex": "A team believes you because you showed up right."
+    }
+  },
+  {
+    "id": "speed-moat",
+    "type": "english",
+    "title": "Speed is a competitive moat",
+    "source": "Stripe Press",
+    "excerpt": "You do not need to be smarter than rivals if you can decide and ship while they are still scheduling a meeting.",
+    "words": [
+      {
+        "w": "moat",
+        "def": "护城河",
+        "ex": "competitive moat"
+      },
+      {
+        "w": "rival",
+        "def": "对手",
+        "ex": "smarter than rivals"
+      },
+      {
+        "w": "decide",
+        "def": "决策",
+        "ex": "decide and ship"
+      },
+      {
+        "w": "schedule",
+        "def": "安排",
+        "ex": "scheduling a meeting"
+      },
+      {
+        "w": "ship",
+        "def": "交付",
+        "ex": "ship"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "competitive moat",
+        "zh": "竞争护城河"
+      },
+      {
+        "ph": "while they are still …",
+        "zh": "而当他们还在……时"
+      }
+    ],
+    "grammar": {
+      "point": "if 条件句：You do not need to be smarter if you can ship.",
+      "ex": "You do not need to be smarter if you can ship."
+    }
+  },
+  {
+    "id": "documentation-kindness",
+    "type": "english",
+    "title": "Documentation is kindness to your future self",
+    "source": "Julia Evans",
+    "excerpt": "A note written today saves the confused person you will be in three months. Writing it down is a gift, not overhead.",
+    "words": [
+      {
+        "w": "kindness",
+        "def": "善意",
+        "ex": "documentation is kindness"
+      },
+      {
+        "w": "confused",
+        "def": "困惑的",
+        "ex": "the confused person"
+      },
+      {
+        "w": "gift",
+        "def": "礼物",
+        "ex": "a gift"
+      },
+      {
+        "w": "overhead",
+        "def": "额外负担",
+        "ex": "not overhead"
+      },
+      {
+        "w": "note",
+        "def": "笔记",
+        "ex": "a note written today"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "to your future self",
+        "zh": "给未来的自己"
+      },
+      {
+        "ph": "a gift, not overhead",
+        "zh": "是礼物不是负担"
+      }
+    ],
+    "grammar": {
+      "point": "将来时态（you will be）：the person you will be in three months",
+      "ex": "the person you will be in three months"
+    }
+  },
+  {
+    "id": "say-no",
+    "type": "english",
+    "title": "Saying no protects the yes",
+    "source": "Essentialism",
+    "excerpt": "Every optional commitment you accept dilutes the few that matter. A clear no is what makes a real yes possible.",
+    "words": [
+      {
+        "w": "commitment",
+        "def": "承诺/投入",
+        "ex": "optional commitment"
+      },
+      {
+        "w": "dilute",
+        "def": "稀释",
+        "ex": "dilutes the few"
+      },
+      {
+        "w": "matter",
+        "def": "重要",
+        "ex": "the few that matter"
+      },
+      {
+        "w": "optional",
+        "def": "可选的",
+        "ex": "optional"
+      },
+      {
+        "w": "possible",
+        "def": "可能的",
+        "ex": "makes … possible"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "protect the yes",
+        "zh": "保护那个真正的「是」"
+      },
+      {
+        "ph": "makes … possible",
+        "zh": "让……成为可能"
+      }
+    ],
+    "grammar": {
+      "point": "every + 单数名词作主语谓语单数：Every commitment dilutes the few.",
+      "ex": "Every commitment dilutes the few that matter."
+    }
+  },
+  {
+    "id": "quiet-quit-motivation",
+    "type": "english",
+    "title": "Motivation quits quietly before performance does",
+    "source": "James Clear",
+    "excerpt": "You stop caring long before you stop showing up. By the time results drop, the engine was already cold.",
+    "words": [
+      {
+        "w": "motivation",
+        "def": "动力",
+        "ex": "motivation quits"
+      },
+      {
+        "w": "care",
+        "def": "在意",
+        "ex": "stop caring"
+      },
+      {
+        "w": "drop",
+        "def": "下滑",
+        "ex": "results drop"
+      },
+      {
+        "w": "engine",
+        "def": "引擎",
+        "ex": "the engine was cold"
+      },
+      {
+        "w": "cold",
+        "def": "冷掉的",
+        "ex": "already cold"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "quits quietly",
+        "zh": "悄悄退场"
+      },
+      {
+        "ph": "the engine was cold",
+        "zh": "引擎早已凉了"
+      }
+    ],
+    "grammar": {
+      "point": "before 引导时间从句：You stop caring before you stop showing up.",
+      "ex": "You stop caring before you stop showing up."
+    }
+  },
+  {
+    "id": "learning-public",
+    "type": "english",
+    "title": "Learning in public compounds your career",
+    "source": "Sahil Lavingia",
+    "excerpt": "Sharing what you learn turns private progress into a visible track record. Strangers hire, fund, and teach the person they can see.",
+    "words": [
+      {
+        "w": "visible",
+        "def": "可见的",
+        "ex": "a visible track record"
+      },
+      {
+        "w": "track record",
+        "def": "履历/记录",
+        "ex": "visible track record"
+      },
+      {
+        "w": "stranger",
+        "def": "陌生人",
+        "ex": "strangers hire"
+      },
+      {
+        "w": "fund",
+        "def": "资助",
+        "ex": "fund"
+      },
+      {
+        "w": "share",
+        "def": "分享",
+        "ex": "sharing what you learn"
+      }
+    ],
+    "expressions": [
+      {
+        "ph": "compounds your career",
+        "zh": "让你的职业复利增长"
+      },
+      {
+        "ph": "turn … into",
+        "zh": "把……变成……"
+      }
+    ],
+    "grammar": {
+      "point": "turn A into B：turns private progress into a visible track record.",
+      "ex": "turns private progress into a visible track record."
+    }
+  }
+]

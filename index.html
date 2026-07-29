@@ -1032,8 +1032,17 @@ window.ProjectLibrary = (function () {
 
   function get(id) { return TEMPLATES.find(function (t) { return t.id === id; }) || null; }
   function all() { return TEMPLATES.slice(); }
+  /* V1.4.2：注入远程项目案例（复用 TEMPLATES 形状）；按 id 去重，避免重复加载污染；match/get/all 不受影响 */
+  function addCases(list) {
+    (list || []).forEach(function (c) {
+      if (!c || !(c.id || c.name)) return;
+      if (c.id && TEMPLATES.some(function (t) { return t.id === c.id; })) return;
+      TEMPLATES.push(c);
+    });
+    return TEMPLATES.length;
+  }
 
-  return { match: match, get: get, all: all };
+  return { match: match, get: get, all: all, addCases: addCases };
 })();
 
 
@@ -2492,19 +2501,116 @@ window.LearningSource = (function () {
   /* LocalSource：内置静态数据源（可继续扩充内容） */
   function LocalSource(id, data){ return { id:id, type:'local', load:function(){ return data; } }; }
   /* V1.3.2 预留：联网数据源（当前不实现联网逻辑，load 返回空数组） */
-  function RemoteSource(id, endpoint){ return { id:id, type:'remote', endpoint:endpoint, async:true, load:function(){ return []; } }; }
+  /* V1.4.1 远程英语课文数据源：从同源静态 JSON 拉取（GitHub Pages 可托管），失败自动降级到本地 8 篇 */
+  /* V1.4.2：远程内容端点配置——每个 type 对应一个静态 JSON 文件；部署后手动更新文件即可扩充内容，无需改 index.html 逻辑 */
+  const REMOTE_SOURCES = [
+    { id: 'remote-en',      endpoint: './data/english-lessons.json', type: 'english' },
+    { id: 'remote-ai',      endpoint: './data/ai-courses.json',      type: 'ai' },
+    { id: 'remote-project', endpoint: './data/project-cases.json',   type: 'project' }
+  ];
+  function RemoteSource(id, endpoint, type){
+    return {
+      id: id, type: 'remote', endpoint: endpoint, contentType: type || 'english', async: true,
+      /* 拉取远程内容原始数据；网络/解析错误向上抛出，由 loadRemote 按源单独捕获降级 */
+      fetchLessons: function(){
+        return fetch(this.endpoint, { cache: 'no-cache' }).then(function(res){
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        });
+      },
+      /* 校验单条内容是否可入库（按 contentType 区分必备字段；英语需 words[]，AI/项目需 title 或 name） */
+      validate: function(o){
+        if (!o || typeof o !== 'object') return false;
+        if (!o.title && !o.name) return false;
+        if (this.contentType === 'english') {
+          var hasCat = (o.category === 'en') || (o.type === 'english') || (o.type === 'en');
+          if (!hasCat) return false;
+          if (!Array.isArray(o.words)) return false;
+        }
+        return true;
+      },
+      /* 归一化：按 contentType 路由到对应形状，强制 id 前缀避免与本地命名空间冲突 */
+      normalize: function(o){
+        if (!this.validate(o)) return null;
+        if (this.contentType === 'english') return this._normEnglish(o);
+        if (this.contentType === 'ai')      return this._normAi(o);
+        if (this.contentType === 'project') return this._normProject(o);
+        return null;
+      },
+      /* 英语：与本地 8 篇数据结构完全一致（type:'english' → category:'en'） */
+      _normEnglish: function(o){
+        var slug = String(o.title).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60);
+        var words = (o.words || []).map(function(w){
+          if (typeof w === 'string') return { w: w, def:'', ex:'' };
+          return { w: w.w, def: w.def || '', ex: w.ex || '' };
+        });
+        var expressions = (o.expressions || []).map(function(e){
+          if (typeof e === 'string') return { ph: e, zh:'' };
+          return { ph: e.ph || '', zh: e.zh || '' };
+        });
+        var grammar = o.grammar || { point:'', ex:'' };
+        var obj = {
+          id: 'ren-en-' + (o.id ? String(o.id) : (slug || U.uid('r'))),
+          category: 'en', title: o.title, source: o.source || '远程',
+          excerpt: o.excerpt || '', words: words, expressions: expressions, grammar: grammar
+        };
+        /* quiz 为可选字段：保留入库但不强制渲染（EnglishMod 暂不使用，V1.4.1 不因此大改 UI） */
+        if (o.quiz) obj.quiz = o.quiz;
+        return obj;
+      },
+      /* AI 课程：复用 BUILTIN_AI 形状（category:'ai'），进 Library 后自动出现在 AI 中心 */
+      _normAi: function(o){
+        var slug = String(o.title).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60);
+        return {
+          id: 'ren-ai-' + (o.id ? String(o.id) : (slug || U.uid('r'))),
+          category: 'ai',
+          title: o.title,
+          subtitle: o.subtitle || '',
+          source: o.source || '远程',
+          intro: o.intro || '',
+          problem: o.problem || '',
+          forWhom: o.forWhom || '',
+          caps: Array.isArray(o.caps) ? o.caps : [],
+          cases: Array.isArray(o.cases) ? o.cases : []
+        };
+      },
+      /* 项目案例：复用 ProjectLibrary TEMPLATES 形状（不进 Library，由 loadRemote 旁路入 ProjectLibrary） */
+      _normProject: function(o){
+        var slug = String(o.name || o.title || 'case').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60);
+        return {
+          id: 'prj-' + (o.id ? String(o.id) : (slug || U.uid('r'))),
+          name: o.name || o.title || '未命名案例',
+          keywords: Array.isArray(o.keywords) ? o.keywords : [],
+          intro: o.intro || '',
+          goal: o.goal || '',
+          forWhom: o.forWhom || '',
+          estDuration: o.estDuration || '',
+          stages: Array.isArray(o.stages) ? o.stages : [],
+          resources: Array.isArray(o.resources) ? o.resources : [],
+          pitfalls: Array.isArray(o.pitfalls) ? o.pitfalls : []
+        };
+      },
+      /* 旧同步接口兼容：始终返回空，远程加载走异步 loadRemote，避免阻塞启动 */
+      load: function(){ return []; }
+    };
+  }
 
   const sources = [];
   function addSource(src){ if(src && typeof src.load==='function') sources.push(src); }
   let registered = false;
+  var remoteSources = [];
   function registerBuiltin(){
     if(registered) return;
     addSource(LocalSource('builtin-en', BUILTIN_EN));
     addSource(LocalSource('builtin-ai', BUILTIN_AI));
     addSource(LocalSource('builtin-product', BUILTIN_PRODUCT));
+    /* 注册三个远程数据源（仅设置引用，不在同步 load 中拉取，避免阻塞启动） */
+    remoteSources = REMOTE_SOURCES.map(function(cfg){
+      return RemoteSource(cfg.id, cfg.endpoint, cfg.type);
+    });
     registered = true;
   }
-  /* 聚合所有数据源内容到 Library（可重复调用，按 id 幂等） */
+  /* 同步加载：仅本地内置库，保证离线/无网络时内容立即可用，永不阻塞启动（本地英语/AI/项目模板始终保留） */
   function load(){
     registerBuiltin();
     sources.forEach(function(src){
@@ -2513,7 +2619,35 @@ window.LearningSource = (function () {
     });
     return window.Library.all().length;
   }
-  return { addSource, load, LocalSource, RemoteSource, registerBuiltin,
+  /* V1.4.2 异步加载远程内容：三路并行，按 type 路由（英语/AI→Library，项目→ProjectLibrary）；
+     任一路失败仅该池降级，其余两池与本地不受影响，绝不抛错、绝不白屏 */
+  function loadRemote(){
+    if (!remoteSources.length) return Promise.resolve(0);
+    var tasks = remoteSources.map(function(rs){
+      return rs.fetchLessons().then(function(raw){
+        const list = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.lessons) ? raw.lessons : []);
+        let added = 0;
+        list.forEach(function(o){
+          const norm = rs.normalize(o);
+          if (!norm) return;
+          if (rs.contentType === 'project') {
+            if (window.ProjectLibrary && window.ProjectLibrary.addCases) window.ProjectLibrary.addCases([norm]);
+          } else {
+            window.Library.register(norm);
+          }
+          added++;
+        });
+        return added;
+      }).catch(function(err){
+        console.warn('[RemoteSource] 远程内容加载失败（' + rs.contentType + '），已降级为本地：', err);
+        return 0;
+      });
+    });
+    return Promise.all(tasks).then(function(arr){
+      return arr.reduce(function(a,b){ return a + b; }, 0);
+    });
+  }
+  return { addSource, load, loadRemote, LocalSource, RemoteSource, registerBuiltin,
     builtins: function(){ return { en: BUILTIN_EN, ai: BUILTIN_AI, product: BUILTIN_PRODUCT }; } };
 })();
 
@@ -4098,6 +4232,10 @@ window.App = (function () {
     S.load();
     // V1.3.1 加载学习数据源（LocalSource 内置库）到 LearningLibrary
     if (window.LearningSource) window.LearningSource.load();
+    // V1.4.1 异步拉取远程英语课文（RemoteSource → Library），非阻塞、失败静默降级，不影响 App 启动
+    if (window.LearningSource && window.LearningSource.loadRemote) {
+      try { window.LearningSource.loadRemote(); } catch (e) { /* 任何异常都不影响 App 启动 */ }
+    }
     applyTheme(S.data.settings.theme || 'light');
     // 底部导航
     document.querySelectorAll('.tab').forEach(b => b.onclick = () => go(b.dataset.tab));

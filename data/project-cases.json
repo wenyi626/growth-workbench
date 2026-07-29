@@ -1,0 +1,1462 @@
+[
+  {
+    "id": "magic-kitchen",
+    "type": "project",
+    "name": "魔法厨房",
+    "keywords": [
+      "食谱",
+      "餐饮",
+      "采购",
+      "家庭",
+      "AI"
+    ],
+    "intro": "把家里的食材、口味和一周安排交给 AI，自动出菜单、生成采购清单，并按做法一步步引导下厨。",
+    "goal": "做一个能根据「冰箱里有什么」生成本周菜单与采购单的家庭厨房助手。",
+    "forWhom": "讨厌每天想「吃什么」、想少外卖多做饭的家庭用户。",
+    "estDuration": "3–4 周",
+    "stages": [
+      {
+        "name": "需求与数据",
+        "steps": [
+          {
+            "title": "梳理家庭忌口与常买食材",
+            "doneCriteria": "列出 20 个常买 + 5 个忌口",
+            "estTime": "2h"
+          },
+          {
+            "title": "确定输入方式（拍照/手输）",
+            "doneCriteria": "选定一种最省事的方式",
+            "estTime": "1h"
+          }
+        ]
+      },
+      {
+        "name": "产品与提示",
+        "steps": [
+          {
+            "title": "设计菜单生成提示",
+            "doneCriteria": "输出 7 天菜单 + 采购单",
+            "estTime": "3h"
+          },
+          {
+            "title": "定义做法引导格式",
+            "doneCriteria": "分步 + 计时提醒",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "MVP 与上线",
+        "steps": [
+          {
+            "title": "用表格 + AI 跑通一周",
+            "doneCriteria": "能出可用菜单",
+            "estTime": "1 周"
+          },
+          {
+            "title": "接入拍照识别食材",
+            "doneCriteria": "能识别常用食材",
+            "estTime": "1 周"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "家常菜谱网站",
+      "营养搭配常识",
+      "WorkBuddy/ChatGPT 提示技巧"
+    ],
+    "pitfalls": [
+      "菜单不接地气（先小范围试吃）",
+      "采购单太理想化（按真实超市类目）",
+      "忽略备餐时间"
+    ]
+  },
+  {
+    "id": "xhs-system",
+    "type": "project",
+    "name": "小红书账号运营系统",
+    "keywords": [
+      "小红书",
+      "自媒体",
+      "内容",
+      "排版",
+      "选题"
+    ],
+    "intro": "从选题、标题、封面文案到发布排期，用 AI 串成可复用的内容生产流水线，降低日更门槛。",
+    "goal": "搭一个能持续产出小红书笔记（选题→草稿→标题→发布表）的运营系统。",
+    "forWhom": "想认真做号但卡在「今天发什么」的个人运营。",
+    "estDuration": "2–3 周",
+    "stages": [
+      {
+        "name": "定位与选题",
+        "steps": [
+          {
+            "title": "确定账号人设与赛道",
+            "doneCriteria": "写成一句话定位",
+            "estTime": "2h"
+          },
+          {
+            "title": "建选题库并每周补",
+            "doneCriteria": "≥30 个选题",
+            "estTime": "3h"
+          }
+        ]
+      },
+      {
+        "name": "内容生产",
+        "steps": [
+          {
+            "title": "用模板生成笔记草稿",
+            "doneCriteria": "符合账号语气",
+            "estTime": "3h"
+          },
+          {
+            "title": "生成 5 个标题 + 封面文案",
+            "doneCriteria": "可挑可改",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "排期与复盘",
+        "steps": [
+          {
+            "title": "做发布日历",
+            "doneCriteria": "排满两周",
+            "estTime": "1h"
+          },
+          {
+            "title": "周复盘数据调选题",
+            "doneCriteria": "记 3 条结论",
+            "estTime": "2h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "小红书创作学院",
+      "爆款标题公式",
+      "Prompt 模板库"
+    ],
+    "pitfalls": [
+      "盲目追热点丢人设",
+      "标题党伤账号",
+      "不复盘越做越偏"
+    ]
+  },
+  {
+    "id": "personal-blog",
+    "type": "project",
+    "name": "个人博客（自动化发布）",
+    "keywords": [
+      "博客",
+      "写作",
+      "静态站",
+      "自动化",
+      "SEO"
+    ],
+    "intro": "用静态站点 + AI 辅助写作 + 自动发布，把「想写」变成「能稳定发」，沉淀个人思考与流量。",
+    "goal": "做一个从草稿到上线的低摩擦博客系统，写作不被建站琐事打断。",
+    "forWhom": "想长期写作、积累个人品牌与搜索流量的人。",
+    "estDuration": "3–4 周",
+    "stages": [
+      {
+        "name": "选栈与结构",
+        "steps": [
+          {
+            "title": "定静态框架与托管",
+            "doneCriteria": "选定方案并跑通空站",
+            "estTime": "3h"
+          },
+          {
+            "title": "设计内容分类与模板",
+            "doneCriteria": "确定栏目与版式",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "写作流",
+        "steps": [
+          {
+            "title": "用 AI 辅助扩写与校润",
+            "doneCriteria": "草稿变可读长文",
+            "estTime": "3h"
+          },
+          {
+            "title": "自动生成摘要与标签",
+            "doneCriteria": "发布时一并产出",
+            "estTime": "1h"
+          }
+        ]
+      },
+      {
+        "name": "发布与增长",
+        "steps": [
+          {
+            "title": "配置自动部署",
+            "doneCriteria": "推送即上线",
+            "estTime": "2h"
+          },
+          {
+            "title": "接搜索与订阅",
+            "doneCriteria": "出 sitemap + RSS",
+            "estTime": "2h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "静态站点框架文档",
+      "SEO 基础",
+      "Markdown 写作规范"
+    ],
+    "pitfalls": [
+      "过度追求工具忽略内容",
+      "每次都手工改样式",
+      "不发 RSS 丢回头客"
+    ]
+  },
+  {
+    "id": "auto-report",
+    "type": "project",
+    "name": "自动化周报生成器",
+    "keywords": [
+      "报表",
+      "自动化",
+      "周报",
+      "数据",
+      "效率"
+    ],
+    "intro": "把分散在各系统（表格/看板/日历）的数据自动汇总，生成一份结构清晰的周报，省下每周拼报告的时间。",
+    "goal": "做一个定时抓取多源数据、拼成周报并推送到群/邮件的工具。",
+    "forWhom": "每周都要写周报、数据散落各处的职场人。",
+    "estDuration": "2–3 周",
+    "stages": [
+      {
+        "name": "数据源梳理",
+        "steps": [
+          {
+            "title": "列出周报要的字段",
+            "doneCriteria": "明确 10 个核心指标",
+            "estTime": "2h"
+          },
+          {
+            "title": "打通取数方式",
+            "doneCriteria": "表格/接口能取到",
+            "estTime": "3h"
+          }
+        ]
+      },
+      {
+        "name": "生成与排版",
+        "steps": [
+          {
+            "title": "写周报生成提示",
+            "doneCriteria": "固定结构输出",
+            "estTime": "3h"
+          },
+          {
+            "title": "加同比/环比与亮点",
+            "doneCriteria": "自动算变化",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "定时与推送",
+        "steps": [
+          {
+            "title": "设定时任务",
+            "doneCriteria": "周一早自动跑",
+            "estTime": "1h"
+          },
+          {
+            "title": "推送到群/邮件",
+            "doneCriteria": "到人不用手动发",
+            "estTime": "2h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "表格/看板 API 文档",
+      "模板化周报范例",
+      "定时任务工具"
+    ],
+    "pitfalls": [
+      "数据源经常变（先固定口径）",
+      "只堆数字没结论",
+      "报错无人知（加失败提醒）"
+    ]
+  },
+  {
+    "id": "ecom-dashboard",
+    "type": "project",
+    "name": "电商数据看板",
+    "keywords": [
+      "电商",
+      "数据",
+      "看板",
+      "运营",
+      "指标"
+    ],
+    "intro": "把店铺的流量、转化、客单、退款等核心指标汇成一块实时看板，让运营一眼看清健康度。",
+    "goal": "做一个每天自动更新的电商经营看板，异常指标自动标红。",
+    "forWhom": "管店铺/做运营的卖家与团队。",
+    "estDuration": "3–4 周",
+    "stages": [
+      {
+        "name": "指标定义",
+        "steps": [
+          {
+            "title": "定核心指标体系",
+            "doneCriteria": "列出 8–10 个关键指标",
+            "estTime": "3h"
+          },
+          {
+            "title": "对齐口径与来源",
+            "doneCriteria": "避免各算各的",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "取数与建模",
+        "steps": [
+          {
+            "title": "拉取订单/流量数据",
+            "doneCriteria": "能日更",
+            "estTime": "1 周"
+          },
+          {
+            "title": "建指标计算层",
+            "doneCriteria": "转化率等派生指标",
+            "estTime": "1 周"
+          }
+        ]
+      },
+      {
+        "name": "看板与预警",
+        "steps": [
+          {
+            "title": "搭可视化看板",
+            "doneCriteria": "关键指标一屏",
+            "estTime": "3h"
+          },
+          {
+            "title": "配异常预警",
+            "doneCriteria": "跌了就提醒",
+            "estTime": "2h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "电商平台开放接口",
+      "指标体系方法论",
+      "可视化工具教程"
+    ],
+    "pitfalls": [
+      "指标太多看不过来",
+      "口径不一互相打架",
+      "只看总量不看结构"
+    ]
+  },
+  {
+    "id": "english-system",
+    "type": "project",
+    "name": "英语学习系统",
+    "keywords": [
+      "英语",
+      "学习",
+      "卡片",
+      "听力",
+      "系统"
+    ],
+    "intro": "把「输入（阅读/听力）→ 抽词 → 复习」串成系统，用间隔重复把零散接触变成真正积累。",
+    "goal": "做一个能持续积累生词、按遗忘曲线复习、并能回看原文语境的英语学习系统。",
+    "forWhom": "想靠日常材料自学英语、苦于记了就忘的人。",
+    "estDuration": "3–4 周",
+    "stages": [
+      {
+        "name": "输入与抽取",
+        "steps": [
+          {
+            "title": "接阅读材料/听力稿",
+            "doneCriteria": "能导入文本",
+            "estTime": "2h"
+          },
+          {
+            "title": "自动抽生词与例句",
+            "doneCriteria": "带语境存卡",
+            "estTime": "3h"
+          }
+        ]
+      },
+      {
+        "name": "复习机制",
+        "steps": [
+          {
+            "title": "实现间隔重复",
+            "doneCriteria": "按遗忘曲线排",
+            "estTime": "1 周"
+          },
+          {
+            "title": "做错题/薄弱项加权",
+            "doneCriteria": "多考记不住的",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "回顾与输出",
+        "steps": [
+          {
+            "title": "按主题回看原文",
+            "doneCriteria": "在语境里复习",
+            "estTime": "2h"
+          },
+          {
+            "title": "加每日小测",
+            "doneCriteria": "检验留存",
+            "estTime": "2h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "间隔重复原理",
+      "词频表",
+      "原版短文素材"
+    ],
+    "pitfalls": [
+      "只收藏不复习",
+      "脱离语境背单词",
+      "难度不分级劝退"
+    ]
+  },
+  {
+    "id": "personal-assistant",
+    "type": "project",
+    "name": "个人 AI 助手",
+    "keywords": [
+      "助手",
+      "知识",
+      "问答",
+      "RAG",
+      "效率"
+    ],
+    "intro": "把你的笔记、文档、习惯喂给一个私人助手，让它基于「你自己的资料」回答，而不是泛泛而谈。",
+    "goal": "做一个只认你这一套资料的问答助手，处理「我之前记过什么」之类的问题。",
+    "forWhom": "笔记多、信息杂、总找不到自己写过啥的人。",
+    "estDuration": "3–4 周",
+    "stages": [
+      {
+        "name": "资料归集",
+        "steps": [
+          {
+            "title": "汇总笔记与文档",
+            "doneCriteria": "统一入一个库",
+            "estTime": "3h"
+          },
+          {
+            "title": "清洗与切分",
+            "doneCriteria": "便于检索",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "检索问答",
+        "steps": [
+          {
+            "title": "搭 RAG 问答",
+            "doneCriteria": "带引用回答",
+            "estTime": "1 周"
+          },
+          {
+            "title": "加记忆与偏好",
+            "doneCriteria": "记得你的习惯",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "入口与边界",
+        "steps": [
+          {
+            "title": "做聊天入口",
+            "doneCriteria": "网页/微信可用",
+            "estTime": "2h"
+          },
+          {
+            "title": "定不能乱答的边界",
+            "doneCriteria": "拿不准就明说",
+            "estTime": "2h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "RAG 教程",
+      "向量数据库文档",
+      "笔记软件导出方式"
+    ],
+    "pitfalls": [
+      "资料太乱检索失效",
+      "啥都问助手变依赖",
+      "隐私数据没隔离"
+    ]
+  },
+  {
+    "id": "habit-app",
+    "type": "project",
+    "name": "习惯养成 App",
+    "keywords": [
+      "习惯",
+      "打卡",
+      "App",
+      "动机",
+      "产品"
+    ],
+    "intro": "做一个轻量习惯打卡应用，重点不是计数，而是用提示、复盘和正反馈把行为变成惯性。",
+    "goal": "做出一个真正让人坚持下来的习惯小应用，而不是又一个三天弃的打卡器。",
+    "forWhom": "想培养阅读/运动/写作等习惯、屡败屡战的人。",
+    "estDuration": "4–6 周",
+    "stages": [
+      {
+        "name": "机制设计",
+        "steps": [
+          {
+            "title": "定习惯模型与链",
+            "doneCriteria": "支持习惯链/不中断",
+            "estTime": "3h"
+          },
+          {
+            "title": "设计正反馈",
+            "doneCriteria": "进度可见有成就感",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "原型开发",
+        "steps": [
+          {
+            "title": "搭最小可用版",
+            "doneCriteria": "能建习惯能打卡",
+            "estTime": "1 周"
+          },
+          {
+            "title": "加复盘与提醒",
+            "doneCriteria": "每晚小结",
+            "estTime": "1 周"
+          }
+        ]
+      },
+      {
+        "name": "留存打磨",
+        "steps": [
+          {
+            "title": "做周/月视图",
+            "doneCriteria": "看见趋势",
+            "estTime": "2h"
+          },
+          {
+            "title": "失效恢复机制",
+            "doneCriteria": "断了不弃",
+            "estTime": "2h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "行为设计（原子习惯）",
+      "打卡类产品参考",
+      "移动端开发基础"
+    ],
+    "pitfalls": [
+      "功能堆太多变负担",
+      "只计数无意义",
+      "断了就放弃（要做温柔恢复）"
+    ]
+  },
+  {
+    "id": "knowledge-base",
+    "type": "project",
+    "name": "个人知识库（RAG）",
+    "keywords": [
+      "知识库",
+      "RAG",
+      "笔记",
+      "检索",
+      "第二大脑"
+    ],
+    "intro": "把读过的书、文章、笔记变成可对话的「第二大脑」，随问随答、带得出处。",
+    "goal": "做一个私人知识库，读过的东西以后能检索、能追问、能连起来。",
+    "forWhom": "重度阅读、做研究、写作者。",
+    "estDuration": "3–4 周",
+    "stages": [
+      {
+        "name": "入库流程",
+        "steps": [
+          {
+            "title": "定可入库来源",
+            "doneCriteria": "书/文/笔记分类",
+            "estTime": "2h"
+          },
+          {
+            "title": "做切分与嵌入",
+            "doneCriteria": "能语义检索",
+            "estTime": "1 周"
+          }
+        ]
+      },
+      {
+        "name": "问答体验",
+        "steps": [
+          {
+            "title": "搭带引用的问答",
+            "doneCriteria": "答得出处",
+            "estTime": "1 周"
+          },
+          {
+            "title": "做关联推荐",
+            "doneCriteria": "相关问题一起给",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "维护",
+        "steps": [
+          {
+            "title": "定期整理与去重",
+            "doneCriteria": "库不烂",
+            "estTime": "持续"
+          },
+          {
+            "title": "导出读书卡片",
+            "doneCriteria": "沉淀成作品",
+            "estTime": "2h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "RAG 实践",
+      "知识管理方法论",
+      "嵌入模型选择"
+    ],
+    "pitfalls": [
+      "啥都往里塞变垃圾场",
+      "不整理检索变慢",
+      "只存不读等于没建"
+    ]
+  },
+  {
+    "id": "short-video-script",
+    "type": "project",
+    "name": "短视频脚本生成器",
+    "keywords": [
+      "短视频",
+      "脚本",
+      "文案",
+      "自媒体",
+      "AI"
+    ],
+    "intro": "输入一个主题或热点，自动产出分镜脚本、口播文案与标题，让日更短视频不再卡在「写什么」。",
+    "goal": "做一个从主题到成片脚本的生成器，覆盖选题、结构、钩子、结尾。",
+    "forWhom": "做短视频但 scripting 慢、想提效的创作者。",
+    "estDuration": "2–3 周",
+    "stages": [
+      {
+        "name": "结构模板",
+        "steps": [
+          {
+            "title": "定爆款脚本结构",
+            "doneCriteria": "钩子-价值-行动",
+            "estTime": "2h"
+          },
+          {
+            "title": "建分镜模板",
+            "doneCriteria": "画面+口播对应",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "生成流",
+        "steps": [
+          {
+            "title": "主题转脚本",
+            "doneCriteria": "一次出 3 版",
+            "estTime": "3h"
+          },
+          {
+            "title": "配标题与标签",
+            "doneCriteria": "利于分发",
+            "estTime": "1h"
+          }
+        ]
+      },
+      {
+        "name": "迭代",
+        "steps": [
+          {
+            "title": "用数据回灌优化",
+            "doneCriteria": "哪种结构完播高",
+            "estTime": "2h"
+          },
+          {
+            "title": "沉淀自己的模板",
+            "doneCriteria": "越用越准",
+            "estTime": "2h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "短视频脚本公式",
+      "平台算法常识",
+      "Prompt 模板"
+    ],
+    "pitfalls": [
+      "脚本千篇一律",
+      "只追热点无定位",
+      "不看数据瞎更"
+    ]
+  },
+  {
+    "id": "support-bot",
+    "type": "project",
+    "name": "客服自动回复机器人",
+    "keywords": [
+      "客服",
+      "机器人",
+      "RAG",
+      "工单",
+      "效率"
+    ],
+    "intro": "基于产品文档与历史工单训练一个客服助手，先草拟回复、人工确认，把重复咨询挡在前面。",
+    "goal": "做一个能基于知识库起草客服回复的机器人，降低一线重复劳动。",
+    "forWhom": "客服团队、SaaS 支持、电商售后。",
+    "estDuration": "3–4 周",
+    "stages": [
+      {
+        "name": "知识准备",
+        "steps": [
+          {
+            "title": "整理产品文档与 FAQ",
+            "doneCriteria": "结构化入库",
+            "estTime": "1 周"
+          },
+          {
+            "title": "清洗历史工单",
+            "doneCriteria": "当少样本",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "回复引擎",
+        "steps": [
+          {
+            "title": "搭 RAG 起草回复",
+            "doneCriteria": "带依据不出错",
+            "estTime": "1 周"
+          },
+          {
+            "title": "加语气与边界",
+            "doneCriteria": "该转人工就转",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "落地",
+        "steps": [
+          {
+            "title": "接工单/对话系统",
+            "doneCriteria": "在原有工具里用",
+            "estTime": "2h"
+          },
+          {
+            "title": "做人工确认环节",
+            "doneCriteria": "人把关才发",
+            "estTime": "2h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "RAG 实践",
+      "工单系统 API",
+      "客服话术规范"
+    ],
+    "pitfalls": [
+      "直接自动发易翻车",
+      "知识库过时答错",
+      "不统计命中率难优化"
+    ]
+  },
+  {
+    "id": "resume-optimizer",
+    "type": "project",
+    "name": "简历优化器",
+    "keywords": [
+      "简历",
+      "求职",
+      "文案",
+      "AI",
+      "优化"
+    ],
+    "intro": "针对目标岗位，把粗糙简历改写成更对口的表达，并标出与 JD 的匹配缺口。",
+    "goal": "做一个能按岗位 JD 优化简历、补齐关键词、指出短板的工具。",
+    "forWhom": "正在求职、海投但回应少的人。",
+    "estDuration": "2–3 周",
+    "stages": [
+      {
+        "name": "解析与匹配",
+        "steps": [
+          {
+            "title": "解析简历与 JD",
+            "doneCriteria": "抽出技能与要求",
+            "estTime": "3h"
+          },
+          {
+            "title": "算匹配度与缺口",
+            "doneCriteria": "标红短板",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "改写",
+        "steps": [
+          {
+            "title": "按岗位重写经历",
+            "doneCriteria": "用结果量化",
+            "estTime": "3h"
+          },
+          {
+            "title": "补行业关键词",
+            "doneCriteria": "不过度堆砌",
+            "estTime": "1h"
+          }
+        ]
+      },
+      {
+        "name": "校验",
+        "steps": [
+          {
+            "title": "做版本对比",
+            "doneCriteria": "改前改后一眼看",
+            "estTime": "2h"
+          },
+          {
+            "title": "加真实性提醒",
+            "doneCriteria": "不编造经历",
+            "estTime": "1h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "简历写作指南",
+      "目标行业 JD 样例",
+      "STAR 法则"
+    ],
+    "pitfalls": [
+      "编造经历埋雷",
+      "堆关键词变生硬",
+      "一份简历投所有岗"
+    ]
+  },
+  {
+    "id": "meeting-notes",
+    "type": "project",
+    "name": "会议纪要整理助手",
+    "keywords": [
+      "会议",
+      "纪要",
+      "转录",
+      "总结",
+      "效率"
+    ],
+    "intro": "录音转写后自动产出结构化纪要：结论、待办、负责人、时间点，开完会立刻有人能看。",
+    "goal": "做一个把会议录音变成可行动纪要的助手，省去人工整理。",
+    "forWhom": "会议多、整理纪要占时间的团队与个人。",
+    "estDuration": "2–3 周",
+    "stages": [
+      {
+        "name": "转录接入",
+        "steps": [
+          {
+            "title": "接语音转写",
+            "doneCriteria": "出带时间戳文稿",
+            "estTime": "2h"
+          },
+          {
+            "title": "区分说话人",
+            "doneCriteria": "谁说的清楚",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "结构化",
+        "steps": [
+          {
+            "title": "抽结论与待办",
+            "doneCriteria": "负责人+时限",
+            "estTime": "3h"
+          },
+          {
+            "title": "生成要点摘要",
+            "doneCriteria": "一分钟看完",
+            "estTime": "1h"
+          }
+        ]
+      },
+      {
+        "name": "分发",
+        "steps": [
+          {
+            "title": "推送到群/文档",
+            "doneCriteria": "开完就有",
+            "estTime": "2h"
+          },
+          {
+            "title": "待办进任务系统",
+            "doneCriteria": "不丢动作",
+            "estTime": "2h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "Whisper/转写工具",
+      "会议纪要模板",
+      "任务系统 API"
+    ],
+    "pitfalls": [
+      "转写不准没人校对",
+      "待办无负责人",
+      "纪要太长没人看"
+    ]
+  },
+  {
+    "id": "competitor-watch",
+    "type": "project",
+    "name": "竞品监控周报",
+    "keywords": [
+      "竞品",
+      "监控",
+      "周报",
+      "调研",
+      "增长"
+    ],
+    "intro": "定期抓竞品在官网、更新日志、社媒的动态，自动生成一份「这周对手干了啥」的周报。",
+    "goal": "做一个持续盯竞品、周周出简报的系统，不用自己天天刷。",
+    "forWhom": "做增长、产品、投资的同学。",
+    "estDuration": "2–3 周",
+    "stages": [
+      {
+        "name": "监控源",
+        "steps": [
+          {
+            "title": "列竞品与渠道",
+            "doneCriteria": "官网/更新/社媒",
+            "estTime": "2h"
+          },
+          {
+            "title": "接抓取或 RSS",
+            "doneCriteria": "能定时取",
+            "estTime": "3h"
+          }
+        ]
+      },
+      {
+        "name": "提炼",
+        "steps": [
+          {
+            "title": "变化自动摘要",
+            "doneCriteria": "发生了啥",
+            "estTime": "3h"
+          },
+          {
+            "title": "标重点与影响",
+            "doneCriteria": "对你意味着啥",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "投递",
+        "steps": [
+          {
+            "title": "周报自动推送",
+            "doneCriteria": "周一到点",
+            "estTime": "1h"
+          },
+          {
+            "title": "可回溯归档",
+            "doneCriteria": "能查历史",
+            "estTime": "2h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "RSS/抓取工具",
+      "竞品分析框架",
+      "摘要提示词"
+    ],
+    "pitfalls": [
+      "源太多噪声大",
+      "只罗列不变现",
+      "不归档无法对比"
+    ]
+  },
+  {
+    "id": "reading-cards",
+    "type": "project",
+    "name": "读书笔记卡片库",
+    "keywords": [
+      "读书",
+      "笔记",
+      "卡片",
+      "知识",
+      "写作"
+    ],
+    "intro": "读一书一章就抽核心观点成卡片，长期积累成可检索、可引用的个人素材库，写作时随手取用。",
+    "goal": "做一个把读书收获沉淀为卡片、并能在写作时检索调用的系统。",
+    "forWhom": "爱读书、要做内容输出的人。",
+    "estDuration": "3–4 周",
+    "stages": [
+      {
+        "name": "抽取",
+        "steps": [
+          {
+            "title": "定卡片格式",
+            "doneCriteria": "观点+出处+我的话",
+            "estTime": "2h"
+          },
+          {
+            "title": "读书即抽卡",
+            "doneCriteria": "章末自动整理",
+            "estTime": "1 周"
+          }
+        ]
+      },
+      {
+        "name": "组织",
+        "steps": [
+          {
+            "title": "打标签与链接",
+            "doneCriteria": "卡片互相关联",
+            "estTime": "2h"
+          },
+          {
+            "title": "搜索与筛选",
+            "doneCriteria": "按主题取",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "调用",
+        "steps": [
+          {
+            "title": "写作时检索引用",
+            "doneCriteria": "一键插入",
+            "estTime": "2h"
+          },
+          {
+            "title": "定期回顾温习",
+            "doneCriteria": "防止遗忘",
+            "estTime": "持续"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "卡片笔记法（Zettelkasten）",
+      "读书笔记范例",
+      "检索工具"
+    ],
+    "pitfalls": [
+      "只摘不写自己的话",
+      "不关联成孤岛",
+      "存了不回看"
+    ]
+  },
+  {
+    "id": "budget-helper",
+    "type": "project",
+    "name": "家庭记账与预算助手",
+    "keywords": [
+      "记账",
+      "预算",
+      "家庭",
+      "理财",
+      "AI"
+    ],
+    "intro": "拍照/导入账单后自动分类，结合预算给出花超预警和「钱去哪了」的可视化，让记账不痛苦。",
+    "goal": "做一个低摩擦记账 + 预算提醒的家庭财务小助手。",
+    "forWhom": "想管钱但嫌记账麻烦的人。",
+    "estDuration": "3–4 周",
+    "stages": [
+      {
+        "name": "入账",
+        "steps": [
+          {
+            "title": "账单自动分类",
+            "doneCriteria": "拍小票即归类",
+            "estTime": "1 周"
+          },
+          {
+            "title": "对接账户导出",
+            "doneCriteria": "能批量导入",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "预算",
+        "steps": [
+          {
+            "title": "设月度预算",
+            "doneCriteria": "按类目封顶",
+            "estTime": "2h"
+          },
+          {
+            "title": "超支预警",
+            "doneCriteria": "快超就提醒",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "洞察",
+        "steps": [
+          {
+            "title": "出月度报表",
+            "doneCriteria": "钱去哪了一目了然",
+            "estTime": "2h"
+          },
+          {
+            "title": "给省钱建议",
+            "doneCriteria": "基于历史",
+            "estTime": "2h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "记账分类体系",
+      "预算方法论",
+      "表格/账单导入"
+    ],
+    "pitfalls": [
+      "分类太粗没用",
+      "不预警等于没预算",
+      "手动记账难坚持"
+    ]
+  },
+  {
+    "id": "content-calendar",
+    "type": "project",
+    "name": "内容日历排期工具",
+    "keywords": [
+      "内容",
+      "排期",
+      "日历",
+      "自媒体",
+      "协作"
+    ],
+    "intro": "把多平台内容统一排进一个日历，状态、负责人、发布时间一目了然，避免遗漏和撞车。",
+    "goal": "做一个多平台内容排期日历，支持草稿—待发—已发状态流转。",
+    "forWhom": "一人管多号、或小团队协作的内容团队。",
+    "estDuration": "2–3 周",
+    "stages": [
+      {
+        "name": "模型",
+        "steps": [
+          {
+            "title": "定内容状态机",
+            "doneCriteria": "草稿→待发→已发",
+            "estTime": "2h"
+          },
+          {
+            "title": "定字段与视图",
+            "doneCriteria": "负责人/平台/时间",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "排期",
+        "steps": [
+          {
+            "title": "日历视图搭建",
+            "doneCriteria": "拖拽改期",
+            "estTime": "1 周"
+          },
+          {
+            "title": "冲突与提醒",
+            "doneCriteria": "同日多平台预警",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "协同",
+        "steps": [
+          {
+            "title": "多人可见可改",
+            "doneCriteria": "权限分清",
+            "estTime": "2h"
+          },
+          {
+            "title": "接发布提醒",
+            "doneCriteria": "到点提醒发",
+            "estTime": "1h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "内容运营 SOP",
+      "日历组件库",
+      "协作工具参考"
+    ],
+    "pitfalls": [
+      "状态混乱分不清",
+      "无负责人互相甩",
+      "不提醒照样忘发"
+    ]
+  },
+  {
+    "id": "code-review-bot",
+    "type": "project",
+    "name": "代码评审助手",
+    "keywords": [
+      "代码",
+      "评审",
+      "CI",
+      "质量",
+      "AI"
+    ],
+    "intro": "在 PR 上自动给出评审意见：明显 bug、边界遗漏、风格与安全隐患，让人把精力放在设计层面。",
+    "goal": "做一个接进代码仓库、对每次提交给初评意见的助手。",
+    "forWhom": "开发团队、开源维护者、赶进度的创业小队。",
+    "estDuration": "3–4 周",
+    "stages": [
+      {
+        "name": "接入",
+        "steps": [
+          {
+            "title": "接仓库与 PR 事件",
+            "doneCriteria": "能拿到 diff",
+            "estTime": "2h"
+          },
+          {
+            "title": "取上下文代码",
+            "doneCriteria": "不只看改动行",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "评审",
+        "steps": [
+          {
+            "title": "写评审提示",
+            "doneCriteria": "分严重级给意见",
+            "estTime": "1 周"
+          },
+          {
+            "title": "标 bug/风格/安全",
+            "doneCriteria": "分类清晰",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "落地",
+        "steps": [
+          {
+            "title": "评论到 PR",
+            "doneCriteria": "人再决断",
+            "estTime": "2h"
+          },
+          {
+            "title": "误报反馈闭环",
+            "doneCriteria": "越用越准",
+            "estTime": "2h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "代码评审规范",
+      "CI 配置",
+      "仓库 API"
+    ],
+    "pitfalls": [
+      "直接自动改代码危险",
+      "误报多被人无视",
+      "不看上下文妄断"
+    ]
+  },
+  {
+    "id": "travel-agent",
+    "type": "project",
+    "name": "旅行规划 Agent",
+    "keywords": [
+      "旅行",
+      "规划",
+      "Agent",
+      "行程",
+      "自动化"
+    ],
+    "intro": "给预算、天数、偏好，自动产出可执行的行程：交通、住宿、景点、吃饭的顺路安排与备选。",
+    "goal": "做一个能按约束生成并不断调整行程的旅行规划助手。",
+    "forWhom": "怕做攻略、又不想跟团的人。",
+    "estDuration": "3–4 周",
+    "stages": [
+      {
+        "name": "约束收集",
+        "steps": [
+          {
+            "title": "定偏好与硬约束",
+            "doneCriteria": "预算/天数/体力",
+            "estTime": "2h"
+          },
+          {
+            "title": "接目的地数据",
+            "doneCriteria": "景点/交通可查",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "规划",
+        "steps": [
+          {
+            "title": "生成日行程",
+            "doneCriteria": "顺路不乱跑",
+            "estTime": "1 周"
+          },
+          {
+            "title": "加备选与备用",
+            "doneCriteria": "一家关门有替补",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "可调",
+        "steps": [
+          {
+            "title": "支持改需求重排",
+            "doneCriteria": "说变就变",
+            "estTime": "2h"
+          },
+          {
+            "title": "导出可带走的行程",
+            "doneCriteria": "手机能看",
+            "estTime": "1h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "目的地开放数据",
+      "行程规划常识",
+      "地图/交通 API"
+    ],
+    "pitfalls": [
+      "行程太满走不动",
+      "只堆景点无节奏",
+      "不替补计划翻车"
+    ]
+  },
+  {
+    "id": "resume-screen",
+    "type": "project",
+    "name": "招聘简历初筛助手",
+    "keywords": [
+      "招聘",
+      "简历",
+      "筛选",
+      "HR",
+      "效率"
+    ],
+    "intro": "按岗位要求对简历做初筛：匹配度打分、关键经历抽取、明显不符标注，让人只看短名单。",
+    "goal": "做一个按 JD 初筛简历、给出短名单与理由的助手，减轻 HR 初筛量。",
+    "forWhom": "招人量大、初筛占时间的 HR 与团队负责人。",
+    "estDuration": "2–3 周",
+    "stages": [
+      {
+        "name": "标准",
+        "steps": [
+          {
+            "title": "从 JD 抽筛选维度",
+            "doneCriteria": "硬技能/经验/背景",
+            "estTime": "2h"
+          },
+          {
+            "title": "定打分权重",
+            "doneCriteria": "哪些一票否决",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "初筛",
+        "steps": [
+          {
+            "title": "批量评简历",
+            "doneCriteria": "出匹配分+理由",
+            "estTime": "1 周"
+          },
+          {
+            "title": "标红不符项",
+            "doneCriteria": "一眼看出来",
+            "estTime": "2h"
+          }
+        ]
+      },
+      {
+        "name": "把关",
+        "steps": [
+          {
+            "title": "只给人看短名单",
+            "doneCriteria": "人最终决",
+            "estTime": "1h"
+          },
+          {
+            "title": "留可追溯记录",
+            "doneCriteria": "合规可查",
+            "estTime": "2h"
+          }
+        ]
+      }
+    ],
+    "resources": [
+      "JD 解析方法",
+      "简历解析工具",
+      "招聘合规要求"
+    ],
+    "pitfalls": [
+      "只看分数漏潜力",
+      "一票否决太粗暴",
+      "忽视合规与偏见"
+    ]
+  }
+]

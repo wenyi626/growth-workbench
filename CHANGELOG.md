@@ -3,6 +3,54 @@
 > 格式参考 [Keep a Changelog](https://keepachangelog.com/)。版本号规范：`v1.0` / `v1.1` / `v2.0` …；开发态 `version.json` 为 `dev`。
 > 每次发版必须在此追加条目，并更新 PROJECT.md 第 2 节「当前版本」。
 
+## [v1.4.2] - Learning Content Expansion（学习内容扩展）
+
+> 本版本目标：扩充学习内容供给，把内容池从「英语 / AI 工具 / 项目模板」三路并进，未来可持续新增而**不改动 `index.html` 内容逻辑**。仅做内容扩展，不重构架构、不统一存储。
+
+### Added
+- **`RemoteSource` 支持三类内容（english / ai / project）**：`RemoteSource(id, endpoint, type)` 新增 `type` 参数；`REMOTE_SOURCES` 配置三个静态 JSON 端点（`english-lessons.json` / `ai-courses.json` / `project-cases.json`）；`normalize` 按 `type` 路由到对应形状并强制 id 前缀（`ren-en-` / `ren-ai-` / `prj-`），与本地 `en-` / `ai-` / `tpl-` 命名空间互斥，杜绝后写覆盖。
+- **英语内容扩充**：`data/english-lessons.json` 由 5 篇扩至 **25 篇远程**（保留原 5 篇 + 新增 20 篇不同主题，含 words/expressions/grammar）；加本地 8 篇，**英语总量 33 篇**。
+- **AI 课程新内容池**：新增 `data/ai-courses.json`（**13 篇**远程，覆盖 ComfyUI / Flowise / RAG / Agent / 向量数据库 / Prompt Engineering / AI 自动化 / AI 产品设计 / AI 创业案例 / Perplexity / Midjourney / Whisper / 模型微调——均为本地 11 个工具之外**真实不同主题**，无「入门/进阶/专家」式拆分灌水）；加本地 11 个，**AI 总量 24 个**。
+- **项目案例新内容池**：新增 `data/project-cases.json`（**20 个真实项目案例**，复用 `ProjectLibrary.TEMPLATES` 形状：魔法厨房 / 小红书运营系统 / 个人博客 / 自动化周报 / 电商看板 / 英语学习系统 / 个人 AI 助手 / 习惯 App / 知识库 / 短视频脚本 / 客服机器人 / 简历优化 / 会议纪要 / 竞品监控 / 读书卡片 / 家庭记账 / 内容日历 / 代码评审 / 旅行规划 / 简历初筛）；**项目案例总量 20 个**。
+- **`ProjectLibrary.addCases(list)`**：新增远程案例注入接口（按 `id` 去重 push 进 `TEMPLATES`）；`match/get/all` 不变，`ProjectEngine` / `RuleEngine` / `TodayAgent` 零改动。
+
+### Changed
+- **加载策略（三路并行、各自降级）**：`LearningSource.loadRemote()` 遍历三个远程源，按 `type` 路由——英语/AI 进 `Library`，项目旁路进 `ProjectLibrary`；任一路失败仅该池降级（静默 `warn`），其余两池与本地不受影响，绝不抛错、绝不白屏。
+- 运行时版本 `version.json` → `1.4.2`。
+
+### 约束遵守
+- 职责边界不变：`Library` / `LearningSource` / `ProjectLibrary` / `ProjectEngine` 各自职责与对外接口保持原样；英语/AI 走 `Library`，项目走 `ProjectLibrary`（Option A，不为「统一」而统一）。
+- 未修改 `pgwb_data_v1`（远程内容仅运行时进内存注册，学习进度 schema 不变，旧记录可继续学习/重学）。
+- 未触碰 AI 学习联网、自媒体热点抓取、财富/身体模块；不接入 LLM / 任何 Key / 后端；全部内容为手写静态 JSON。
+- 本地英语 8 篇、本地 AI 11 个、本地项目模板 5 个均保留不变。
+
+### 降级能力（必须满足）
+- App 可正常打开；英语/AI/项目三模块均可用；学习历史与旧记录不受影响。
+- 某路远程失败（网络/HTTP/解析/`file://`）→ 仅该池回退本地，无白屏、无异常中断；三路全失败等同 V1.4.1 现状。
+
+## [v1.4.1] - RemoteSource English（英语联网课文）
+
+> 本版本目标：让英语学习模块支持联网获取课文。仅做英语联网，不触碰 AI 学习 / 自媒体 / 财富 / ProjectEngine / RuleEngine / TodayAgent；不接入 LLM。
+
+### Added
+- **`RemoteSource` 真正联网（原为 V1.3.1 占位空壳）**：`fetchLessons()` 通过 `fetch(endpoint)` 拉取同源静态 JSON 课文；`validate(lesson)` 校验（title + category/type + words 数组，quiz 可选）；`normalize(lesson)` 将 `type:'english'` 归一为 `category:'en'`，补齐 words/expressions/grammar 默认形状，保证最终进入 `Library` 的对象与本地 8 篇完全一致。
+- **远程课文 JSON 文件**：新增 `data/english-lessons.json`（同源静态托管，GitHub Pages 可访问，无后端），首版含 5 篇远程课文（含 `type:'english'`；其中 2 篇带可选 `quiz` 字段以验证 quiz 容错）。
+- **`LearningSource.loadRemote()` 异步加载**：在 `App.load()` 中**非阻塞**调用；成功则把远程课文并入 `Library`（远程 + 本地），失败（网络/解析错误）静默降级为仅本地 8 篇，**绝不抛错、不阻塞启动**。
+- **`docs/Architecture/RemoteSource.md`**：新增架构文档，记录加载策略与降级契约。
+
+### Changed
+- **加载策略（RemoteSource 优先、LocalSource 兜底）**：`LearningSource.load()` 仍仅同步加载本地内置库（保证离线/无网络时英语立即可用、永不白屏）；远程课文通过异步 `loadRemote()` 在启动后并入，最终效果为「远程成功 → 远程+本地；远程失败 → 仅本地 8 篇」。
+
+### 约束遵守
+- 未修改本地英语课文数据结构（`{id,category:'en',title,source,excerpt,words,expressions,grammar}` 保持不变）；未改动 `Library.byCategory('en')` / `AI.generateEnglish()` / `EnglishMod.open()` 的调用契约。
+- 未触碰 AI 学习模块、自媒体热点、财富模块、`ProjectEngine`、`RuleEngine`、`TodayAgent`；不接入 LLM / OpenAI / Claude Key；不做聊天机器人。
+- 数据契约 `pgwb_data_v1` 不变（远程课文仅作为学习对象流入 `Library`，不写入存储；用户产生的学习记录仍走既有 `S.add('learning',...)` 结构）。
+- 运行时版本 `version.json` → `1.4.1`。
+
+### 降级能力（必须满足）
+- App 可正常打开；英语学习可正常使用；学习历史不受影响；`pgwb_data_v1` 不变。
+- 任何网络错误 → 静默降级本地 8 篇，无白屏、无异常中断。
+
 ## [v1.3.3] - Project Learning Foundation（项目学习引擎）
 
 > 本版本目标：把「学习」里的 Project（创造）模块从「手工记录工具」升级为「基于本地项目知识库的项目学习引擎」。新增 `ProjectLibrary`（本地项目知识库）+ `ProjectEngine`（项目路线生成器），进度与下一步改为自动计算，创建前可预览并自由调整阶段与步骤。

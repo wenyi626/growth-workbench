@@ -56,3 +56,5 @@
 - [x] 学习引擎基础 Learning Foundation（v1.3.1）：LearningLibrary + LearningSource 数据源抽象（英语8/AI11/产品2，不再写死4篇；RemoteSource 为 V1.3.2 联网预留）；英语模块改读 Library；学习历史升级「查看历史笔记 / 继续学习 / 重新学习」
 - [x] AI 工具学习中心（v1.3.1）+ 课程模板标准化（v1.3.2）：AI 页从抽象表单重构为 11 个真实 AI 工具的课程中心（由 `AIToolMod` 驱动）；v1.3.2 进一步把所有工具统一为 6 段固定模板（是什么/核心能力/实战案例/实际操作/今日任务/小测验）并行动化重写（去百科化），新增工具只填同一组字段即可复用模板。
 - [x] Project 学习引擎基础（v1.3.3）：ProjectLibrary 本地项目知识库（5 套模板：个人 AI 工作台 / 小红书账号 / 淘宝自动化 / 个人网站 / 通用兜底）+ ProjectEngine 项目路线生成器；进度/下一步自动计算，创建前预览可调，旧项目向后兼容。
+- [x] RemoteSource English（v1.4.1）：`RemoteSource` 从占位升级为真正联网数据源（`fetchLessons`/`validate`/`normalize`），新增 `data/english-lessons.json`（5 篇远程课文，含 `type:'english'`，2 篇带可选 `quiz`），`LearningSource.loadRemote()` 在 `App.load` 非阻塞并入并静默降级本地 8 篇；英语联网不触碰其它模块、不接 LLM。
+- [x] Learning Content Expansion（v1.4.2）：`RemoteSource` 扩展支持 `english`/`ai`/`project` 三类远程内容（三路并行、各自降级，按 type 路由：英语/AI 进 `Library`，项目旁路 `ProjectLibrary.addCases`）；新增 `data/ai-courses.json`（13 篇远程 AI 课程，均为本地 11 工具之外的真实主题）+ `data/project-cases.json`（20 个真实项目案例，复用 `TEMPLATES` 形状）；`english-lessons.json` 由 5 扩至 25 篇；英语 33 / AI 24 / 项目案例 20，内容供给大幅扩充，模块职责边界不变、不接 LLM、不改 `pgwb_data_v1`。
